@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('destination');
             $table->integer('number_of_seats');
             $table->decimal('price');
+            $table->string('vehicle_number');
+            $table->string('vehicle_model');
             $table->string('description');
             $table->timestamps();
         });
