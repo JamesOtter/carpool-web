@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('requests', function (Blueprint $table) {
             $table->id();
-            $table->id('rider_id');
+            $table->integer('rider_id');
             $table->string('departure');
             $table->string('destination');
             $table->integer('number_of_passengers');
