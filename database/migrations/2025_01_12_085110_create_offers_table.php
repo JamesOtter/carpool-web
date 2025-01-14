@@ -14,10 +14,14 @@ return new class extends Migration
         Schema::create('offers', function (Blueprint $table) {
             $table->id();
             $table->integer('driver_id');
-            $table->string('departure');
-            $table->string('destination');
+            $table->string('departure_address');
+            $table->float('departure_latitude');
+            $table->float('departure_longitude');
+            $table->string('destination_address');
+            $table->float('destination_latitude');
+            $table->float('destination_longitude');
             $table->integer('number_of_seats');
-            $table->decimal('price');
+            $table->float('price');
             $table->string('vehicle_number');
             $table->string('vehicle_model');
             $table->string('description');
