@@ -21,7 +21,8 @@ return new class extends Migration
             $table->string('destination_address');
             $table->decimal('destination_latitude', 10, 7);
             $table->decimal('destination_longitude', 10, 7);
-            $table->integer('number_of_passengers');
+            $table->dateTime('departure_datetime');
+            $table->integer('number_of_passenger');
             $table->decimal('price', 10, 2);
             $table->string('description')->nullable();
             $table->timestamps();
