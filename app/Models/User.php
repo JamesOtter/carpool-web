@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'contact_number',
+        'preference_id'
     ];
 
     /**
@@ -44,5 +46,14 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function preference()
+    {
+        return $this->belongsTo(Preference::class);
+    }
+    public function rides()
+    {
+        return $this->hasMany(Ride::class);
     }
 }
