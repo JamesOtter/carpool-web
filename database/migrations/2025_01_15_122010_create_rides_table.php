@@ -13,17 +13,17 @@ return new class extends Migration
     {
         Schema::create('rides', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id');
-            $table->string('ride_type');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->enum('ride_type', ['request', 'offer']);
             $table->string('departure_address');
-            $table->float('departure_latitude');
-            $table->float('departure_longitude');
+            $table->decimal('departure_latitude', 10, 7);
+            $table->decimal('departure_longitude', 10, 7);
             $table->string('destination_address');
-            $table->float('destination_latitude');
-            $table->float('destination_longitude');
+            $table->decimal('destination_latitude', 10, 7);
+            $table->decimal('destination_longitude', 10, 7);
             $table->integer('number_of_passengers');
-            $table->float('price');
-            $table->string('description');
+            $table->decimal('price', 10, 2);
+            $table->string('description')->nullable();
             $table->timestamps();
         });
     }

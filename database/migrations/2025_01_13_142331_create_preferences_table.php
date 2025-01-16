@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('preferences', function (Blueprint $table) {
             $table->id();
             $table->string('gender');
-            $table->boolean('smoking_habits');
-            $table->string('race');
-            $table->boolean('foods_and_drinks');
-            $table->string('occupation');
+            $table->boolean('smoking_habits')->nullable();
+            $table->string('race')->nullable();
+            $table->boolean('foods_and_drinks')->nullable();
+            $table->string('occupation')->nullable();
             $table->timestamps();
         });
     }
