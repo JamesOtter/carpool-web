@@ -23,6 +23,7 @@
                             <div class="ml-10 flex items-baseline space-x-4">
                                 <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
                                 <x-nav-link href="/" :active="request()->is('/')">Home</x-nav-link>
+                                <x-nav-link href="/rides" :active="request()->is('rides')">Rides</x-nav-link>
                                 <x-nav-link href="/about" :active="request()->is('about')">About</x-nav-link>
 {{--                                <x-nav-link type="button" :active="request()->is('about')">About</x-nav-link>--}}
                             </div>
@@ -103,8 +104,9 @@
             <div class="md:hidden hidden" id="mobile-menu">
                 <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
                     <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-                    <a href="/" class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white" aria-current="page">Home</a>
-                    <a href="/about" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">About</a>
+                    <x-mobile-nav-link href="/" :active="request()->is('/')">Home</x-mobile-nav-link>
+                    <x-mobile-nav-link href="/rides" :active="request()->is('rides')">Rides</x-mobile-nav-link>
+                    <x-mobile-nav-link href="/about" :active="request()->is('about')">About</x-mobile-nav-link>
                 </div>
                 <div class="border-t border-gray-700 pb-3 pt-4">
                     <div class="flex items-center px-5">

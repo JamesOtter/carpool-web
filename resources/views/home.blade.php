@@ -19,30 +19,6 @@
         Home
     </x:slot:heading>
 
-    <div id="map"></div>
+    <h1>Welcome to Carpool app.</h1>
 
-    <script>
-        var map = L.map('map').setView([4.3348, 101.1351], 15); //Default location and zoom
-
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        L.marker([4.3348, 101.1351]).addTo(map)
-            .bindPopup('A pretty CSS popup.<br> Easily customizable.')
-            .openPopup();
-
-    </script>
-
-{{--    <h1>Welcome to Carpool app.</h1>--}}
-{{--    <br>--}}
-
-{{--    <ul>--}}
-{{--        @foreach($locations as $location)--}}
-{{--            <li>--}}
-{{--                From: {{ $location['from_address'] }}--}}
-{{--            </li>--}}
-{{--        @endforeach--}}
-{{--    </ul>--}}
 </x-layout>
