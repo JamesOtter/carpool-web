@@ -21,6 +21,10 @@
 
     <div id="map"></div>
 
+    @foreach($rides as $ride)
+        <p>No.{{ $ride->id  }} address: {{ $ride->departure_address }}</p>
+    @endforeach
+
     <script>
         var map = L.map('map').setView([4.3348, 101.1351], 15); //Default location and zoom
 
