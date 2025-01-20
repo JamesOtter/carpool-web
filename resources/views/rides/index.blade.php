@@ -19,6 +19,22 @@
         Rides
     </x:slot:heading>
 
+    <div class="text-gray-600 flex justify-end pb-6">
+        <x-bladewind::toggle
+            label="Map toggle"
+        />
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2">
+        <div class="flex justify-center">
+            <h1>Content 1</h1>
+        </div>
+        <div class="flex justify-center">
+            <h1>Content 2</h1>
+        </div>
+    </div>
+
+    <br><br>
     <div id="map"></div>
 
     @foreach($rides as $ride)
