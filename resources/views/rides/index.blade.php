@@ -7,6 +7,8 @@
             #map {
                 height: 500px;
                 width: 100%;
+                position: sticky;
+                top: 100px;
             }
         </style>
     </x:slot:header>
@@ -22,26 +24,31 @@
     <div class="text-gray-600 flex justify-end pb-6">
         <x-bladewind::toggle
             label="Map toggle"
+            onclick="toggleMap()"
         />
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2">
-        <div class="flex justify-center">
-            <h1>Content 1</h1>
+    <div id="contentWrapper" class="grid grid-cols-2">
+        <div id="content_1" class="flex flex-wrap basis-1/2">
+            @foreach($rides as $ride)
+                <p>No.{{ $ride->id  }} address: {{ $ride->departure_address }}</p>
+            @endforeach
         </div>
-        <div class="flex justify-center">
-            <h1>Content 2</h1>
+        <div id="content_2" class="flex basis-1/2">
+            <div id="map"></div>
         </div>
     </div>
 
-    <br><br>
-    <div id="map"></div>
-
-    @foreach($rides as $ride)
-        <p>No.{{ $ride->id  }} address: {{ $ride->departure_address }}</p>
-    @endforeach
-
     <script>
+        function toggleMap(){
+            const content_2 = document.getElementById('content_2');
+            const contentWrapper = document.getElementById('contentWrapper');
+
+            content_2.classList.toggle('hidden');
+            contentWrapper.classList.toggle('grid-cols-1');
+            contentWrapper.classList.toggle('grid-cols-2');
+        }
+
         var map = L.map('map').setView([4.3348, 101.1351], 15); //Default location and zoom
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
