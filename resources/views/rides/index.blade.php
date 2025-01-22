@@ -5,7 +5,7 @@
 
         <style>
             #map {
-                height: 500px;
+                height: 600px;
                 width: 100%;
                 position: sticky;
                 top: 100px;
@@ -14,19 +14,59 @@
     </x:slot:header>
 
     <x:slot:title>
-        Rides
+        Search Rides
     </x:slot:title>
 
     <x:slot:heading>
-        Rides
-    </x:slot:heading>
+        <div class="flex justify-between">
+            <div class="grid grid-cols-9 gap-4">
+                <div class="col-span-2">
+                    <x-bladewind::input
+                        name="departure"
+                        label="Departure"
+                        prefix="map-pin"
+                        prefix_is_icon="true"
+                    />
+                </div>
+                <div class="col-span-2">
+                    <x-bladewind::input
+                        name="destination"
+                        label="Destination"
+                        prefix="map-pin"
+                        prefix_is_icon="true"
+                    />
+                </div>
 
-    <div class="text-gray-600 flex justify-end pb-6">
-        <x-bladewind::toggle
-            label="Map toggle"
-            onclick="toggleMap()"
-        />
-    </div>
+                <x-bladewind::datepicker
+                    min_date="{{ \Carbon\Carbon::yesterday()->format('Y-m-d') }}"
+                    label="Select a date"
+                />
+                @php
+                    $ride_type = [
+                        [ 'label' => 'Request', 'value' => 'request' ],
+                        [ 'label' => 'Offer', 'value' => 'offer' ],
+                    ];
+                @endphp
+                <x-bladewind::select
+                    name="ride_type"
+                    label="Ride type"
+                    :data="$ride_type"
+                />
+                <x-bladewind::input
+                    numeric="true"
+                    label="No. of Passenger"
+                />
+                <x-bladewind::button size="medium" radius="full" class="col-span-1 place-self-start">Search</x-bladewind::button>
+                <div class="mb-3 text-sm text-gray-600 font-medium flex justify-center">
+                    <x-bladewind::toggle
+                        label="Map toggle"
+                        checked="true"
+                        onclick="toggleMap()"
+                    />
+                </div>
+            </div>
+        </div>
+    </x:slot:heading>
 
     <div id="contentWrapper" class="grid grid-cols-2">
         <div id="content_1" class="flex flex-wrap basis-1/2">
@@ -41,9 +81,11 @@
 
     <script>
         function toggleMap(){
+            const content_1 = document.getElementById('content_1');
             const content_2 = document.getElementById('content_2');
             const contentWrapper = document.getElementById('contentWrapper');
 
+            content_1.classList.toggle('px-32');
             content_2.classList.toggle('hidden');
             contentWrapper.classList.toggle('grid-cols-1');
             contentWrapper.classList.toggle('grid-cols-2');
