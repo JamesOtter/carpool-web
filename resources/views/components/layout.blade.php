@@ -142,12 +142,12 @@
         </nav>
 
         <header class="bg-white shadow">
-            <div class="mx-auto px-4 py-6 sm:px-6 lg:px-8">
+            <div class="mx-auto px-4 pt-3 sm:px-6 lg:px-8">
                 <h1 class="text-3xl font-bold tracking-tight text-gray-900">{{ $heading }}</h1>
             </div>
         </header>
         <main>
-            <div class="mx-auto px-4 py-6 sm:px-6 lg:px-8">
+            <div class="mx-auto px-4 py-2 sm:px-6 lg:px-8">
                 {{ $slot }}
             </div>
         </main>

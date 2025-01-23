@@ -2,15 +2,6 @@
     <x:slot:header>
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-        <style>
-            #map {
-                height: 600px;
-                width: 100%;
-                position: sticky;
-                top: 100px;
-            }
-        </style>
     </x:slot:header>
 
     <x:slot:title>
@@ -68,16 +59,42 @@
         </div>
     </x:slot:heading>
 
-    <div id="contentWrapper" class="grid grid-cols-2">
-        <div id="content_1" class="flex flex-wrap basis-1/2">
+    <div class="flex h-screen">
+        <div class="w-1/2 max-h-screen overflow-auto">
             @foreach($rides as $ride)
-                <p>No.{{ $ride->id  }} address: {{ $ride->departure_address }}</p>
+                <x-bladewind::card
+                    compact="true"
+                    has_shadow="true"
+                    hover_effect="true"
+                    class="mb-2 mr-2"
+                >
+                    Username: {{ $ride->user->name }}
+                    <br>
+                    Ride type: {{ $ride->ride_type }}
+                    <br>
+                    No: {{ $ride->id }}
+                    <br>
+                    Address: {{ $ride->departure_address }}
+                    <br>
+                    Price: RM {{ $ride->price }}
+                </x-bladewind::card>
             @endforeach
         </div>
-        <div id="content_2" class="flex basis-1/2">
-            <div id="map"></div>
+        <div class="fixed right-0 w-1/2 h-screen">
+            <div id="map" class="h-full"></div>
         </div>
     </div>
+
+{{--    <div id="contentWrapper" class="grid grid-cols-2">--}}
+{{--        <div id="content_1" class="flex flex-wrap basis-1/2">--}}
+{{--            @foreach($rides as $ride)--}}
+{{--                <p>No.{{ $ride->id  }} address: {{ $ride->departure_address }}</p>--}}
+{{--            @endforeach--}}
+{{--        </div>--}}
+{{--        <div id="content_2" class="flex basis-1/2">--}}
+{{--            <div id="map"></div>--}}
+{{--        </div>--}}
+{{--    </div>--}}
 
     <script>
         function toggleMap(){
