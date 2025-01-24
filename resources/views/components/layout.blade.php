@@ -38,6 +38,17 @@
                     </div>
                     <div class="hidden md:block">
                         <div class="ml-4 flex items-center md:ml-6">
+                            <x-bladewind::button
+                                outline="true"
+                                color="cyan"
+                                size="small"
+                                radius="medium"
+                                class="mx-6"
+                                tag="a"
+                                href="/rides/create"
+                            >
+                                <x-bladewind::icon name="plus-circle" class="h-4 w-4" />Post a ride
+                            </x-bladewind::button>
                             <button type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                                 <span class="absolute -inset-1.5"></span>
                                 <span class="sr-only">View notifications</span>

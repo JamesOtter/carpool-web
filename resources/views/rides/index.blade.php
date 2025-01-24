@@ -47,7 +47,12 @@
                     numeric="true"
                     label="No. of Passenger"
                 />
-                <x-bladewind::button size="medium" radius="full" class="col-span-1 place-self-start">Search</x-bladewind::button>
+                <x-bladewind::button
+                    size="medium"
+                    radius="full"
+                    class="col-span-1 place-self-start drop-shadow-sm hover:drop-shadow-lg"
+                >Search
+                </x-bladewind::button>
                 <div class="mb-3 text-sm text-gray-600 font-medium flex justify-center">
                     <x-bladewind::toggle
                         label="Map toggle"
@@ -59,8 +64,8 @@
         </div>
     </x:slot:heading>
 
-    <div class="flex h-screen">
-        <div class="w-1/2 max-h-screen overflow-auto">
+    <div id="content_wrapper" class="flex h-screen">
+        <div id="content_1" class="w-1/2 max-h-screen overflow-auto">
             @foreach($rides as $ride)
                 <x-bladewind::card
                     compact="true"
@@ -80,32 +85,22 @@
                 </x-bladewind::card>
             @endforeach
         </div>
-        <div class="fixed right-0 w-1/2 h-screen">
+        <div id="content_2" class="fixed right-0 w-1/2 h-screen">
             <div id="map" class="h-full"></div>
         </div>
     </div>
 
-{{--    <div id="contentWrapper" class="grid grid-cols-2">--}}
-{{--        <div id="content_1" class="flex flex-wrap basis-1/2">--}}
-{{--            @foreach($rides as $ride)--}}
-{{--                <p>No.{{ $ride->id  }} address: {{ $ride->departure_address }}</p>--}}
-{{--            @endforeach--}}
-{{--        </div>--}}
-{{--        <div id="content_2" class="flex basis-1/2">--}}
-{{--            <div id="map"></div>--}}
-{{--        </div>--}}
-{{--    </div>--}}
-
     <script>
         function toggleMap(){
+            const content_wrapper = document.getElementById('content_wrapper');
             const content_1 = document.getElementById('content_1');
             const content_2 = document.getElementById('content_2');
-            const contentWrapper = document.getElementById('contentWrapper');
 
-            content_1.classList.toggle('px-32');
+            content_1.classList.toggle('w-1/2');
+            content_1.classList.toggle('w-full');
+            content_1.classList.toggle('mx-40');
+            content_1.classList.toggle('overflow-auto');
             content_2.classList.toggle('hidden');
-            contentWrapper.classList.toggle('grid-cols-1');
-            contentWrapper.classList.toggle('grid-cols-2');
         }
 
         var map = L.map('map').setView([4.3348, 101.1351], 15); //Default location and zoom
