@@ -66,23 +66,64 @@
 
     <div id="content_wrapper" class="flex h-screen">
         <div id="content_1" class="w-1/2 max-h-screen overflow-auto">
+
             @foreach($rides as $ride)
-                <x-bladewind::card
-                    compact="true"
-                    has_shadow="true"
-                    hover_effect="true"
-                    class="mb-2 mr-2"
-                >
-                    Username: {{ $ride->user->name }}
-                    <br>
-                    Ride type: {{ $ride->ride_type }}
-                    <br>
-                    No: {{ $ride->id }}
-                    <br>
-                    Address: {{ $ride->departure_address }}
-                    <br>
-                    Price: RM {{ $ride->price }}
-                </x-bladewind::card>
+                <a href="{{ route('rides.show', $ride->id) }}" class="block">
+                    <x-bladewind::card
+                        compact="true"
+                        has_shadow="true"
+                        hover_effect="true"
+                        class="mb-2 mr-2 hover:border-indigo-800"
+                    >
+                        <x-bladewind::timeline-group
+                            position="left"
+                            stacked="true"
+                            color="pink"
+                            anchor="big"
+                            completed="true"
+                        >
+                            <x-bladewind::timeline
+                                date="Departure"
+                                icon="map-pin"
+                                content="{{ $ride->departure_address }}"
+                            />
+                            <x-bladewind::timeline
+                                date="Destination"
+                                icon="map-pin"
+                                content="{{ $ride->destination_address }}"
+                            />
+                        </x-bladewind::timeline-group>
+
+                        <hr class="my-2">
+                        <div class="flex flex-auto gap-4">
+                            <div class="flex flex-auto gap-2">
+                                <x-bladewind::icon name="clock" />
+                                <div class="text-slate-500">
+                                    {{ \Carbon\Carbon::parse($ride->departure_datetime)->toDayDateTimeString() }}
+                                </div>
+                            </div>
+                            <div class="flex flex-auto gap-2">
+                                <x-bladewind::icon name="banknotes" class="text-green-500"/>
+                                <div class="text-slate-500">
+                                    RM{{ $ride->price }}
+                                </div>
+                            </div>
+                            <div class="flex flex-auto gap-2">
+                                <x-bladewind::icon name="users" />
+                                <div class="text-slate-500">
+                                    {{ $ride->number_of_passenger }} Seats
+                                </div>
+                            </div>
+                            <div>
+                                @if($ride->ride_type === 'request')
+                                    <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="orange" rounded="true" class="font-semibold" />
+                                @else
+                                    <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="cyan" rounded="true" class="font-semibold" />
+                                @endif
+                            </div>
+                        </div>
+                    </x-bladewind::card>
+                </a>
             @endforeach
         </div>
         <div id="content_2" class="fixed right-0 w-1/2 h-screen">
