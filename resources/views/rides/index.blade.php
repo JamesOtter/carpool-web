@@ -12,19 +12,17 @@
         <div class="flex justify-between">
             <div class="grid grid-cols-9 gap-4">
                 <div class="col-span-2">
-                    <x-bladewind::input
+                    <x-location-input
                         name="departure"
                         label="Departure"
-                        prefix="map-pin"
-                        prefix_is_icon="true"
+                        id="departure"
                     />
                 </div>
                 <div class="col-span-2">
-                    <x-bladewind::input
+                    <x-location-input
                         name="destination"
                         label="Destination"
-                        prefix="map-pin"
-                        prefix_is_icon="true"
+                        id="destination"
                     />
                 </div>
 
@@ -66,7 +64,6 @@
 
     <div id="content_wrapper" class="flex h-screen">
         <div id="content_1" class="w-1/2 max-h-screen overflow-auto">
-
             @foreach($rides as $ride)
                 <a href="{{ route('rides.show', $ride->id) }}" class="block">
                     <x-bladewind::card
