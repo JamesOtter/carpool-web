@@ -1,4 +1,4 @@
-@props(['name', 'placeholder' => '', 'label' => '', 'id', 'required' => false])
+@props(['name', 'placeholder' => null, 'label' => null, 'id', 'required' => false, 'error_message' => null])
 <div>
     <x-bladewind::input
         :name="$name"
@@ -9,6 +9,7 @@
         id="{{ $id }}"
         class="autocomplete-input"
         required="{{ $required }}"
+        error_message="{{ $error_message }}"
     />
 </div>
 
