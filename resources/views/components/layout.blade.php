@@ -92,7 +92,7 @@
                                         <!-- Active: "bg-gray-100 outline-none", Not Active: "" -->
                                         <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 outline-none" role="menuitem" tabindex="-1" id="user-menu-item-0">Your Profile</a>
                                         <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 outline-none" role="menuitem" tabindex="-1" id="user-menu-item-1">Settings</a>
-                                        <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-500 hover:text-white outline-none" role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</a>
+                                        <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-500 hover:text-white outline-none" role="menuitem" tabindex="-1" id="user-menu-item-2">Log out</a>
                                     </div>
                                 </div>
                             @endauth
@@ -160,7 +160,7 @@
                     <div class="mt-3 space-y-1 px-2">
                         <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Your Profile</a>
                         <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Settings</a>
-                        <a href="{{ route('logout') }}" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Sign out</a>
+                        <a href="{{ route('logout') }}" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Log out</a>
                     </div>
                 </div>
             </div>
@@ -179,6 +179,40 @@
     </div>
 
     <script>
+        document.getElementById('user-menu-item-2').addEventListener('click', function(event) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: "Confirm Logout?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top",
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
+                    Toast.fire({
+                        icon: "success",
+                        title: "Logged out"
+                    });
+                    setTimeout(function () {
+                        window.location.replace('/logout');
+                    }, 2000);
+                }
+            });
+        });
+
         function toggleDropdown() {
             const dropdown = document.getElementById('user-menu-dropdown');
             dropdown.classList.toggle('hidden');

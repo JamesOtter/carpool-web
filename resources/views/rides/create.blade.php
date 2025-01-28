@@ -19,9 +19,7 @@
         </div>
     </x:slot:heading>
 
-    <x-bladewind::notification />
-
-    <form method="POST" action="/rides" class="create-ride-form">
+    <form method="POST" action="/rides" id="create-ride-form">
         @csrf
 
         <div class="md:px-32">
@@ -112,7 +110,6 @@
                         />
                     </div>
                 </div>
-
                 <div>
                     <label for="">Description</label>
                     <x-bladewind::textarea
@@ -121,17 +118,17 @@
                         rows="10"
                     />
                 </div>
+            </div>
 
-                <div class="place-self-end">
-                    <x-bladewind::button
-                        name="btn-save"
-                        radius="medium"
-                        has_spinner="true"
-                        can_submit="true"
-                    >
-                        Post Now
-                    </x-bladewind::button>
-                </div>
+            <div class="place-self-end">
+                <x-bladewind::button
+                    name="btn-save"
+                    radius="medium"
+                    has_spinner="true"
+                    can_submit="true"
+                >
+                    Post Now
+                </x-bladewind::button>
             </div>
         </div>
     </form>
@@ -150,15 +147,4 @@
     async
     defer
 ></script>
-<script>
-    dom_el('.create-ride-form').addEventListener('submit', function (e){
-        e.preventDefault();
-        signUp();
-    });
 
-    signUp = () => {
-        (validateForm('.create-ride-form')) ?
-            unhide('.btn-save .bw-spinner') : // do this is validated
-            hide('.btn-save .bw-spinner'); // do this if not validated
-    }
-</script>
