@@ -71,6 +71,14 @@
                     class="mt-3 shadow-md hover:shadow-blue-500/50">
                     Register
                 </x-bladewind::button>
+                <x-bladewind::button
+                    name="btn-clear"
+                    type="secondary"
+                    class="ml-2 mt-3 shadow-md hover:shadow-slate-500/50"
+                    id="clear-all">
+                    Clear All
+                </x-bladewind::button>
+
             </div>
         </form>
         <div id="form-messages" class="mt-3"></div>
@@ -79,6 +87,11 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+            $('#clear-all').on('click', function(event) {
+                event.preventDefault();
+                $('#register-form').find('input').val('');
+            });
+
             $('#register-form').on('submit', function(event) {
                 event.preventDefault();
 
@@ -111,7 +124,7 @@
                         });
                         Toast.fire({
                             icon: "success",
-                            title: "Signed in successfully. Redirecting..."
+                            title: "Signed in successfully. Redirecting to home page..."
                         });
                         setTimeout(function () {
                             window.location.replace('/');

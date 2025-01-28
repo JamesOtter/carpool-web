@@ -18,7 +18,7 @@ class RegisterController extends Controller
         $attributes = $request->validate([
             'name' => ['required', 'max:255'],
             'email' => ['required', 'email', Rule::unique('users', 'email')],
-            'contact_number' => ['required'],
+            'contact_number' => ['required', 'regex:/^60\d{8,10}$/'],
             'password' => ['required', Password::min(6), 'confirmed'],
         ]);
 
