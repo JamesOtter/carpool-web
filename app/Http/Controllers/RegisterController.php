@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class RegisterController extends Controller
@@ -12,19 +13,22 @@ class RegisterController extends Controller
     public function create(){
         return view('auth.register');
     }
-    public function store(){
+    public function store(Request $request){
 
-        $attributes = request()->validate([
-            'name' => ['required'],
-            'email' => ['required', 'email'],
+        $attributes = $request->validate([
+            'name' => ['required', 'max:255'],
+            'email' => ['required', 'email', Rule::unique('users', 'email')],
             'contact_number' => ['required'],
             'password' => ['required', Password::min(6), 'confirmed'],
         ]);
 
-        $user = User::create($attributes);
+        try {
+            $user = User::create($attributes);
+            Auth::login($user);
 
-        Auth::login($user);
-
-        return redirect('/');
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
     }
 }

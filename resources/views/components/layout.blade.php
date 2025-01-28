@@ -9,6 +9,7 @@
     <link href="{{ asset('vendor/bladewind/css/animate.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('vendor/bladewind/css/bladewind-ui.min.css') }}" rel="stylesheet" />
     <script src="{{ asset('vendor/bladewind/js/helpers.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
     {{ $header }}
     <title>{{ $title }}</title>
@@ -91,7 +92,7 @@
                                         <!-- Active: "bg-gray-100 outline-none", Not Active: "" -->
                                         <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 outline-none" role="menuitem" tabindex="-1" id="user-menu-item-0">Your Profile</a>
                                         <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 outline-none" role="menuitem" tabindex="-1" id="user-menu-item-1">Settings</a>
-                                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-200 outline-none" role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</a>
+                                        <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-500 hover:text-white outline-none" role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</a>
                                     </div>
                                 </div>
                             @endauth
@@ -159,7 +160,7 @@
                     <div class="mt-3 space-y-1 px-2">
                         <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Your Profile</a>
                         <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Settings</a>
-                        <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Sign out</a>
+                        <a href="{{ route('logout') }}" class="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white">Sign out</a>
                     </div>
                 </div>
             </div>
@@ -177,7 +178,6 @@
         </main>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         function toggleDropdown() {
             const dropdown = document.getElementById('user-menu-dropdown');
