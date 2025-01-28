@@ -81,7 +81,6 @@
 
             </div>
         </form>
-        <div id="form-messages" class="mt-3"></div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -124,7 +123,7 @@
                         });
                         Toast.fire({
                             icon: "success",
-                            title: "Signed in successfully. Redirecting to home page..."
+                            title: "Account created successfully. Redirecting to home page..."
                         });
                         setTimeout(function () {
                             window.location.replace('/');

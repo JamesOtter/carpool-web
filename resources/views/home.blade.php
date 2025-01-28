@@ -16,9 +16,13 @@
     </x:slot:title>
 
     <x:slot:heading>
-        Home
+        <div class="pb-3 md:px-32">
+            <p>Home Page</p>
+        </div>
     </x:slot:heading>
 
-    <h1>Welcome to Carpool app.</h1>
+    <div class="md:px-32">
+        <h1>Welcome to Carpool app.</h1>
+    </div>
 
 </x-layout>

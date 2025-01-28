@@ -8,10 +8,14 @@
     </x:slot:title>
 
     <x:slot:heading>
-        About Page
+        <div class="pb-3 md:px-32">
+            <p>About Page</p>
+        </div>
     </x:slot:heading>
 
-    <h1>This is about page</h1>
+    <div class="md:px-32">
+        <h1>This is an about page</h1>
+    </div>
 
 </x-layout>
 

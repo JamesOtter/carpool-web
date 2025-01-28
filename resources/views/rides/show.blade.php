@@ -8,8 +8,12 @@
     </x:slot:title>
 
     <x:slot:heading>
-        Details Page
+        <div class="pb-3 md:px-32">
+            <p>Details Page</p>
+        </div>
     </x:slot:heading>
 
-    <h1>This is details page</h1>
+    <div class="md:px-32">
+        <h1>This is details page</h1>
+    </div>
 </x-layout>
