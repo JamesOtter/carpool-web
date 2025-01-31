@@ -1,14 +1,12 @@
 <x-layout>
-    <x:slot:header>
+    @section('custom-css')
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    </x:slot:header>
+    @endsection
 
-    <x:slot:title>
-        Search Rides
-    </x:slot:title>
+    @section('title', 'Search Rides')
 
-    <x:slot:heading>
+    @section('heading')
         <div class="flex justify-between">
             <div class="grid grid-cols-9 gap-4">
                 <div class="col-span-2">
@@ -60,77 +58,79 @@
                 </div>
             </div>
         </div>
-    </x:slot:heading>
+    @endsection
 
-    <div id="content_wrapper" class="flex h-screen">
-        <div id="content_1" class="w-1/2 max-h-screen overflow-auto">
-            @foreach($rides as $ride)
-                <a href="{{ route('rides.show', $ride->id) }}" class="block">
-                    <x-bladewind::card
-                        compact="true"
-                        has_shadow="true"
-                        hover_effect="true"
-                        class="mb-2 mr-2 hover:border-indigo-800"
-                    >
-                        <x-bladewind::timeline-group
-                            position="left"
-                            stacked="true"
-                            color="pink"
-                            anchor="big"
-                            completed="true"
+    @section('content')
+        <div id="content_wrapper" class="flex h-screen">
+            <div id="content_1" class="w-1/2 max-h-screen overflow-auto">
+                @foreach($rides as $ride)
+                    <a href="{{ route('rides.show', $ride->id) }}" class="block">
+                        <x-bladewind::card
+                            compact="true"
+                            has_shadow="true"
+                            hover_effect="true"
+                            class="mb-2 mr-2 hover:border-indigo-800"
                         >
-                            <x-bladewind::timeline
-                                date="Departure"
-                                icon="map-pin"
-                                content="{{ $ride->departure_address }}"
-                            />
-                            <x-bladewind::timeline
-                                date="Destination"
-                                icon="map-pin"
-                                content="{{ $ride->destination_address }}"
-                            />
-                        </x-bladewind::timeline-group>
+                            <x-bladewind::timeline-group
+                                position="left"
+                                stacked="true"
+                                color="pink"
+                                anchor="big"
+                                completed="true"
+                            >
+                                <x-bladewind::timeline
+                                    date="Departure"
+                                    icon="map-pin"
+                                    content="{{ $ride->departure_address }}"
+                                />
+                                <x-bladewind::timeline
+                                    date="Destination"
+                                    icon="map-pin"
+                                    content="{{ $ride->destination_address }}"
+                                />
+                            </x-bladewind::timeline-group>
 
-                        <hr class="my-2">
-                        <div class="flex flex-auto gap-4">
-                            <div class="flex flex-auto gap-2">
-                                <x-bladewind::icon name="clock" />
-                                <div class="text-slate-500">
-                                    {{ \Carbon\Carbon::parse($ride->departure_datetime)->toDayDateTimeString() }}
+                            <hr class="my-2">
+                            <div class="flex flex-auto gap-4">
+                                <div class="flex flex-auto gap-2">
+                                    <x-bladewind::icon name="clock" />
+                                    <div class="text-slate-500">
+                                        {{ \Carbon\Carbon::parse($ride->departure_datetime)->toDayDateTimeString() }}
+                                    </div>
+                                </div>
+                                <div class="flex flex-auto gap-2">
+                                    <x-bladewind::icon name="banknotes" class="text-green-500"/>
+                                    <div class="text-slate-500">
+                                        RM{{ $ride->price }}
+                                    </div>
+                                </div>
+                                <div class="flex flex-auto gap-2">
+                                    <x-bladewind::icon name="users" />
+                                    <div class="text-slate-500">
+                                        {{ $ride->number_of_passenger }} Seats
+                                    </div>
+                                </div>
+                                <div>
+                                    @if($ride->ride_type === 'request')
+                                        <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="orange" rounded="true" class="font-semibold" />
+                                    @else
+                                        <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="cyan" rounded="true" class="font-semibold" />
+                                    @endif
                                 </div>
                             </div>
-                            <div class="flex flex-auto gap-2">
-                                <x-bladewind::icon name="banknotes" class="text-green-500"/>
-                                <div class="text-slate-500">
-                                    RM{{ $ride->price }}
-                                </div>
-                            </div>
-                            <div class="flex flex-auto gap-2">
-                                <x-bladewind::icon name="users" />
-                                <div class="text-slate-500">
-                                    {{ $ride->number_of_passenger }} Seats
-                                </div>
-                            </div>
-                            <div>
-                                @if($ride->ride_type === 'request')
-                                    <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="orange" rounded="true" class="font-semibold" />
-                                @else
-                                    <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="cyan" rounded="true" class="font-semibold" />
-                                @endif
-                            </div>
-                        </div>
-                    </x-bladewind::card>
-                </a>
-            @endforeach
+                        </x-bladewind::card>
+                    </a>
+                @endforeach
+            </div>
+            <div id="content_2" class="fixed right-0 w-1/2 h-screen">
+                <div id="map" class="h-full"></div>
+            </div>
         </div>
-        <div id="content_2" class="fixed right-0 w-1/2 h-screen">
-            <div id="map" class="h-full"></div>
-        </div>
-    </div>
+    @endsection
 
+    @section('custom-js')
     <script>
         function toggleMap(){
-            const content_wrapper = document.getElementById('content_wrapper');
             const content_1 = document.getElementById('content_1');
             const content_2 = document.getElementById('content_2');
 
@@ -153,5 +153,5 @@
             .openPopup();
 
     </script>
-
+    @endsection
 </x-layout>

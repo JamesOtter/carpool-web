@@ -1,22 +1,23 @@
 <x-layout>
-    <x:slot:header>
+    @section('custom-css')
+    @endsection
 
-    </x:slot:header>
+    @section('title', 'About Page')
 
-    <x:slot:title>
-        About
-    </x:slot:title>
-
-    <x:slot:heading>
+    @section('heading')
         <div class="pb-3 md:px-32">
             <p>About Page</p>
         </div>
-    </x:slot:heading>
+    @endsection
 
-    <div class="md:px-32">
-        <h1>This is an about page</h1>
-    </div>
+    @section('content')
+        <div class="md:px-32">
+            <h1>This is an about page</h1>
+        </div>
+    @endsection
 
+    @section('custom-js')
+    @endsection
 </x-layout>
 
 

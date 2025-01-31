@@ -11,8 +11,11 @@
     <script src="{{ asset('vendor/bladewind/js/helpers.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
-    {{ $header }}
-    <title>{{ $title }}</title>
+
+    @yield('custom-css')
+
+    <title>@yield('title')</title>
+
     @php
         date_default_timezone_set("Asia/Kuala_Lumpur");
     @endphp
@@ -33,12 +36,13 @@
                                 <x-nav-link href="/" :active="request()->is('/')">Home</x-nav-link>
                                 <x-nav-link href="/rides" :active="request()->is('rides')">Rides</x-nav-link>
                                 <x-nav-link href="/about" :active="request()->is('about')">About</x-nav-link>
-{{--                                <x-nav-link type="button" :active="request()->is('about')">About</x-nav-link>--}}
+{{--                            <x-nav-link type="button" :active="request()->is('about')">About</x-nav-link>--}}
                             </div>
                         </div>
                     </div>
                     <div class="hidden md:block">
                         <div class="ml-4 flex items-center md:ml-6">
+{{--                        Post ride button--}}
                             <x-bladewind::button
                                 outline="true"
                                 color="cyan"
@@ -58,7 +62,6 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
                                     </svg>
                                 </button>
-
 
                                 <!-- Profile dropdown -->
                                 <div class="relative ml-3">
@@ -168,17 +171,27 @@
 
         <header class="bg-white shadow">
             <div class="mx-auto px-4 pt-3 sm:px-6 lg:px-8">
-                <h1 class="text-3xl font-bold tracking-tight text-gray-900">{{ $heading }}</h1>
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900">@yield('heading')</h1>
             </div>
         </header>
+
         <main>
             <div class="mx-auto px-4 py-2 sm:px-6 lg:px-8">
-                {{ $slot }}
+                @yield('content')
             </div>
         </main>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initAutocomplete"
+        async
+        defer
+    ></script>
+
+    @auth
     <script>
+        // Logout confirmation
         document.getElementById('user-menu-item-2').addEventListener('click', function(event) {
             event.preventDefault();
 
@@ -212,7 +225,11 @@
                 }
             });
         });
+    </script>
+    @endauth
 
+    <script>
+        // Dropdown user menu
         function toggleDropdown() {
             const dropdown = document.getElementById('user-menu-dropdown');
             dropdown.classList.toggle('hidden');
@@ -227,7 +244,7 @@
             }
         });
 
-        //mobile menu dropdown
+        //mobile user menu dropdown
         document.addEventListener("DOMContentLoaded", function () {
             const menuButton = document.getElementById("mobile-menu-button");
             const mobileMenu = document.getElementById("mobile-menu");
@@ -250,7 +267,7 @@
             });
         });
     </script>
+    @yield('custom-js')
 </body>
-
 
 </html>
