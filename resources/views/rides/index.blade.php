@@ -177,6 +177,13 @@
             });
         }
 
+        //Update prices on page load
+        $(document).ready(function() {
+            @foreach($rides as $ride)
+            updatePrice({{ $ride->id }}); // Call updatePrice for each ride
+            @endforeach
+        });
+
         // Update prices every 60 seconds (optional)
         {{--setInterval(function() {--}}
         {{--    @foreach($rides as $ride)--}}
