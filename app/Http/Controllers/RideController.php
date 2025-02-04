@@ -100,4 +100,35 @@ class RideController extends Controller
 
         return redirect()->route('rides.index')->with('success', 'Ride deleted successfully!');
     }
+
+    public function getPrice(Request $request)
+    {
+        // Get ride ID or other parameters from the request
+        $rideId = $request->input('ride_id');
+
+        // Fetch the ride details from the database
+        $ride = Ride::find($rideId);
+
+        // Calculate dynamic price (e.g., base price + surge pricing)
+        $basePrice = (float) $ride->price;
+        $surgePrice = $this->calculateSurgePrice($ride); // Your logic for surge pricing
+        $totalPrice = $basePrice + $surgePrice;
+
+        // Return the price as a JSON response
+        return response()->json([
+            'total_price' => $totalPrice,
+            'base_price' => $basePrice,
+            'surge_price' => $surgePrice,
+        ]);
+    }
+
+    private function calculateSurgePrice($ride)
+    {
+        // Example: Surge pricing during peak hours
+        $currentHour = now()->hour;
+        if ($currentHour >= 0 && $currentHour <= 24) { // Morning peak
+            return $ride->price * 0.2; // 20% surge
+        }
+        return 0; // No surge
+    }
 }
