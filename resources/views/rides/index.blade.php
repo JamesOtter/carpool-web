@@ -173,6 +173,21 @@
                 },
                 error: function(xhr) {
                     console.error('Error fetching price:', xhr.responseText);
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
+                    Toast.fire({
+                        icon: "Error",
+                        title: "Failed to fetch price"
+                    });
                 }
             });
         }
@@ -182,6 +197,22 @@
             @foreach($rides as $ride)
             updatePrice({{ $ride->id }}); // Call updatePrice for each ride
             @endforeach
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: "success",
+                title: "Price Refreshed"
+            });
         });
 
         // Update prices every 60 seconds (optional)
@@ -192,7 +223,7 @@
 
         {{--    const Toast = Swal.mixin({--}}
         {{--        toast: true,--}}
-        {{--        position: "top-end",--}}
+        {{--        position: "top",--}}
         {{--        showConfirmButton: false,--}}
         {{--        timer: 3000,--}}
         {{--        timerProgressBar: true,--}}
