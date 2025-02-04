@@ -95,7 +95,8 @@
                                 <div class="flex flex-auto gap-2">
                                     <x-bladewind::icon name="clock" />
                                     <div class="text-slate-500">
-                                        {{ \Carbon\Carbon::parse($ride->departure_datetime)->toDayDateTimeString() }}
+                                        {{ \Carbon\Carbon::parse($ride->departure_date)->format('D, M j, Y') }}
+                                        {{ \Carbon\Carbon::parse($ride->departure_time)->format('h:i A') }}
                                     </div>
                                 </div>
                                 <div class="flex flex-auto gap-2">

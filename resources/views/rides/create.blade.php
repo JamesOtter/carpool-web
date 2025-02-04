@@ -119,7 +119,7 @@
                         </div>
 
                         <div class="grow">
-                            <label for="">Price</label>
+                            <label for="">Base Price</label>
                             <x-bladewind::input
                                 name="price"
                                 placeholder="0.00"
@@ -128,6 +128,26 @@
                                 required="true"
                                 numeric="true"
                                 error_message="You will need to enter price"
+                            />
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="grow hidden" id="car_plate_number_field">
+                            <label for="">Car Plate Number</label>
+                            <x-bladewind::input
+                                name="car_plate_number"
+                                placeholder="Enter car plate number"
+                                required="true"
+                                error_message="You will need to enter car plate number"
+                            />
+                        </div>
+                        <div class="grow hidden" id="car_model_field">
+                            <label for="">Car Model</label>
+                            <x-bladewind::input
+                                name="car_model"
+                                placeholder="Enter car model"
+                                required="true"
+                                error_message="You will need to enter car model"
                             />
                         </div>
                     </div>
@@ -156,6 +176,33 @@
     @endsection
 
     @section('custom-js')
+{{--    Ride type manipulate form fields based on selection--}}
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                let rideTypeSelect = document.querySelector(".bw-ride_type");
+                let carPlateField = document.getElementById("car_plate_number_field");
+                let carModelField = document.getElementById("car_model_field");
+
+                if (!rideTypeSelect) {
+                    console.error("Element with name 'ride_type' not found!");
+                    return;
+                }
+
+                function toggleFields() {
+                    if (rideTypeSelect.value === "offer") {
+                        carPlateField.classList.remove("hidden");
+                        carModelField.classList.remove("hidden");
+                    } else {
+                        carPlateField.classList.add("hidden");
+                        carModelField.classList.add("hidden");
+                    }
+                }
+
+                toggleFields(); // Run on page load for pre-selected values
+
+                rideTypeSelect.addEventListener("change", toggleFields);
+            });
+        </script>
     @endsection
 </x-layout>
 
