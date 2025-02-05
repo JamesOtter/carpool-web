@@ -195,7 +195,7 @@
         //Update prices on page load
         $(document).ready(function() {
             @foreach($rides as $ride)
-            updatePrice({{ $ride->id }}); // Call updatePrice for each ride
+            updatePrice({{ $ride->id }});
             @endforeach
 
             const Toast = Swal.mixin({

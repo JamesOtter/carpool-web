@@ -83,7 +83,9 @@
                         dataType: "json",
                         success: function(response) {
                             Swal.close();
-                            console.log(response.status)
+                            $('.text-red-500').remove();
+                            $('input').removeClass('border-red-400');
+
                             if(response.success) {
                                 const Toast = Swal.mixin({
                                     toast: true,
@@ -118,6 +120,7 @@
 
                             $('.text-red-500').remove();
                             $('input').removeClass('border-red-400');
+
                             $('[name="password"]').val('');
 
                             for (let key in errors) {

@@ -110,24 +110,35 @@
                         dataType: "json",
                         success: function(response) {
                             Swal.close();
-                            const Toast = Swal.mixin({
-                                toast: true,
-                                position: "top",
-                                showConfirmButton: false,
-                                timer: 2000,
-                                timerProgressBar: true,
-                                didOpen: (toast) => {
-                                    toast.onmouseenter = Swal.stopTimer;
-                                    toast.onmouseleave = Swal.resumeTimer;
-                                }
-                            });
-                            Toast.fire({
-                                icon: "success",
-                                title: "Account created successfully. Redirecting to home page..."
-                            });
-                            setTimeout(function () {
-                                window.location.replace('/');
-                            }, 2000);
+                            $('.text-red-500').remove();
+                            $('input').removeClass('border-red-400');
+
+                            if(response.success){
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: "top",
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                    timerProgressBar: true,
+                                    didOpen: (toast) => {
+                                        toast.onmouseenter = Swal.stopTimer;
+                                        toast.onmouseleave = Swal.resumeTimer;
+                                    }
+                                });
+                                Toast.fire({
+                                    icon: "success",
+                                    title: "Account created successfully. Redirecting to home page..."
+                                });
+                                setTimeout(function () {
+                                    window.location.replace('/');
+                                }, 2000);
+                            }else{
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Failed to register account. Please try again.',
+                                    text: response.message
+                                });
+                            }
                         },
                         error: function(xhr) {
                             Swal.close();
@@ -135,6 +146,7 @@
 
                             $('.text-red-500').remove();
                             $('input').removeClass('border-red-400');
+
                             $('[name="password"]').val('');
                             $('[name="password_confirmation"]').val('');
 

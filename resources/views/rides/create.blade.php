@@ -167,8 +167,17 @@
                         radius="medium"
                         has_spinner="true"
                         can_submit="true"
+                        class="shadow-md shadow-blue-200 hover:shadow-blue-400"
                     >
                         Post Now
+                    </x-bladewind::button>
+                    <x-bladewind::button
+                        name="btn-clear"
+                        type="secondary"
+                        radius="medium"
+                        class="ml-2 mt-3 shadow-md hover:shadow-slate-500/50"
+                        id="clear-all">
+                        Clear All
                     </x-bladewind::button>
                 </div>
             </div>
@@ -201,6 +210,76 @@
                 toggleFields(); // Run on page load for pre-selected values
 
                 rideTypeSelect.addEventListener("change", toggleFields);
+            });
+        </script>
+        <script>
+            $(document).ready(function() {
+                $('#clear-all').on('click', function(event) {
+                    event.preventDefault();
+                    $('#create-ride-form').find('input').val('');
+                });
+
+                $('#create-ride-form').on('submit', function(event) {
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: 'Loading...',
+                        text: 'Please wait while we process your request.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    $.ajax({
+                        url: $(this).attr('action'),
+                        method: $(this).attr('method'),
+                        data: $(this).serialize(),
+                        dataType: "json",
+                        success: function(response) {
+                            Swal.close();
+                            if(response.success) {
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: "top",
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                    timerProgressBar: true,
+                                    didOpen: (toast) => {
+                                        toast.onmouseenter = Swal.stopTimer;
+                                        toast.onmouseleave = Swal.resumeTimer;
+                                    }
+                                });
+                                Toast.fire({
+                                    icon: "success",
+                                    title: "Ride created successfully. Redirecting to Rides page..."
+                                });
+                                setTimeout(function () {
+                                    window.location.replace('/rides');
+                                }, 2000);
+                            }else{
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Failed to create ride. Please try again.',
+                                    text: response.message
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            Swal.close();
+                            let errors = xhr.responseJSON.errors;
+
+                            $('.text-red-500').remove();
+                            $('input').removeClass('border-red-400');
+
+                            for (let key in errors) {
+                                let input = $('[name=' + key + ']');
+                                input.addClass('border-red-400');
+                                input.after('<p class="text-red-500 text-sm mb-2">' + errors[key][0] + '</p>');
+                            }
+                        }
+                    });
+                });
             });
         </script>
     @endsection

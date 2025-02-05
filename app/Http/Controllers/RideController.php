@@ -20,6 +20,7 @@ class RideController extends Controller
     }
     public function store(Request $request)
     {
+        dd($request);
         $validatedData = $request->validate([
             'user_id' => 'required|exists:users,id',
             'ride_type' => 'required|in:request,offer',
@@ -35,7 +36,12 @@ class RideController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $ride = Ride::create($validatedData);
+        try {
+            $ride = Ride::create($validatedData);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
 
         // If the ride type is 'offer', create an entry in the 'offers' table.
         if ($ride->ride_type === 'offer') {
@@ -44,14 +50,19 @@ class RideController extends Controller
                 'vehicle_model' => 'required|string|max:50',
             ]);
 
-            Offer::create([
-                'ride_id' => $ride->id,
-                'vehicle_number' => $request->vehicle_number,
-                'vehicle_model' => $request->vehicle_model,
-            ]);
+            try {
+                Offer::create([
+                    'ride_id' => $ride->id,
+                    'vehicle_number' => $request->vehicle_number,
+                    'vehicle_model' => $request->vehicle_model,
+                ]);
+
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            }
         }
 
-        return redirect()->route('rides.index')->with('success', 'Ride created successfully!');
+        return response()->json(['success' => true]);
     }
 
     public function show($id)
