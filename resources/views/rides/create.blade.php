@@ -267,15 +267,30 @@
                         },
                         error: function(xhr) {
                             Swal.close();
-                            let errors = xhr.responseJSON.errors;
 
-                            $('.text-red-500').remove();
-                            $('input').removeClass('border-red-400');
+                            if(xhr.status === 422) {
+                                let errors = xhr.responseJSON.errors;
 
-                            for (let key in errors) {
-                                let input = $('[name=' + key + ']');
-                                input.addClass('border-red-400');
-                                input.after('<p class="text-red-500 text-sm mb-2">' + errors[key][0] + '</p>');
+                                $('.text-red-500').remove();
+                                $('input').removeClass('border-red-400');
+
+                                for (let key in errors) {
+                                    let input = $('[name=' + key + ']');
+                                    input.addClass('border-red-400');
+                                    input.after('<p class="text-red-500 text-sm mb-2">' + errors[key][0] + '</p>');
+                                }
+                            }else if(xhr.status === 0){
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Failed to create ride.</br>Please try again.',
+                                    text: `Error ${xhr.status}: No internet connection or Server is down.`
+                                });
+                            }else{
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Failed to create ride.</br>Please try again.',
+                                    text: `Error ${xhr.status}: ${xhr.statusText}`
+                                });
                             }
                         }
                     });

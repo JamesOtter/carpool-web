@@ -226,8 +226,6 @@
             });
         });
     </script>
-    @endauth
-
     <script>
         // Dropdown user menu
         function toggleDropdown() {
@@ -267,6 +265,8 @@
             });
         });
     </script>
+    @endauth
+
     @yield('custom-js')
 </body>
 

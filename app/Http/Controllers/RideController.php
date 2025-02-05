@@ -20,7 +20,6 @@ class RideController extends Controller
     }
     public function store(Request $request)
     {
-        dd($request);
         $validatedData = $request->validate([
             'user_id' => 'required|exists:users,id',
             'ride_type' => 'required|in:request,offer',
@@ -28,7 +27,8 @@ class RideController extends Controller
             'departure_id' => 'required|string',
             'destination_address' => 'required|string|max:255',
             'destination_id' => 'required|string',
-            'departure_datetime' => 'required|date',
+            'departure_date' => 'required|date',
+            'departure_time' => 'required|date_format:H:i',
             'number_of_passenger' => 'required|integer|min:1',
             'distance' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:0',
