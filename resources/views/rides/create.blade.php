@@ -29,14 +29,12 @@
                             <x-location-input
                                 name="departure_address"
                                 placeholder="Enter departure address"
-                                id="departure"
+                                id="departure_address"
                                 required="true"
                                 error_message="You will need to enter departure address"
+                                :need_id="true"
+                                place_id="departure_id"
                             />
-                        </div>
-
-                        <div>
-                            <input type="hidden" id="departure_id" name="departure_id">
                         </div>
 
                         <div class="place-self-center">
@@ -47,15 +45,13 @@
                             <x-location-input
                                 name="destination_address"
                                 placeholder="Enter destination address"
-                                id="destination"
+                                id="destination_address"
                                 required="true"
                                 error_message="You will need to enter destination address"
+                                :need_id="true"
+                                place_id="destination_id"
                             />
                         </div>
-                    </div>
-
-                    <div>
-                        <input type="hidden" id="destination_id" name="destination_id">
                     </div>
 
                     <div class="flex flex-wrap gap-4">
@@ -111,11 +107,11 @@
                         </div>
 
                         <div>
-                            <input type="hidden" name="distance">
+                            <input type="hidden" name="distance" id="distance">
                         </div>
 
                         <div>
-                            <input type="hidden" name="duration">
+                            <input type="hidden" name="duration" id="duration">
                         </div>
 
                         <div class="grow">
@@ -185,17 +181,12 @@
     @endsection
 
     @section('custom-js')
-{{--    Ride type manipulate form fields based on selection--}}
         <script>
+            //Ride type manipulate form fields based on selection
             document.addEventListener("DOMContentLoaded", function() {
                 let rideTypeSelect = document.querySelector(".bw-ride_type");
                 let carPlateField = document.getElementById("car_plate_number_field");
                 let carModelField = document.getElementById("car_model_field");
-
-                if (!rideTypeSelect) {
-                    console.error("Element with name 'ride_type' not found!");
-                    return;
-                }
 
                 function toggleFields() {
                     if (rideTypeSelect.value === "offer") {
@@ -212,6 +203,7 @@
                 rideTypeSelect.addEventListener("change", toggleFields);
             });
         </script>
+
         <script>
             $(document).ready(function() {
                 $('#clear-all').on('click', function(event) {
