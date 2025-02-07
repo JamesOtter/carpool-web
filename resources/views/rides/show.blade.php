@@ -5,9 +5,12 @@
     @section('title', 'Details Page')
 
     @section('heading')
-        <div class="pb-3 md:px-32">
-            <p>Details Page</p>
-        </div>
+            <div class="pb-3 md:px-32">
+                <x-breadcrumbs :breadcrumbs="[
+                    ['name' => 'Rides', 'link' => '/rides'],
+                    ['name' => 'Details', 'link' => null],
+                ]"/>
+            </div>
     @endsection
 
     @section('content')

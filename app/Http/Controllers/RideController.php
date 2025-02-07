@@ -9,9 +9,30 @@ use Illuminate\Support\Facades\Auth;
 
 class RideController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $rides = Ride::with('user', 'offer')->latest()->SimplePaginate(2); //include related user and offer
+        $rides = Ride::with('user', 'offer')->latest();
+
+        // Apply filters dynamically
+        $rides->when($request->departure, function ($query, $departure) {
+            return $query->where('departure_address', $departure);
+        })
+            ->when($request->destination, function ($query, $destination) {
+                return $query->where('destination_address', $destination);
+            })
+            ->when($request->date, function ($query, $date) {
+                return $query->whereDate('departure_date', $date);
+            })
+            ->when($request->ride_type, function ($query, $ride_type) {
+                return $query->where('ride_type', $ride_type);
+            })
+            ->when($request->passengers, function ($query, $passengers) {
+                return $query->where('number_of_passenger', '>=', $passengers); // Ensuring enough seats
+            });
+
+        // Paginate the results
+        $rides = $rides->paginate(2);
+
         return view('rides.index', compact('rides'));
     }
 

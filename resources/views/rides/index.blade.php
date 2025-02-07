@@ -8,12 +8,13 @@
 
     @section('heading')
         <div class="flex justify-between">
-            <div class="grid grid-cols-9 gap-4">
+            <form method="GET" action="{{ route('rides.index') }}" class="grid grid-cols-9 gap-4">
                 <div class="col-span-2">
                     <x-location-input
                         name="departure"
                         label="Departure"
                         id="departure"
+                        value="{{ request('departure') }}"
                     />
                 </div>
                 <div class="col-span-2">
@@ -21,12 +22,15 @@
                         name="destination"
                         label="Destination"
                         id="destination"
+                        value="{{ request('destination') }}"
                     />
                 </div>
 
                 <x-bladewind::datepicker
                     min_date="{{ \Carbon\Carbon::yesterday()->format('Y-m-d') }}"
                     label="Select a date"
+                    name="date"
+                    value="{{ request('date') }}"
                 />
                 @php
                     $ride_type = [
@@ -38,16 +42,20 @@
                     name="ride_type"
                     label="Ride type"
                     :data="$ride_type"
+                    value="{{ request('ride_type') }}"
                 />
                 <x-bladewind::input
                     numeric="true"
-                    label="No. of Passenger"
+                    label="Min. Passenger"
+                    name="passengers"
+                    value="{{ request('passengers') }}"
                 />
                 <x-bladewind::button
                     size="medium"
                     radius="full"
                     class="col-span-1 place-self-start drop-shadow-sm hover:drop-shadow-lg"
-                >Search
+                    can_submit="true"
+                >Filter
                 </x-bladewind::button>
                 <div class="mb-3 text-sm text-gray-600 font-medium flex justify-center">
                     <x-bladewind::toggle
@@ -56,7 +64,7 @@
                         onclick="toggleMap()"
                     />
                 </div>
-            </div>
+            </form>
         </div>
     @endsection
 
@@ -127,7 +135,7 @@
                     @endforeach
                     <!-- This is the pagination navigation links -->
                     <div class="mr-2">
-                        {{ $rides->links() }}
+                        {{ $rides->appends(request()->query())->links() }}
                     </div>
                 @else
                     <x-bladewind::empty-state

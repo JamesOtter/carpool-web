@@ -8,9 +8,9 @@
     @section('heading')
         <div class="pb-3 md:px-32">
             <x-breadcrumbs :breadcrumbs="[
-            ['name' => 'Rides', 'link' => '/rides'],
-            ['name' => 'Create', 'link' => null],
-        ]"/>
+                ['name' => 'Rides', 'link' => '/rides'],
+                ['name' => 'Create', 'link' => null],
+            ]"/>
             <div>
                 Create Ride Form
             </div>
