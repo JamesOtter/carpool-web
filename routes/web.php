@@ -15,20 +15,34 @@ Route::get('/about', function () {
 });
 
 //Route::resource('rides', RideController::class);
-Route::get('/rides', [RideController::class, 'index'])->name('rides.index');
-Route::get('/rides/create', [RideController::class, 'create'])->name('rides.create');
-Route::post('/rides', [RideController::class, 'store'])->name('rides.store');
-Route::get('/rides/{id}', [RideController::class, 'show'])->name('rides.show');
+Route::get('/rides', [RideController::class, 'index'])
+    ->name('rides.index');
+Route::get('/rides/create', [RideController::class, 'create'])
+    ->name('rides.create')
+    ->middleware('auth');
+Route::post('/rides', [RideController::class, 'store'])
+    ->name('rides.store')
+    ->middleware('auth');
+Route::get('/rides/{id}', [RideController::class, 'show'])
+    ->name('rides.show');
 Route::get('/rides/{id}/edit', [RideController::class, 'edit'])->name('rides.edit');
 Route::patch('/rides/{id}', [RideController::class, 'update'])->name('rides.update');
 Route::delete('/rides/{id}', [RideController::class, 'destroy'])->name('rides.destroy');
+Route::post('/get-price', [RideController::class, 'getPrice'])
+    ->name('get.price');
 
-Route::post('/get-price', [RideController::class, 'getPrice'])->name('get.price');
+Route::get('/login', [SessionController::class, 'create'])
+    ->name('login')
+    ->middleware('guest');
+Route::post('/login', [SessionController::class, 'store'])
+    ->middleware('guest');
+Route::get('/logout', [SessionController::class, 'destroy'])
+    ->name('logout')
+    ->middleware('auth');
 
-Route::get('/login', [SessionController::class, 'create'])->name('login')->middleware('guest');
-Route::post('/login', [SessionController::class, 'store'])->middleware('guest');
-Route::get('/logout', [SessionController::class, 'destroy'])->name('logout')->middleware('auth');
-
-Route::get('/register', [RegisterController::class, 'create'])->name('register')->middleware('guest');
-Route::post('/register', [RegisterController::class, 'store'])->middleware('guest');
+Route::get('/register', [RegisterController::class, 'create'])
+    ->name('register')
+    ->middleware('guest');
+Route::post('/register', [RegisterController::class, 'store'])
+    ->middleware('guest');
 

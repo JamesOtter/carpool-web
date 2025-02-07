@@ -129,18 +129,18 @@
                     </div>
                     <div class="flex flex-wrap gap-4">
                         <div class="grow hidden" id="car_plate_number_field">
-                            <label for="">Car Plate Number</label>
+                            <label for="">Vehicle number</label>
                             <x-bladewind::input
-                                name="car_plate_number"
+                                name="vehicle_number"
                                 placeholder="Enter car plate number"
                                 required="true"
                                 error_message="You will need to enter car plate number"
                             />
                         </div>
                         <div class="grow hidden" id="car_model_field">
-                            <label for="">Car Model</label>
+                            <label for="">Vehicle Model</label>
                             <x-bladewind::input
-                                name="car_model"
+                                name="vehicle_model"
                                 placeholder="Enter car model"
                                 required="true"
                                 error_message="You will need to enter car model"

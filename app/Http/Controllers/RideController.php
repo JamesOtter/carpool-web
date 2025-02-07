@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Offer;
 use App\Models\Ride;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RideController extends Controller
 {
     public function index()
     {
-        $rides = Ride::with('user', 'offer')->get(); //include related user and offer
+        $rides = Ride::with('user', 'offer')->latest()->SimplePaginate(2); //include related user and offer
         return view('rides.index', compact('rides'));
     }
 
@@ -20,9 +21,7 @@ class RideController extends Controller
     }
     public function store(Request $request)
     {
-
-        $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id',
+        $request->validate([
             'ride_type' => 'required|in:request,offer',
             'departure_address' => 'required|string|max:255',
             'departure_id' => 'required|string',
@@ -38,7 +37,21 @@ class RideController extends Controller
         ]);
 
         try {
-            $ride = Ride::create($validatedData);
+            $ride = Ride::create([
+                'user_id' => Auth::user()->id,
+                'ride_type' => $request->ride_type,
+                'departure_address' => $request->departure_address,
+                'departure_id' => $request->departure_id,
+                'destination_address' => $request->destination_address,
+                'destination_id' => $request->destination_id,
+                'departure_date' => $request->departure_date,
+                'departure_time' => $request->departure_time,
+                'number_of_passenger' => $request->number_of_passenger,
+                'distance' => $request->distance,
+                'duration' => $request->duration,
+                'price' => $request->price,
+                'description' => $request->description,
+            ]);
 
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
