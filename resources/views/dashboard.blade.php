@@ -51,10 +51,46 @@
                                         <td>
                                             <div class="flex">
                                                 <div>
-                                                    <a href="#" class="px-3 py-1 mr-2 rounded-md bg-blue-500 text-white hover:bg-blue-600">Edit</a>
+                                                    <button
+                                                       class="px-3 py-1 mr-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
+                                                       onclick="showModal('edit-ride-{{ $ride->id }}')"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <x-bladewind::modal
+                                                        name="edit-ride-{{ $ride->id }}"
+                                                        blur_size="small"
+                                                        size="large"
+                                                        ok_button_label="Save Changes"
+                                                        ok_button_action=""
+                                                        show_close_icon="true"
+                                                        title="Editing Ride - {{ $ride->id }}"
+                                                        close_after_action="false"
+                                                    >
+                                                        <form action="/rides/{{ $ride->id }}" method="POST" id="edit-ride-form-{{ $ride->id }}">
+                                                            @csrf
+
+
+                                                        </form>
+
+                                                        <x-bladewind::processing
+                                                            name="ride-updating"
+                                                            message="Updating your ride." />
+
+                                                        <x-bladewind::process-complete
+                                                            name="ride-update-yes"
+                                                            process_completed_as="passed"
+                                                            button_label="Done"
+                                                            button_action="hideModal('edit-ride-{{ $ride->id }}')"
+                                                            message="Ride updated successfully." />
+                                                    </x-bladewind::modal>
                                                 </div>
                                                 <div>
-                                                    <a href="#" class="px-3 py-1 rounded-md bg-red-500 text-white hover:bg-red-600">Delete</a>
+                                                    <button
+                                                        class="px-3 py-1 rounded-md bg-red-500 text-white hover:bg-red-600"
+                                                    >
+                                                        Delete
+                                                    </button>
                                                 </div>
                                             </div>
                                         </td>
