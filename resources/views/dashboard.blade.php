@@ -60,7 +60,7 @@
                                                     <x-bladewind::modal
                                                         name="edit-ride-{{ $ride->id }}"
                                                         blur_size="small"
-                                                        size="large"
+                                                        size="xl"
                                                         ok_button_label="Save Changes"
                                                         ok_button_action=""
                                                         show_close_icon="true"
@@ -70,7 +70,143 @@
                                                         <form action="/rides/{{ $ride->id }}" method="POST" id="edit-ride-form-{{ $ride->id }}">
                                                             @csrf
 
+                                                            <div class="flex gap-4">
+                                                                <div class="grow">
+                                                                    <label for="">Departure</label>
+                                                                    <x-location-input
+                                                                        name="departure_address"
+                                                                        placeholder="Enter departure address"
+                                                                        id="departure_address"
+                                                                        required="true"
+                                                                        :need_id="true"
+                                                                        place_id="departure_id"
+                                                                        value="{{ $ride->departure_address }}"
+                                                                    />
+                                                                </div>
 
+                                                                <div class="place-self-center">
+                                                                    <x-bladewind::icon name="arrow-right-circle" class="text-green-500 h-10 w-10"/>
+                                                                </div>
+
+                                                                <div class="grow">
+                                                                    <label for="">Destination</label>
+                                                                    <x-location-input
+                                                                        name="destination_address"
+                                                                        placeholder="Enter destination address"
+                                                                        id="destination_address"
+                                                                        required="true"
+                                                                        :need_id="true"
+                                                                        place_id="destination_id"
+                                                                        value="{{ $ride->destination_address }}"
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="flex gap-4">
+                                                                <div class="grow">
+                                                                    <label for="">Select a date</label>
+                                                                    <x-bladewind::datepicker
+                                                                        min_date="{{ \Carbon\Carbon::yesterday()->format('Y-m-d') }}"
+                                                                        placeholder="Select a date"
+                                                                        required="true"
+                                                                        name="departure_date"
+                                                                        default_date="{{ $ride->departure_date }}"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <div>
+                                                                        <label for="">Select a time</label>
+                                                                    </div>
+                                                                    <div>
+                                                                        <x-bladewind::timepicker
+                                                                            format="24"
+                                                                            required="true"
+                                                                            name="departure_time"
+                                                                            selected_value="{{ $ride->departure_time }}"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <div class="grow">
+                                                                    @php
+                                                                        $ride_type = [
+                                                                            [ 'label' => 'Request', 'value' => 'request' ],
+                                                                            [ 'label' => 'Offer', 'value' => 'offer' ],
+                                                                        ];
+                                                                    @endphp
+                                                                    <label for="">Ride type</label>
+                                                                    <x-bladewind::select
+                                                                        name="ride_type"
+                                                                        placeholder="Ride type"
+                                                                        :data="$ride_type"
+                                                                        required="true"
+                                                                        selected_value="{{ $ride->ride_type }}"
+                                                                    />
+                                                                </div>
+                                                                <div class="grow">
+                                                                    <label for="">Number of passenger</label>
+                                                                    <x-bladewind::input
+                                                                        name="number_of_passenger"
+                                                                        numeric="true"
+                                                                        placeholder="No. of Passenger"
+                                                                        prefix="users"
+                                                                        prefix_is_icon="true"
+                                                                        required="true"
+                                                                        value="{{ $ride->number_of_passenger }}"
+                                                                    />
+                                                                </div>
+
+                                                                <div class="grow">
+                                                                    <label for="">Base Price</label>
+                                                                    <x-bladewind::input
+                                                                        name="price"
+                                                                        placeholder="0.00"
+                                                                        prefix="RM"
+                                                                        transparent_prefix="false"
+                                                                        required="true"
+                                                                        numeric="true"
+                                                                        error_message="You will need to enter price"
+                                                                        value="{{ $ride->price }}"
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            <div>
+                                                                <input type="hidden" name="distance" id="distance">
+                                                            </div>
+
+                                                            <div>
+                                                                <input type="hidden" name="duration" id="duration">
+                                                            </div>
+
+                                                            <div class="flex flex-wrap gap-4">
+                                                                <div class="grow hidden" id="car_plate_number_field">
+                                                                    <label for="">Vehicle number</label>
+                                                                    <x-bladewind::input
+                                                                        name="vehicle_number"
+                                                                        placeholder="Enter car plate number"
+                                                                        required="true"
+                                                                        error_message="You will need to enter car plate number"
+                                                                    />
+                                                                </div>
+                                                                <div class="grow hidden" id="car_model_field">
+                                                                    <label for="">Vehicle Model</label>
+                                                                    <x-bladewind::input
+                                                                        name="vehicle_model"
+                                                                        placeholder="Enter car model"
+                                                                        required="true"
+                                                                        error_message="You will need to enter car model"
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            <div>
+                                                                <label for="">Description</label>
+                                                                <x-bladewind::textarea
+                                                                    name="description"
+                                                                    placeholder="Add more description about your ride"
+                                                                    rows="10"
+                                                                />
+                                                            </div>
                                                         </form>
 
                                                         <x-bladewind::processing
@@ -117,6 +253,28 @@
     @endsection
 
     @section('custom-js')
+        <script>
+            //Ride type manipulate form fields based on selection
+            document.addEventListener("DOMContentLoaded", function() {
+                let rideTypeSelect = document.querySelector(".bw-ride_type");
+                let carPlateField = document.getElementById("car_plate_number_field");
+                let carModelField = document.getElementById("car_model_field");
+
+                function toggleFields() {
+                    if (rideTypeSelect.value === "offer") {
+                        carPlateField.classList.remove("hidden");
+                        carModelField.classList.remove("hidden");
+                    } else {
+                        carPlateField.classList.add("hidden");
+                        carModelField.classList.add("hidden");
+                    }
+                }
+
+                toggleFields(); // Run on page load for pre-selected values
+
+                rideTypeSelect.addEventListener("change", toggleFields);
+            });
+        </script>
     @endsection
 </x-layout>
 

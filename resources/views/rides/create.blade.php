@@ -31,7 +31,6 @@
                                 placeholder="Enter departure address"
                                 id="departure_address"
                                 required="true"
-                                error_message="You will need to enter departure address"
                                 :need_id="true"
                                 place_id="departure_id"
                             />
@@ -40,6 +39,7 @@
                         <div class="place-self-center">
                             <x-bladewind::icon name="arrow-right-circle" class="text-green-500 h-10 w-10"/>
                         </div>
+
                         <div class="grow">
                             <label for="">Destination</label>
                             <x-location-input
@@ -47,7 +47,6 @@
                                 placeholder="Enter destination address"
                                 id="destination_address"
                                 required="true"
-                                error_message="You will need to enter destination address"
                                 :need_id="true"
                                 place_id="destination_id"
                             />
@@ -62,7 +61,6 @@
                                 placeholder="Select a date"
                                 required="true"
                                 name="departure_date"
-                                error_message="You will need to select a date"
                             />
                         </div>
                         <div class="grid-rows-2">
@@ -90,7 +88,6 @@
                                 placeholder="Ride type"
                                 :data="$ride_type"
                                 required="true"
-                                error_message="You will need to select a ride type"
                             />
                         </div>
                         <div class="grow">
@@ -102,7 +99,6 @@
                                 prefix="users"
                                 prefix_is_icon="true"
                                 required="true"
-                                error_message="You will need to enter number of passenger"
                             />
                         </div>
 
@@ -123,7 +119,6 @@
                                 transparent_prefix="false"
                                 required="true"
                                 numeric="true"
-                                error_message="You will need to enter price"
                             />
                         </div>
                     </div>
@@ -134,7 +129,6 @@
                                 name="vehicle_number"
                                 placeholder="Enter car plate number"
                                 required="true"
-                                error_message="You will need to enter car plate number"
                             />
                         </div>
                         <div class="grow hidden" id="car_model_field">
@@ -143,7 +137,6 @@
                                 name="vehicle_model"
                                 placeholder="Enter car model"
                                 required="true"
-                                error_message="You will need to enter car model"
                             />
                         </div>
                     </div>

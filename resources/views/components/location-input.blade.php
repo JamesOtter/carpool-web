@@ -1,4 +1,4 @@
-@props(['name', 'placeholder' => null, 'label' => null, 'id', 'required' => false, 'error_message' => null, 'need_id' => false, 'place_id' => null])
+@props(['name', 'placeholder' => null, 'label' => null, 'id', 'required' => false, 'error_message' => null, 'need_id' => false, 'place_id' => null, 'value' => null])
 <div>
     <x-bladewind::input
         :name="$name"
@@ -11,6 +11,7 @@
         required="{{ $required }}"
         error_message="{{ $error_message }}"
         data-place-id="{{ $place_id }}"
+        value="{{ $value }}"
     />
 
     @if($need_id)
@@ -24,7 +25,6 @@
         const destinationAddress = document.getElementById('destination_address').value;
 
         if (!departureAddress || !destinationAddress) {
-            console.log('Both departure and destination addresses must be filled');
             return;
         }
 
