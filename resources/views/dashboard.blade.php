@@ -61,14 +61,15 @@
                                                         name="edit-ride-{{ $ride->id }}"
                                                         blur_size="small"
                                                         size="xl"
-                                                        ok_button_label="Save Changes"
-                                                        ok_button_action=""
+                                                        ok_button_label=""
+                                                        cancel_button_label=""
                                                         show_close_icon="true"
                                                         title="Editing Ride - {{ $ride->id }}"
                                                         close_after_action="false"
                                                     >
                                                         <form action="/rides/{{ $ride->id }}" method="POST" id="edit-ride-form-{{ $ride->id }}">
                                                             @csrf
+                                                            @method('patch')
 
                                                             <div class="flex gap-4">
                                                                 <div class="grow">
@@ -207,18 +208,29 @@
                                                                     rows="10"
                                                                 />
                                                             </div>
+                                                            <div class="grid justify-items-end">
+                                                                <x-bladewind::button
+                                                                    name="btn-save-{{ $ride->id }}"
+                                                                    radius="medium"
+                                                                    has_spinner="true"
+                                                                    can_submit="true"
+                                                                    class="shadow-md shadow-blue-200 hover:shadow-blue-400"
+                                                                >
+                                                                    Save Changes
+                                                                </x-bladewind::button>
+                                                            </div>
                                                         </form>
 
-                                                        <x-bladewind::processing
-                                                            name="ride-updating"
-                                                            message="Updating your ride." />
+{{--                                                        <x-bladewind::processing--}}
+{{--                                                            name="ride-updating"--}}
+{{--                                                            message="Updating your ride." />--}}
 
-                                                        <x-bladewind::process-complete
-                                                            name="ride-update-yes"
-                                                            process_completed_as="passed"
-                                                            button_label="Done"
-                                                            button_action="hideModal('edit-ride-{{ $ride->id }}')"
-                                                            message="Ride updated successfully." />
+{{--                                                        <x-bladewind::process-complete--}}
+{{--                                                            name="ride-update-yes"--}}
+{{--                                                            process_completed_as="passed"--}}
+{{--                                                            button_label="Done"--}}
+{{--                                                            button_action="hideModal('edit-ride-{{ $ride->id }}')"--}}
+{{--                                                            message="Ride updated successfully." />--}}
                                                     </x-bladewind::modal>
                                                 </div>
                                                 <div>
@@ -275,6 +287,87 @@
                 rideTypeSelect.addEventListener("change", toggleFields);
             });
         </script>
+            <script>
+                $(document).ready(function() {
+
+                    $('#edit-ride-form-{{ $ride->id }}').on('submit', function(event) {
+                        event.preventDefault();
+
+                        Swal.fire({
+                            title: 'Loading...',
+                            text: 'Please wait while we process your request.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        $.ajax({
+                            url: $(this).attr('action'),
+                            method: $(this).attr('method'),
+                            data: $(this).serialize(),
+                            dataType: "json",
+                            success: function(response) {
+                                Swal.close();
+                                if(response.success) {
+                                    const Toast = Swal.mixin({
+                                        toast: true,
+                                        position: "top",
+                                        showConfirmButton: false,
+                                        timer: 2000,
+                                        timerProgressBar: true,
+                                        didOpen: (toast) => {
+                                            toast.onmouseenter = Swal.stopTimer;
+                                            toast.onmouseleave = Swal.resumeTimer;
+                                        }
+                                    });
+                                    Toast.fire({
+                                        icon: "success",
+                                        title: "Ride edited successfully. Redirecting to Rides page..."
+                                    });
+                                    setTimeout(function () {
+                                        window.location.replace('/dashboard');
+                                    }, 2000);
+                                }else{
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Failed to edit ride. Please try again.',
+                                        text: response.message
+                                    });
+                                }
+                            },
+                            error: function(xhr) {
+                                Swal.close();
+
+                                if(xhr.status === 422) {
+                                    let errors = xhr.responseJSON.errors;
+
+                                    $('.text-red-500').remove();
+                                    $('input').removeClass('border-red-400');
+
+                                    for (let key in errors) {
+                                        let input = $('[name=' + key + ']');
+                                        input.addClass('border-red-400');
+                                        input.after('<p class="text-red-500 text-sm mb-2">' + errors[key][0] + '</p>');
+                                    }
+                                }else if(xhr.status === 0){
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Failed to edit ride.</br>Please try again.',
+                                        text: `Error ${xhr.status}: No internet connection or Server is down.`
+                                    });
+                                }else{
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Failed to create ride.</br>Please try again.',
+                                        text: `Error ${xhr.status}: ${xhr.statusText}`
+                                    });
+                                }
+                            }
+                        });
+                    });
+                });
+            </script>
     @endsection
 </x-layout>
 

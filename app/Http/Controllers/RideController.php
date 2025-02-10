@@ -114,6 +114,7 @@ class RideController extends Controller
 
     public function update(Request $request, $id)
     {
+        dd($id);
         $ride = Ride::findOrFail($id);
 
         $validatedData = $request->validate([
