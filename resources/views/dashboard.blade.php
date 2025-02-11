@@ -52,7 +52,7 @@
                                             <div class="flex">
                                                 <div>
                                                     <button
-                                                       class="px-3 py-1 mr-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
+                                                       class="edit-button px-3 py-1 mr-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
                                                        onclick="showModal('edit-ride-{{ $ride->id }}')"
                                                     >
                                                         Edit
@@ -75,13 +75,13 @@
                                                                 <div class="grow">
                                                                     <label for="">Departure</label>
                                                                     <x-location-input
-                                                                        name="departure_address"
+                                                                        name="departure_address-{{ $ride->id }}"
                                                                         placeholder="Enter departure address"
                                                                         id="departure_address"
                                                                         required="true"
                                                                         :need_id="true"
                                                                         place_id="departure_id"
-                                                                        value="{{ $ride->departure_address }}"
+                                                                        value="{!! $ride->departure_address !!}"
                                                                     />
                                                                 </div>
 
@@ -92,13 +92,13 @@
                                                                 <div class="grow">
                                                                     <label for="">Destination</label>
                                                                     <x-location-input
-                                                                        name="destination_address"
+                                                                        name="destination_address-{{ $ride->id }}"
                                                                         placeholder="Enter destination address"
                                                                         id="destination_address"
                                                                         required="true"
                                                                         :need_id="true"
                                                                         place_id="destination_id"
-                                                                        value="{{ $ride->destination_address }}"
+                                                                        value="{!! $ride->destination_address !!}"
                                                                     />
                                                                 </div>
                                                             </div>
@@ -110,7 +110,7 @@
                                                                         min_date="{{ \Carbon\Carbon::yesterday()->format('Y-m-d') }}"
                                                                         placeholder="Select a date"
                                                                         required="true"
-                                                                        name="departure_date"
+                                                                        name="departure_date-{{ $ride->id }}"
                                                                         default_date="{{ $ride->departure_date }}"
                                                                     />
                                                                 </div>
@@ -122,7 +122,7 @@
                                                                         <x-bladewind::timepicker
                                                                             format="24"
                                                                             required="true"
-                                                                            name="departure_time"
+                                                                            name="departure_time-{{ $ride->id }}"
                                                                             selected_value="{{ $ride->departure_time }}"
                                                                         />
                                                                     </div>
@@ -136,7 +136,7 @@
                                                                     @endphp
                                                                     <label for="">Ride type</label>
                                                                     <x-bladewind::select
-                                                                        name="ride_type"
+                                                                        name="ride_type-{{ $ride->id }}"
                                                                         placeholder="Ride type"
                                                                         :data="$ride_type"
                                                                         required="true"
@@ -146,7 +146,7 @@
                                                                 <div class="grow">
                                                                     <label for="">Number of passenger</label>
                                                                     <x-bladewind::input
-                                                                        name="number_of_passenger"
+                                                                        name="number_of_passenger-{{ $ride->id }}"
                                                                         numeric="true"
                                                                         placeholder="No. of Passenger"
                                                                         prefix="users"
@@ -159,43 +159,42 @@
                                                                 <div class="grow">
                                                                     <label for="">Base Price</label>
                                                                     <x-bladewind::input
-                                                                        name="price"
+                                                                        name="price-{{ $ride->id }}"
                                                                         placeholder="0.00"
                                                                         prefix="RM"
                                                                         transparent_prefix="false"
                                                                         required="true"
                                                                         numeric="true"
-                                                                        error_message="You will need to enter price"
                                                                         value="{{ $ride->price }}"
                                                                     />
                                                                 </div>
                                                             </div>
 
                                                             <div>
-                                                                <input type="hidden" name="distance" id="distance">
+                                                                <input type="hidden" name="distance-{{ $ride->id }}" id="distance-{{ $ride->id }}">
                                                             </div>
 
                                                             <div>
-                                                                <input type="hidden" name="duration" id="duration">
+                                                                <input type="hidden" name="duration-{{ $ride->id }}" id="duration-{{ $ride->id }}">
                                                             </div>
 
                                                             <div class="flex flex-wrap gap-4">
-                                                                <div class="grow hidden" id="car_plate_number_field">
+                                                                <div class="grow hidden" id="vehicle_plate_number_field_{{ $ride->id }}">
                                                                     <label for="">Vehicle number</label>
                                                                     <x-bladewind::input
-                                                                        name="vehicle_number"
-                                                                        placeholder="Enter car plate number"
+                                                                        name="vehicle_number-{{ $ride->id }}"
+                                                                        placeholder="Enter vehicle plate number"
                                                                         required="true"
-                                                                        error_message="You will need to enter car plate number"
+                                                                        value="{{ $ride->offer->vehicle_number ?? null}}"
                                                                     />
                                                                 </div>
-                                                                <div class="grow hidden" id="car_model_field">
+                                                                <div class="grow hidden" id="vehicle_model_field_{{ $ride->id }}">
                                                                     <label for="">Vehicle Model</label>
                                                                     <x-bladewind::input
-                                                                        name="vehicle_model"
-                                                                        placeholder="Enter car model"
+                                                                        name="vehicle_model-{{ $ride->id }}"
+                                                                        placeholder="Enter vehicle model"
                                                                         required="true"
-                                                                        error_message="You will need to enter car model"
+                                                                        value="{{ $ride->offer->vehicle_model ?? null}}"
                                                                     />
                                                                 </div>
                                                             </div>
@@ -203,7 +202,7 @@
                                                             <div>
                                                                 <label for="">Description</label>
                                                                 <x-bladewind::textarea
-                                                                    name="description"
+                                                                    name="description-{{ $ride->id }}"
                                                                     placeholder="Add more description about your ride"
                                                                     rows="10"
                                                                 />
@@ -220,17 +219,6 @@
                                                                 </x-bladewind::button>
                                                             </div>
                                                         </form>
-
-{{--                                                        <x-bladewind::processing--}}
-{{--                                                            name="ride-updating"--}}
-{{--                                                            message="Updating your ride." />--}}
-
-{{--                                                        <x-bladewind::process-complete--}}
-{{--                                                            name="ride-update-yes"--}}
-{{--                                                            process_completed_as="passed"--}}
-{{--                                                            button_label="Done"--}}
-{{--                                                            button_action="hideModal('edit-ride-{{ $ride->id }}')"--}}
-{{--                                                            message="Ride updated successfully." />--}}
                                                     </x-bladewind::modal>
                                                 </div>
                                                 <div>
@@ -266,108 +254,114 @@
 
     @section('custom-js')
         <script>
-            //Ride type manipulate form fields based on selection
-            document.addEventListener("DOMContentLoaded", function() {
-                let rideTypeSelect = document.querySelector(".bw-ride_type");
-                let carPlateField = document.getElementById("car_plate_number_field");
-                let carModelField = document.getElementById("car_model_field");
+            document.addEventListener('DOMContentLoaded', function() {
+                // Select all ride type dropdowns
+                document.querySelectorAll('[class^="bw-ride_type_"]').forEach(selectElement => {
+                    const rideId = selectElement.classList[0].split('_').pop(); // Extract ride ID from class
+                    const vehiclePlateField = document.getElementById(`vehicle_plate_number_field_${rideId}`);
+                    const vehicleModelField = document.getElementById(`vehicle_model_field_${rideId}`);
 
-                function toggleFields() {
-                    if (rideTypeSelect.value === "offer") {
-                        carPlateField.classList.remove("hidden");
-                        carModelField.classList.remove("hidden");
-                    } else {
-                        carPlateField.classList.add("hidden");
-                        carModelField.classList.add("hidden");
+                    if (!vehiclePlateField || !vehicleModelField) return; // Skip if elements are not found
+
+                    // Function to toggle fields based on the ride type
+                    function toggleVehicleFields() {
+                        if (selectElement.value === 'offer') {
+                            vehiclePlateField.classList.remove('hidden');
+                            vehicleModelField.classList.remove('hidden');
+                        } else {
+                            vehiclePlateField.classList.add('hidden');
+                            vehicleModelField.classList.add('hidden');
+                        }
                     }
-                }
 
-                toggleFields(); // Run on page load for pre-selected values
+                    // Initialize visibility on page load
+                    toggleVehicleFields();
 
-                rideTypeSelect.addEventListener("change", toggleFields);
+                    // Add event listener to detect change in ride type
+                    selectElement.addEventListener('change', toggleVehicleFields);
+                });
             });
         </script>
-            <script>
-                $(document).ready(function() {
+        <script>
+            $(document).ready(function() {
+                $('#edit-ride-form-{{ $ride->id }}').on('submit', function(event) {
+                    event.preventDefault();
 
-                    $('#edit-ride-form-{{ $ride->id }}').on('submit', function(event) {
-                        event.preventDefault();
+                    Swal.fire({
+                        title: 'Loading...',
+                        text: 'Please wait while we process your request.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
 
-                        Swal.fire({
-                            title: 'Loading...',
-                            text: 'Please wait while we process your request.',
-                            allowOutsideClick: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
-
-                        $.ajax({
-                            url: $(this).attr('action'),
-                            method: $(this).attr('method'),
-                            data: $(this).serialize(),
-                            dataType: "json",
-                            success: function(response) {
-                                Swal.close();
-                                if(response.success) {
-                                    const Toast = Swal.mixin({
-                                        toast: true,
-                                        position: "top",
-                                        showConfirmButton: false,
-                                        timer: 2000,
-                                        timerProgressBar: true,
-                                        didOpen: (toast) => {
-                                            toast.onmouseenter = Swal.stopTimer;
-                                            toast.onmouseleave = Swal.resumeTimer;
-                                        }
-                                    });
-                                    Toast.fire({
-                                        icon: "success",
-                                        title: "Ride edited successfully. Redirecting to Rides page..."
-                                    });
-                                    setTimeout(function () {
-                                        window.location.replace('/dashboard');
-                                    }, 2000);
-                                }else{
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Failed to edit ride. Please try again.',
-                                        text: response.message
-                                    });
-                                }
-                            },
-                            error: function(xhr) {
-                                Swal.close();
-
-                                if(xhr.status === 422) {
-                                    let errors = xhr.responseJSON.errors;
-
-                                    $('.text-red-500').remove();
-                                    $('input').removeClass('border-red-400');
-
-                                    for (let key in errors) {
-                                        let input = $('[name=' + key + ']');
-                                        input.addClass('border-red-400');
-                                        input.after('<p class="text-red-500 text-sm mb-2">' + errors[key][0] + '</p>');
+                    $.ajax({
+                        url: $(this).attr('action'),
+                        method: $(this).attr('method'),
+                        data: $(this).serialize(),
+                        dataType: "json",
+                        success: function(response) {
+                            Swal.close();
+                            if(response.success) {
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: "top",
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                    timerProgressBar: true,
+                                    didOpen: (toast) => {
+                                        toast.onmouseenter = Swal.stopTimer;
+                                        toast.onmouseleave = Swal.resumeTimer;
                                     }
-                                }else if(xhr.status === 0){
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Failed to edit ride.</br>Please try again.',
-                                        text: `Error ${xhr.status}: No internet connection or Server is down.`
-                                    });
-                                }else{
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Failed to create ride.</br>Please try again.',
-                                        text: `Error ${xhr.status}: ${xhr.statusText}`
-                                    });
-                                }
+                                });
+                                Toast.fire({
+                                    icon: "success",
+                                    title: "Ride edited successfully. Redirecting to Rides page..."
+                                });
+                                setTimeout(function () {
+                                    window.location.replace('/dashboard');
+                                }, 2000);
+                            }else{
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Failed to edit ride. Please try again.',
+                                    text: response.message
+                                });
                             }
-                        });
+                        },
+                        error: function(xhr) {
+                            Swal.close();
+
+                            if(xhr.status === 422) {
+                                let errors = xhr.responseJSON.errors;
+
+                                $('.text-red-500').remove();
+                                $('input').removeClass('border-red-400');
+
+                                for (let key in errors) {
+                                    let input = $('[name=' + key + ']');
+                                    input.addClass('border-red-400');
+                                    input.after('<p class="text-red-500 text-sm mb-2">' + errors[key][0] + '</p>');
+                                }
+                            }else if(xhr.status === 0){
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Failed to edit ride.</br>Please try again.',
+                                    text: `Error ${xhr.status}: No internet connection or Server is down.`
+                                });
+                            }else{
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Failed to create ride.</br>Please try again.',
+                                    text: `Error ${xhr.status}: ${xhr.statusText}`
+                                });
+                            }
+                        }
                     });
                 });
-            </script>
+            });
+        </script>
     @endsection
 </x-layout>
 

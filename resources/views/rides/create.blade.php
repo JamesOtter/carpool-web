@@ -123,19 +123,19 @@
                         </div>
                     </div>
                     <div class="flex flex-wrap gap-4">
-                        <div class="grow hidden" id="car_plate_number_field">
+                        <div class="grow hidden" id="vehicle_plate_number_field">
                             <label for="">Vehicle number</label>
                             <x-bladewind::input
                                 name="vehicle_number"
-                                placeholder="Enter car plate number"
+                                placeholder="Enter vehicle plate number"
                                 required="true"
                             />
                         </div>
-                        <div class="grow hidden" id="car_model_field">
+                        <div class="grow hidden" id="vehicle_model_field">
                             <label for="">Vehicle Model</label>
                             <x-bladewind::input
                                 name="vehicle_model"
-                                placeholder="Enter car model"
+                                placeholder="Enter vehicle model"
                                 required="true"
                             />
                         </div>
@@ -178,8 +178,8 @@
             //Ride type manipulate form fields based on selection
             document.addEventListener("DOMContentLoaded", function() {
                 let rideTypeSelect = document.querySelector(".bw-ride_type");
-                let carPlateField = document.getElementById("car_plate_number_field");
-                let carModelField = document.getElementById("car_model_field");
+                let carPlateField = document.getElementById("vehicle_plate_number_field");
+                let carModelField = document.getElementById("vehicle_model_field");
 
                 function toggleFields() {
                     if (rideTypeSelect.value === "offer") {
