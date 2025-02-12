@@ -68,6 +68,7 @@ class RideFactory extends Factory
             'duration' => fake()->numberBetween(1, 600),
             'price' => fake()->randomFloat(2, 10, 100),
             'description' => fake()->text(200),
+            'status' => fake()->randomElement(['available', 'booked', 'expired'])
         ];
     }
 }

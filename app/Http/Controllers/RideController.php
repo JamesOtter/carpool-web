@@ -11,7 +11,9 @@ class RideController extends Controller
 {
     public function index(Request $request)
     {
-        $rides = Ride::with('user', 'offer')->latest();
+        $rides = Ride::with('user', 'offer')
+            ->where('status', 'available') // Filter only available rides
+            ->latest();
 
         // Apply filters dynamically
         $rides->when($request->departure, function ($query, $departure) {

@@ -22,7 +22,8 @@ class Ride extends Model
         'duration',
         'number_of_passenger',
         'price',
-        'description'
+        'description',
+        'status'
     ];
 
     public function user()
