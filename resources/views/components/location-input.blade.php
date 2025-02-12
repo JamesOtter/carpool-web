@@ -1,4 +1,15 @@
-@props(['name', 'placeholder' => null, 'label' => null, 'id', 'required' => false, 'error_message' => null, 'need_id' => false, 'place_id' => null, 'value' => null])
+@props(['name',
+        'placeholder' => null,
+        'label' => null,
+        'id',
+        'required' => false,
+        'error_message' => null,
+        'need_id' => false,
+        'place_id' => null,
+        'value' => null,
+        'old_place_id_value' => null,
+        'ride_id_value' => 'null'
+        ])
 <div>
     <x-bladewind::input
         :name="$name"
@@ -15,14 +26,14 @@
     />
 
     @if($need_id)
-        <input type="hidden" name="{{ $place_id }}" id="{{ $place_id }}">
+        <input type="hidden" name="{{ $place_id }}" id="{{ $place_id }}" value="{{ $old_place_id_value }}">
     @endif
 </div>
 
 <script>
     function calculateDistanceAndDuration() {
-        const departureAddress = document.getElementById('departure_address').value;
-        const destinationAddress = document.getElementById('destination_address').value;
+        const departureAddress = document.getElementById('departure_address').value ?? document.getElementById('departure_address_{{ $ride_id_value }}').value;
+        const destinationAddress = document.getElementById('destination_address').value ?? document.getElementById('destination_address_{{ $ride_id_value }}').value;
 
         if (!departureAddress || !destinationAddress) {
             return;
@@ -46,8 +57,14 @@
                     const distanceInKilometers = distanceInMeters / 1000;
                     const durationInMinutes = Math.round(durationInSeconds / 60);
 
-                    document.getElementById('distance').value = distanceInKilometers.toFixed(2);  // Show distance with 2 decimal places
-                    document.getElementById('duration').value = durationInMinutes;
+                    if({{ $ride_id_value }} !== 'null'){
+                        document.getElementById('distance_{{ $ride_id_value }}').value = distanceInKilometers.toFixed(2);  // Show distance with 2 decimal places
+                        document.getElementById('duration_{{ $ride_id_value }}').value = durationInMinutes;
+                    }else{
+                        document.getElementById('distance').value = distanceInKilometers.toFixed(2);  // Show distance with 2 decimal places
+                        document.getElementById('duration').value = durationInMinutes;
+                    }
+
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -85,7 +102,8 @@
                     }
                 }
 
-                if (document.getElementById('departure_address').value && document.getElementById('destination_address').value) {
+                if ((document.getElementById('departure_address').value && document.getElementById('destination_address').value) ||
+                    (document.getElementById('departure_address_{{ $ride_id_value }}').value && document.getElementById('destination_address_{{ $ride_id_value }}').value)) {
                     calculateDistanceAndDuration();  // Call the function when both addresses are entered
                 }
             });

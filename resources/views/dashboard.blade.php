@@ -82,7 +82,9 @@
                                                                         id="departure_address"
                                                                         required="true"
                                                                         :need_id="true"
-                                                                        place_id="departure_id"
+                                                                        place_id="departure_id_{{ $ride->id }}"
+                                                                        old_place_id_value="{{ $ride->departure_id }}"
+                                                                        ride_id_value="{{ $ride->id }}"
                                                                         value="{!! $ride->departure_address !!}"
                                                                     />
                                                                 </div>
@@ -99,7 +101,9 @@
                                                                         id="destination_address"
                                                                         required="true"
                                                                         :need_id="true"
-                                                                        place_id="destination_id"
+                                                                        place_id="destination_id_{{ $ride->id }}"
+                                                                        old_place_id_value="{{ $ride->destination_id }}"
+                                                                        ride_id_value="{{ $ride->id }}"
                                                                         value="{!! $ride->destination_address !!}"
                                                                     />
                                                                 </div>
@@ -173,11 +177,11 @@
                                                             </div>
 
                                                             <div>
-                                                                <input type="hidden" name="distance-{{ $ride->id }}" id="distance-{{ $ride->id }}">
+                                                                <input type="hidden" name="distance_{{ $ride->id }}" id="distance_{{ $ride->id }}" value="{{ $ride->distance }}">
                                                             </div>
 
                                                             <div>
-                                                                <input type="hidden" name="duration-{{ $ride->id }}" id="duration-{{ $ride->id }}">
+                                                                <input type="hidden" name="duration_{{ $ride->id }}" id="duration_{{ $ride->id }}" value="{{ $ride->duration }}">
                                                             </div>
 
                                                             <div class="flex flex-wrap gap-4">
@@ -217,6 +221,7 @@
                                                                     has_spinner="true"
                                                                     can_submit="true"
                                                                     class="shadow-md shadow-blue-200 hover:shadow-blue-400"
+                                                                    data-ride-id="{{ $ride->id }}"
                                                                 >
                                                                     Save Changes
                                                                 </x-bladewind::button>
@@ -285,86 +290,89 @@
                 });
             });
         </script>
-{{--        <script>--}}
-{{--            $(document).ready(function() {--}}
-{{--                $('#edit-ride-form-{{ $ride->id }}').on('submit', function(event) {--}}
-{{--                    event.preventDefault();--}}
+        <script>
+            $(document).ready(function() {
+                $('.bw-button').on('submit', function(event) {
+                    event.preventDefault();
 
-{{--                    Swal.fire({--}}
-{{--                        title: 'Loading...',--}}
-{{--                        text: 'Please wait while we process your request.',--}}
-{{--                        allowOutsideClick: false,--}}
-{{--                        didOpen: () => {--}}
-{{--                            Swal.showLoading();--}}
-{{--                        }--}}
-{{--                    });--}}
+                    let rideId = $(this).data('ride-id');
+                    let form = $("#edit-ride-form-" + rideId);
 
-{{--                    $.ajax({--}}
-{{--                        url: $(this).attr('action'),--}}
-{{--                        method: $(this).attr('method'),--}}
-{{--                        data: $(this).serialize(),--}}
-{{--                        dataType: "json",--}}
-{{--                        success: function(response) {--}}
-{{--                            Swal.close();--}}
-{{--                            if(response.success) {--}}
-{{--                                const Toast = Swal.mixin({--}}
-{{--                                    toast: true,--}}
-{{--                                    position: "top",--}}
-{{--                                    showConfirmButton: false,--}}
-{{--                                    timer: 2000,--}}
-{{--                                    timerProgressBar: true,--}}
-{{--                                    didOpen: (toast) => {--}}
-{{--                                        toast.onmouseenter = Swal.stopTimer;--}}
-{{--                                        toast.onmouseleave = Swal.resumeTimer;--}}
-{{--                                    }--}}
-{{--                                });--}}
-{{--                                Toast.fire({--}}
-{{--                                    icon: "success",--}}
-{{--                                    title: "Ride edited successfully. Redirecting to Rides page..."--}}
-{{--                                });--}}
-{{--                                setTimeout(function () {--}}
-{{--                                    window.location.replace('/dashboard');--}}
-{{--                                }, 2000);--}}
-{{--                            }else{--}}
-{{--                                Swal.fire({--}}
-{{--                                    icon: 'error',--}}
-{{--                                    title: 'Failed to edit ride. Please try again.',--}}
-{{--                                    text: response.message--}}
-{{--                                });--}}
-{{--                            }--}}
-{{--                        },--}}
-{{--                        error: function(xhr) {--}}
-{{--                            Swal.close();--}}
+                    Swal.fire({
+                        title: 'Loading...',
+                        text: 'Please wait while we process your request.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
 
-{{--                            if(xhr.status === 422) {--}}
-{{--                                let errors = xhr.responseJSON.errors;--}}
+                    $.ajax({
+                        url: form.attr('action'),
+                        method: form.attr('method'),
+                        data: form.serialize(),
+                        dataType: "json",
+                        success: function(response) {
+                            Swal.close();
+                            if(response.success) {
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: "top",
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                    timerProgressBar: true,
+                                    didOpen: (toast) => {
+                                        toast.onmouseenter = Swal.stopTimer;
+                                        toast.onmouseleave = Swal.resumeTimer;
+                                    }
+                                });
+                                Toast.fire({
+                                    icon: "success",
+                                    title: "Ride edited successfully. Redirecting to Rides page..."
+                                });
+                                setTimeout(function () {
+                                    window.location.replace('/dashboard');
+                                }, 2000);
+                            }else{
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Failed to edit ride. Please try again.',
+                                    text: response.message
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            Swal.close();
 
-{{--                                $('.text-red-500').remove();--}}
-{{--                                $('input').removeClass('border-red-400');--}}
+                            if(xhr.status === 422) {
+                                let errors = xhr.responseJSON.errors;
 
-{{--                                for (let key in errors) {--}}
-{{--                                    let input = $('[name=' + key + ']');--}}
-{{--                                    input.addClass('border-red-400');--}}
-{{--                                    input.after('<p class="text-red-500 text-sm mb-2">' + errors[key][0] + '</p>');--}}
-{{--                                }--}}
-{{--                            }else if(xhr.status === 0){--}}
-{{--                                Swal.fire({--}}
-{{--                                    icon: 'error',--}}
-{{--                                    title: 'Failed to edit ride.</br>Please try again.',--}}
-{{--                                    text: `Error ${xhr.status}: No internet connection or Server is down.`--}}
-{{--                                });--}}
-{{--                            }else{--}}
-{{--                                Swal.fire({--}}
-{{--                                    icon: 'error',--}}
-{{--                                    title: 'Failed to create ride.</br>Please try again.',--}}
-{{--                                    text: `Error ${xhr.status}: ${xhr.statusText}`--}}
-{{--                                });--}}
-{{--                            }--}}
-{{--                        }--}}
-{{--                    });--}}
-{{--                });--}}
-{{--            });--}}
-{{--        </script>--}}
+                                $('.text-red-500').remove();
+                                $('input').removeClass('border-red-400');
+
+                                for (let key in errors) {
+                                    let input = $('[name=' + key + ']');
+                                    input.addClass('border-red-400');
+                                    input.after('<p class="text-red-500 text-sm mb-2">' + errors[key][0] + '</p>');
+                                }
+                            }else if(xhr.status === 0){
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Failed to edit ride.</br>Please try again.',
+                                    text: `Error ${xhr.status}: No internet connection or Server is down.`
+                                });
+                            }else{
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Failed to create ride.</br>Please try again.',
+                                    text: `Error ${xhr.status}: ${xhr.statusText}`
+                                });
+                            }
+                        }
+                    });
+                });
+            });
+        </script>
     @endsection
 </x-layout>
 

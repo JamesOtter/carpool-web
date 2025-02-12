@@ -86,14 +86,12 @@ class RideController extends Controller
                 'vehicle_number' => 'required|string|max:50',
                 'vehicle_model' => 'required|string|max:50',
             ]);
-
             try {
                 Offer::create([
                     'ride_id' => $ride->id,
                     'vehicle_number' => $request->vehicle_number,
                     'vehicle_model' => $request->vehicle_model,
                 ]);
-
             } catch (\Exception $e) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()]);
             }
@@ -116,19 +114,21 @@ class RideController extends Controller
 
     public function update(Request $request, $id)
     {
-        dd($id);
+        dd($request);
         $ride = Ride::findOrFail($id);
 
         $validatedData = $request->validate([
-            'departure_address' => 'nullable|string|max:255',
-            'departure_latitude' => 'nullable|numeric',
-            'departure_longitude' => 'nullable|numeric',
-            'destination_address' => 'nullable|string|max:255',
-            'destination_latitude' => 'nullable|numeric',
-            'destination_longitude' => 'nullable|numeric',
-            'departure_datetime' => 'nullable|date',
-            'number_of_passenger' => 'nullable|integer|min:1',
-            'price' => 'nullable|numeric|min:0',
+            'ride_type' => 'required|in:request,offer',
+            'departure_address' => 'required|string|max:255',
+            'departure_id' => 'required|string',
+            'destination_address' => 'required|string|max:255',
+            'destination_id' => 'required|string',
+            'departure_date' => 'required|date',
+            'departure_time' => 'required|date_format:H:i',
+            'number_of_passenger' => 'required|integer|min:1',
+            'distance' => 'required|numeric|min:0',
+            'duration' => 'required|integer|min:0',
+            'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
         ]);
 
@@ -139,7 +139,7 @@ class RideController extends Controller
             $offer->update($request->only(['vehicle_number', 'vehicle_model']));
         }
 
-        return redirect()->route('rides.index')->with('success', 'Ride updated successfully!');
+        return response()->json(['success' => true]);
     }
 
     public function destroy($id)
@@ -147,7 +147,7 @@ class RideController extends Controller
         $ride = Ride::findOrFail($id);
         $ride->delete();
 
-        return redirect()->route('rides.index')->with('success', 'Ride deleted successfully!');
+        return response()->json(['success' => true]);
     }
 
     public function getPrice(Request $request)
