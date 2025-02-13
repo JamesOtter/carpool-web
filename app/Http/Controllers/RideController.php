@@ -12,7 +12,7 @@ class RideController extends Controller
     public function index(Request $request)
     {
         $rides = Ride::with('user', 'offer')
-            ->where('status', 'available') // Filter only available rides
+            ->where('status', 'active') // Filter only active rides
             ->latest();
 
         // Apply filters dynamically

@@ -41,7 +41,13 @@
                                 @foreach($rides as $ride)
                                     <tr>
                                         <td>{{ $ride->id }}</td>
-                                        <td>{{ $ride->ride_type }}</td>
+                                        <td>
+                                            @if($ride->ride_type === 'request')
+                                                <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="orange" rounded="true" class="font-semibold" />
+                                            @else
+                                                <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="cyan" rounded="true" class="font-semibold" />
+                                            @endif
+                                        </td>
                                         <td>{{ $ride->departure_address }}</td>
                                         <td>{{ $ride->destination_address }}</td>
                                         <td>{{ $ride->departure_date }}</td>
@@ -49,7 +55,13 @@
                                         <td>{{ $ride->number_of_passenger }}</td>
                                         <td>{{ $ride->price }}</td>
                                         <td>{{ $ride->updated_at->diffForHumans() }}</td>
-                                        <td>{{ $ride->status }}</td>
+                                        <td>
+                                            @if($ride->status === 'active')
+                                                <x-bladewind::tag label="Active" color="green" rounded="true" class="font-semibold" />
+                                            @else
+                                                <x-bladewind::tag label="Inactive" color="red" rounded="true" class="font-semibold" />
+                                            @endif
+                                        </td>
                                         <td>
                                             <div class="flex">
                                                 <div>
@@ -79,7 +91,7 @@
                                                                     <x-location-input
                                                                         name="departure_address-{{ $ride->id }}"
                                                                         placeholder="Enter departure address"
-                                                                        id="departure_address"
+                                                                        id="departure_address_{{ $ride->id }}"
                                                                         required="true"
                                                                         :need_id="true"
                                                                         place_id="departure_id_{{ $ride->id }}"
@@ -98,7 +110,7 @@
                                                                     <x-location-input
                                                                         name="destination_address-{{ $ride->id }}"
                                                                         placeholder="Enter destination address"
-                                                                        id="destination_address"
+                                                                        id="destination_address_{{ $ride->id }}"
                                                                         required="true"
                                                                         :need_id="true"
                                                                         place_id="destination_id_{{ $ride->id }}"

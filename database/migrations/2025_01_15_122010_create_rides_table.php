@@ -26,7 +26,7 @@ return new class extends Migration
             $table->integer('duration');
             $table->decimal('price', 10, 2);
             $table->string('description')->nullable();
-            $table->enum('status', ['available', 'booked', 'expired'])->default('available');
+            $table->enum('status', ['active', 'booked', 'expired'])->default('active');
             $table->timestamps();
         });
     }

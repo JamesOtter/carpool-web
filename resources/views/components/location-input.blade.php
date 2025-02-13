@@ -8,7 +8,7 @@
         'place_id' => null,
         'value' => null,
         'old_place_id_value' => null,
-        'ride_id_value' => 'null'
+        'ride_id_value' => null
         ])
 <div>
     <x-bladewind::input
@@ -31,13 +31,16 @@
 </div>
 
 <script>
-    function calculateDistanceAndDuration() {
-        const departureAddress = document.getElementById('departure_address').value ?? document.getElementById('departure_address_{{ $ride_id_value }}').value;
-        const destinationAddress = document.getElementById('destination_address').value ?? document.getElementById('destination_address_{{ $ride_id_value }}').value;
+    function calculateDistanceAndDuration(rideId) {
+        let departureInput = rideId ? document.getElementById(`departure_address_${rideId}`) : document.getElementById(`departure_address`);
+        let destinationInput = rideId ? document.getElementById(`destination_address_${rideId}`) : document.getElementById(`destination_address`);
 
-        if (!departureAddress || !destinationAddress) {
-            return;
-        }
+        if (!departureInput || !destinationInput) return;
+
+        let departureAddress = departureInput.value;
+        let destinationAddress = destinationInput.value;
+
+        if (!departureAddress || !destinationAddress) return;
 
         // Initialize the Directions service and Distance Matrix service
         const service = new google.maps.DistanceMatrixService();
@@ -51,19 +54,14 @@
             function(response, status) {
                 if (status === 'OK') {
                     const results = response.rows[0].elements[0];
-                    const distanceInMeters = results.distance.value;  // Distance in meters
-                    const durationInSeconds = results.duration.value;  // Duration in seconds
+                    const distanceInKilometers = (results.distance.value / 1000).toFixed(2);
+                    const durationInMinutes = Math.round(results.duration.value / 60);
 
-                    const distanceInKilometers = distanceInMeters / 1000;
-                    const durationInMinutes = Math.round(durationInSeconds / 60);
+                    let distanceField = rideId ? document.getElementById(`distance_${rideId}`) : document.getElementById(`distance`);
+                    let durationField = rideId ? document.getElementById(`duration_${rideId}`) : document.getElementById(`duration`);
 
-                    if({{ $ride_id_value }} !== 'null'){
-                        document.getElementById('distance_{{ $ride_id_value }}').value = distanceInKilometers.toFixed(2);  // Show distance with 2 decimal places
-                        document.getElementById('duration_{{ $ride_id_value }}').value = durationInMinutes;
-                    }else{
-                        document.getElementById('distance').value = distanceInKilometers.toFixed(2);  // Show distance with 2 decimal places
-                        document.getElementById('duration').value = durationInMinutes;
-                    }
+                    if (distanceField) distanceField.value = distanceInKilometers;
+                    if (durationField) durationField.value = durationInMinutes;
 
                 } else {
                     Swal.fire({
@@ -102,9 +100,14 @@
                     }
                 }
 
-                if ((document.getElementById('departure_address').value && document.getElementById('destination_address').value) ||
-                    (document.getElementById('departure_address_{{ $ride_id_value }}').value && document.getElementById('destination_address_{{ $ride_id_value }}').value)) {
-                    calculateDistanceAndDuration();  // Call the function when both addresses are entered
+                let rideId = input.id.match(/_(\d+)$/) ? input.id.match(/_(\d+)$/)[1] : null;
+                console.log(rideId);
+
+                let departureAddress = rideId ? document.getElementById(`departure_address_${rideId}`)?.value : document.getElementById(`departure_address`)?.value;
+                let destinationAddress = rideId ? document.getElementById(`destination_address_${rideId}`)?.value : document.getElementById(`destination_address`)?.value;
+
+                if (departureAddress && destinationAddress) {
+                    calculateDistanceAndDuration(rideId);  // Call the function when both addresses are entered
                 }
             });
 
