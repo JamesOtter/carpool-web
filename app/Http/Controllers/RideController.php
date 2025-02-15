@@ -6,6 +6,7 @@ use App\Models\Offer;
 use App\Models\Ride;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class RideController extends Controller
 {
@@ -114,17 +115,23 @@ class RideController extends Controller
 
     public function update(Request $request, $id)
     {
-        dd($request);
         $ride = Ride::findOrFail($id);
 
-        $validatedData = $request->validate([
+        $inputData = [];
+        foreach ($request->all() as $key => $value) {
+            // Remove any numerical suffix from keys
+            $cleanKey = preg_replace('/_\d+$/', '', $key);
+            $inputData[$cleanKey] = $value;
+        }
+
+        $validatedData = Validator::make($inputData, [
             'ride_type' => 'required|in:request,offer',
             'departure_address' => 'required|string|max:255',
             'departure_id' => 'required|string',
             'destination_address' => 'required|string|max:255',
             'destination_id' => 'required|string',
             'departure_date' => 'required|date',
-            'departure_time' => 'required|date_format:H:i',
+            'departure_time' => 'required|date_format:H:i:s',
             'number_of_passenger' => 'required|integer|min:1',
             'distance' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:0',
@@ -132,11 +139,18 @@ class RideController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $ride->update($validatedData);
+        if ($validatedData->fails()) {
+            return response()->json(['success' => false, 'errors' => $validatedData->errors()], 422);
+        }
 
-        if ($ride->ride_type === 'offer' && $request->has(['vehicle_number', 'vehicle_model'])) {
+        $ride->update($validatedData->validated());
+
+        if ($ride->ride_type === 'offer' && isset($inputData['vehicle_number'], $inputData['vehicle_model'])) {
             $offer = $ride->offer;
-            $offer->update($request->only(['vehicle_number', 'vehicle_model']));
+            $offer->update([
+                'vehicle_number' => $inputData['vehicle_number'],
+                'vehicle_model' => $inputData['vehicle_model'],
+            ]);
         }
 
         return response()->json(['success' => true]);
@@ -145,6 +159,7 @@ class RideController extends Controller
     public function destroy($id)
     {
         $ride = Ride::findOrFail($id);
+
         $ride->delete();
 
         return response()->json(['success' => true]);

@@ -32,8 +32,10 @@ Route::post('/rides', [RideController::class, 'store'])
 Route::get('/rides/{id}', [RideController::class, 'show'])
     ->name('rides.show');
 Route::get('/rides/{id}/edit', [RideController::class, 'edit'])->name('rides.edit');
-Route::patch('/rides/{id}', [RideController::class, 'update'])->name('rides.update');
-Route::delete('/rides/{id}', [RideController::class, 'destroy'])->name('rides.destroy');
+Route::patch('/rides/{id}', [RideController::class, 'update'])
+    ->name('rides.update');
+Route::delete('/rides/{id}', [RideController::class, 'destroy'])
+    ->name('rides.destroy');
 Route::post('/get-price', [RideController::class, 'getPrice'])
     ->name('get.price');
 

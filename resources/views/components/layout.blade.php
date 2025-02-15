@@ -104,10 +104,10 @@
                             @guest
                                 <div class="flex flex-nowrap text-white">
                                     <div>
-                                        <a href="{{ route('login') }}" class="mx-2 px-4 py-2 {{ request()->is('login')? "bg-white text-black rounded-md" : "text-white" }}">Log In</a>|
+                                        <a href="{{ route('login') }}" class="mx-2 px-4 py-2 rounded-md {{ request()->is('login') ? "bg-white text-black" : "text-white hover:bg-gray-700" }}">Log In</a>|
                                     </div>
                                     <div>
-                                        <a href="{{ route('register') }}" class="mx-2 px-4 py-2 {{ request()->is('register')? "bg-white text-black rounded-md" : "text-white" }}">Register</a>
+                                        <a href="{{ route('register') }}" class="mx-2 px-4 py-2 rounded-md {{ request()->is('register') ? "bg-white text-black" : "text-white hover:bg-gray-700" }}">Register</a>
                                     </div>
                                 </div>
                             @endguest

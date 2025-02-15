@@ -2,7 +2,7 @@
     @section('custom-css')
     @endsection
 
-    @section('title', 'About Page')
+    @section('title', 'Dashboard')
 
     @section('heading')
         <div class="pb-3 md:px-32">
@@ -231,7 +231,6 @@
                                                                     name="btn-save-{{ $ride->id }}"
                                                                     radius="medium"
                                                                     has_spinner="true"
-                                                                    can_submit="true"
                                                                     class="shadow-md shadow-blue-200 hover:shadow-blue-400"
                                                                     data-ride-id="{{ $ride->id }}"
                                                                 >
@@ -243,10 +242,15 @@
                                                 </div>
                                                 <div>
                                                     <button
-                                                        class="px-3 py-1 rounded-md bg-red-500 text-white hover:bg-red-600"
+                                                        class="delete-button px-3 py-1 rounded-md bg-red-500 text-white hover:bg-red-600"
+                                                        data-ride-id="{{ $ride->id }}"
                                                     >
                                                         Delete
                                                     </button>
+                                                    <form id="delete-ride-form-{{ $ride->id }}" method="POST" action="/rides/{{ $ride->id }}" class="hidden">
+                                                        @csrf
+                                                        @method('delete')
+                                                    </form>
                                                 </div>
                                             </div>
                                         </td>
@@ -274,6 +278,7 @@
 
     @section('custom-js')
         <script>
+            // Handle ride type dropdowns
             document.addEventListener('DOMContentLoaded', function() {
                 // Select all ride type dropdowns
                 document.querySelectorAll('[class^="bw-ride_type_"]').forEach(selectElement => {
@@ -303,8 +308,40 @@
             });
         </script>
         <script>
+            // Handle edit ride form original values
+            $(document).ready(function () {
+                $(".edit-button").click(function () {
+
+                    let rideId = $(this).attr("onclick").match(/edit-ride-(\d+)/)[1];
+                    let form = $(`#edit-ride-form-${rideId}`);
+
+                    if (!form.data("original")) {
+                        form.data("original", form.serializeArray()); // Store original values
+                    } else {
+                        let originalData = form.data("original");
+                        $.each(originalData, function (i, field) {
+                            form.find(`[name="${field.name}"]`).val(field.value);
+                        });
+                    }
+                });
+
+                $(".modal-body").click(function (event) {
+                    if ($(event.target).hasClass("modal-body") || $(event.target).closest(".bw-close").length) {
+                        let form = $(this).find("form");
+                        if (form.data("original")) {
+                            let originalData = form.data("original");
+                            $.each(originalData, function (i, field) {
+                                form.find(`[name="${field.name}"]`).val(field.value);
+                            });
+                        }
+                    }
+                });
+            });
+        </script>
+        <script>
+            // Handle ajax request to edit ride
             $(document).ready(function() {
-                $('.bw-button').on('submit', function(event) {
+                $('.bw-button').on('click', function(event) {
                     event.preventDefault();
 
                     let rideId = $(this).data('ride-id');
@@ -359,11 +396,16 @@
                             if(xhr.status === 422) {
                                 let errors = xhr.responseJSON.errors;
 
+                                // Clear previous error messages
                                 $('.text-red-500').remove();
                                 $('input').removeClass('border-red-400');
 
                                 for (let key in errors) {
-                                    let input = $('[name=' + key + ']');
+                                    // Find the input field dynamically by using the key as a prefix
+                                    let input = $('[name^=' + key + '_]'); // Select input fields with the correct prefix
+                                    if (input.length === 0) {
+                                        input = $('[name=' + key + ']'); // Fallback to exact match (in case numbering isn't used)
+                                    }
                                     input.addClass('border-red-400');
                                     input.after('<p class="text-red-500 text-sm mb-2">' + errors[key][0] + '</p>');
                                 }
@@ -376,10 +418,87 @@
                             }else{
                                 Swal.fire({
                                     icon: 'error',
-                                    title: 'Failed to create ride.</br>Please try again.',
+                                    title: 'Failed to edit ride.</br>Please try again.',
                                     text: `Error ${xhr.status}: ${xhr.statusText}`
                                 });
                             }
+                        }
+                    });
+                });
+            });
+        </script>
+        <script>
+            // Handle delete ride button
+            $(document).ready(function() {
+                $('.delete-button').on('click', function (event) {
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You won't be able to revert this!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+                            let rideId = $(this).data('ride-id');
+                            let form = $("#delete-ride-form-" + rideId);
+
+                            $.ajax({
+                                url: form.attr('action'),
+                                method: form.attr('method'),
+                                data: form.serialize(),
+                                dataType: "json",
+                                success: function(response) {
+                                    Swal.close();
+                                    if(response.success) {
+                                        const Toast = Swal.mixin({
+                                            toast: true,
+                                            position: "top",
+                                            showConfirmButton: false,
+                                            timer: 2000,
+                                            timerProgressBar: true,
+                                            didOpen: (toast) => {
+                                                toast.onmouseenter = Swal.stopTimer;
+                                                toast.onmouseleave = Swal.resumeTimer;
+                                            }
+                                        });
+                                        Toast.fire({
+                                            icon: "success",
+                                            title: "Ride deleted successfully. Redirecting to Rides page..."
+                                        });
+                                        setTimeout(function () {
+                                            window.location.replace('/dashboard');
+                                        }, 2000);
+                                    }else{
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Failed to delete ride. Please try again.',
+                                            text: response.message
+                                        });
+                                    }
+                                },
+                                error: function(xhr) {
+                                    Swal.close();
+
+                                    if(xhr.status === 0){
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Failed to delete ride.</br>Please try again.',
+                                            text: `Error ${xhr.status}: No internet connection or Server is down.`
+                                        });
+                                    }else{
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Failed to delete ride.</br>Please try again.',
+                                            text: `Error ${xhr.status}: ${xhr.statusText}`
+                                        });
+                                    }
+                                }
+                            });
                         }
                     });
                 });
