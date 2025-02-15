@@ -145,7 +145,7 @@
                                                                         />
                                                                     </div>
                                                                 </div>
-                                                                <div class="grow">
+                                                                <div class="hidden">
                                                                     @php
                                                                         $ride_type = [
                                                                             [ 'label' => 'Request', 'value' => 'request' ],

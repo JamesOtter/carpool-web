@@ -31,11 +31,13 @@ Route::post('/rides', [RideController::class, 'store'])
     ->middleware('auth');
 Route::get('/rides/{id}', [RideController::class, 'show'])
     ->name('rides.show');
-Route::get('/rides/{id}/edit', [RideController::class, 'edit'])->name('rides.edit');
+//Route::get('/rides/{id}/edit', [RideController::class, 'edit'])->name('rides.edit');
 Route::patch('/rides/{id}', [RideController::class, 'update'])
-    ->name('rides.update');
+    ->name('rides.update')
+    ->middleware('auth');
 Route::delete('/rides/{id}', [RideController::class, 'destroy'])
-    ->name('rides.destroy');
+    ->name('rides.destroy')
+    ->middleware('auth');
 Route::post('/get-price', [RideController::class, 'getPrice'])
     ->name('get.price');
 
