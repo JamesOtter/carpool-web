@@ -15,7 +15,8 @@
 
     @section('content')
         <div class="md:px-32">
-            <h1>This is details page</h1>
+            <h1>Description</h1>
+            <p>{{ $ride->description }}</p>
         </div>
     @endsection
 

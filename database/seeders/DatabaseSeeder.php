@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Booking;
 use App\Models\Offer;
 use App\Models\Preference;
 use App\Models\Ride;
@@ -26,6 +27,14 @@ class DatabaseSeeder extends Seeder
                     Offer::factory()->create(['ride_id' => $ride->id]);
                 }
             });
+        });
+
+        // Get all rides and randomly pick some to have bookings
+        $rides = Ride::all()->random(Ride::count() * 0.5); // Assign bookings to 50% of rides
+
+        // Generate bookings only for some rides
+        $rides->each(function ($ride) {
+            Booking::factory(rand(1, 3))->create(['ride_id' => $ride->id]); // 1 to 3 bookings per selected ride
         });
     }
 }

@@ -17,8 +17,8 @@
                     <x-bladewind::tab-heading name="manage-rides" active="true"
                                               icon="cog-6-tooth"
                                               label="Manage Rides" />
-                    <x-bladewind::tab-heading name="manage-request"
-                                              label="Manage Request"
+                    <x-bladewind::tab-heading name="manage-booking"
+                                              label="Manage Booking"
                                               icon="bell" />
                 </x-slot>
                 <x-bladewind::tab-body>
@@ -268,8 +268,8 @@
                         @endif
                     </x-bladewind::tab-content>
 
-                    <x-bladewind::tab-content name="manage-request">
-                        <p>Request list should be here</p>
+                    <x-bladewind::tab-content name="manage-booking">
+                        <p>Booking list should be here</p>
                     </x-bladewind::tab-content>
                 </x-bladewind::tab-body>
             </x-bladewind::tab-group>
@@ -377,7 +377,7 @@
                                 });
                                 Toast.fire({
                                     icon: "success",
-                                    title: "Ride edited successfully. Redirecting to Rides page..."
+                                    title: "Ride edited successfully. Redirecting to Dashboard..."
                                 });
                                 setTimeout(function () {
                                     window.location.replace('/dashboard');
@@ -468,7 +468,7 @@
                                         });
                                         Toast.fire({
                                             icon: "success",
-                                            title: "Ride deleted successfully. Redirecting to Rides page..."
+                                            title: "Ride deleted successfully. Redirecting to Dashboard..."
                                         });
                                         setTimeout(function () {
                                             window.location.replace('/dashboard');

@@ -45,17 +45,23 @@
                     <div class="hidden md:block">
                         <div class="ml-4 flex items-center md:ml-6">
 {{--                        Post ride button--}}
-                            <x-bladewind::button
-                                outline="true"
-                                color="cyan"
-                                size="small"
-                                radius="medium"
-                                class="mx-6"
-                                tag="a"
+                            <a
                                 href="/rides/create"
+                                class="border-2 border-sky-500 text-sky-500 rounded-xl mx-3 px-3 py-1 hover:shadow-md hover:shadow-blue-500/50 hover:text-blue-500/80 hover:border-blue-500/80"
                             >
-                                <x-bladewind::icon name="plus-circle" class="h-4 w-4" />Post a ride
-                            </x-bladewind::button>
+                                <x-bladewind::icon name="plus-circle" type="outline" />Post a ride
+                            </a>
+{{--                            <x-bladewind::button--}}
+{{--                                outline="true"--}}
+{{--                                color="cyan"--}}
+{{--                                size="small"--}}
+{{--                                radius="medium"--}}
+{{--                                class="mx-6"--}}
+{{--                                tag="a"--}}
+{{--                                href="/rides/create"--}}
+{{--                            >--}}
+{{--                                <x-bladewind::icon name="plus-circle" class="h-4 w-4" />Post a ride--}}
+{{--                            </x-bladewind::button>--}}
                             @auth
                                 <button type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                                     <span class="absolute -inset-1.5"></span>
