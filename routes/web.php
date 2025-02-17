@@ -3,6 +3,7 @@
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RideController;
 use App\Http\Controllers\SessionController;
+use App\Models\Booking;
 use App\Models\Ride;
 use Illuminate\Support\Facades\Route;
 
@@ -10,15 +11,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('home');
 });
-
-Route::get('/dashboard', function () {
-    return view('dashboard', [
-        'rides' => Ride::with('user', 'offer')
-            ->where('user_id', auth()->id())
-            ->latest()
-            ->get()
-    ]);
-})->middleware('auth');
 
 //Route::resource('rides', RideController::class);
 Route::get('/rides', [RideController::class, 'index'])
@@ -40,6 +32,15 @@ Route::delete('/rides/{id}', [RideController::class, 'destroy'])
     ->middleware('auth');
 Route::post('/get-price', [RideController::class, 'getPrice'])
     ->name('get.price');
+
+Route::get('/dashboard', function () {
+    return view('dashboard', [
+        'rides' => Ride::with('user', 'offer')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->get(),
+    ]);
+})->middleware('auth');
 
 Route::get('/login', [SessionController::class, 'create'])
     ->name('login')

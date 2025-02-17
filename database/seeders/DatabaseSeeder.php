@@ -29,12 +29,12 @@ class DatabaseSeeder extends Seeder
             });
         });
 
-        // Get all rides and randomly pick some to have bookings
-        $rides = Ride::all()->random(Ride::count() * 0.5); // Assign bookings to 50% of rides
-
-        // Generate bookings only for some rides
-        $rides->each(function ($ride) {
-            Booking::factory(rand(1, 3))->create(['ride_id' => $ride->id]); // 1 to 3 bookings per selected ride
-        });
+//        // Get all rides and randomly pick some to have bookings
+//        $rides = Ride::all()->random(Ride::count() * 0.5); // Assign bookings to 50% of rides
+//
+//        // Generate bookings only for some rides
+//        $rides->each(function ($ride) {
+//            Booking::factory(rand(1, 3))->create(['ride_id' => $ride->id]); // 1 to 3 bookings per selected ride
+//        });
     }
 }

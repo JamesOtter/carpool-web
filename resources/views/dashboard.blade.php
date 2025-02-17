@@ -269,7 +269,7 @@
                     </x-bladewind::tab-content>
 
                     <x-bladewind::tab-content name="manage-booking">
-                        <p>Booking list should be here</p>
+                        <p>Booking listing should be here</p>
                     </x-bladewind::tab-content>
                 </x-bladewind::tab-body>
             </x-bladewind::tab-group>
