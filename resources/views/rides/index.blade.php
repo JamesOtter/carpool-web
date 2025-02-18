@@ -94,7 +94,7 @@
                                     />
                                     <x-bladewind::timeline
                                         date="Destination"
-                                        icon="map-pin"
+                                        icon="flag"
                                         content="{{ $ride->destination_address }}"
                                     />
                                 </x-bladewind::timeline-group>
