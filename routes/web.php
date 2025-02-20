@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RideController;
 use App\Http\Controllers\SessionController;
@@ -41,6 +42,8 @@ Route::get('/dashboard', function () {
             ->get(),
     ]);
 })->middleware('auth');
+
+//Route::post('/chatbot', [ChatbotController::class, 'findRide']);
 
 Route::get('/login', [SessionController::class, 'create'])
     ->name('login')
