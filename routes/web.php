@@ -43,8 +43,6 @@ Route::get('/dashboard', function () {
     ]);
 })->middleware('auth');
 
-//Route::post('/chatbot', [ChatbotController::class, 'findRide']);
-
 Route::get('/login', [SessionController::class, 'create'])
     ->name('login')
     ->middleware('guest');

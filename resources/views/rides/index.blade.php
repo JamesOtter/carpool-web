@@ -8,7 +8,7 @@
 
     @section('heading')
         <div class="flex justify-between">
-            <form method="GET" action="{{ route('rides.index') }}" class="grid grid-cols-9 gap-4">
+            <form method="GET" action="/rides" class="grid grid-cols-9 gap-4">
                 <div class="col-span-2">
                     <x-location-input
                         name="departure"
@@ -182,7 +182,7 @@
     <script>
         function updatePrice(rideId) {
             $.ajax({
-                url: "{{ route('get.price') }}",
+                url: "/get-price",
                 method: 'POST',
                 data: {
                     ride_id: rideId,
@@ -208,7 +208,7 @@
                         }
                     });
                     Toast.fire({
-                        icon: "Error",
+                        icon: "error",
                         title: "Failed to fetch price"
                     });
                 }
@@ -218,7 +218,7 @@
         //Update prices on page load
         $(document).ready(function() {
             @foreach($rides as $ride)
-            updatePrice({{ $ride->id }});
+                updatePrice({{ $ride->id }});
             @endforeach
 
             const Toast = Swal.mixin({

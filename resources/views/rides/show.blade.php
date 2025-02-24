@@ -38,24 +38,26 @@
 
             <div class="grid grid-cols-10 gap-4 mt-5">
                 <div class="grid col-span-7 gap-3 border-r-2 border-gray-300 pr-5">
-                    <x-bladewind::timeline-group
-                        position="left"
-                        stacked="true"
-                        color="pink"
-                        anchor="big"
-                        completed="true"
-                    >
-                        <x-bladewind::timeline
-                            date="Departure"
-                            icon="map-pin"
-                            content="{{ $ride->departure_address }}"
-                        />
-                        <x-bladewind::timeline
-                            date="Destination"
-                            icon="flag"
-                            content="{{ $ride->destination_address }}"
-                        />
-                    </x-bladewind::timeline-group>
+                    <x-bladewind::card compact="true">
+                        <x-bladewind::timeline-group
+                            position="left"
+                            stacked="true"
+                            color="pink"
+                            anchor="big"
+                            completed="true"
+                        >
+                            <x-bladewind::timeline
+                                date="Departure"
+                                icon="map-pin"
+                                content="{{ $ride->departure_address }}"
+                            />
+                            <x-bladewind::timeline
+                                date="Destination"
+                                icon="flag"
+                                content="{{ $ride->destination_address }}"
+                            />
+                        </x-bladewind::timeline-group>
+                    </x-bladewind::card>
 
                     <div class="flex gap-5">
                         <x-bladewind::card compact="true" class="flex-auto">
@@ -167,7 +169,7 @@
             <script>
                 function updatePrice(rideId) {
                     $.ajax({
-                        url: "{{ route('get.price') }}",
+                        url: "/get-price",
                         method: 'POST',
                         data: {
                             ride_id: rideId,

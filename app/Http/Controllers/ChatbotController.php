@@ -3,16 +3,64 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ride;
+use Google_Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class ChatbotController extends Controller
 {
-    public function findRide(Request $request)
+    /**
+     * Fetch Dialogflow Access Token dynamically
+     */
+    private function getDialogflowAccessToken()
     {
-        $departure = $request->input('queryResult.parameters.departure_location');
-        $destination = $request->input('queryResult.parameters.destination_location');
-        $date = $request->input('queryResult.parameters.departure_date');
+        $client = new Google_Client();
+        $client->setAuthConfig(storage_path(env('GOOGLE_APPLICATION_CREDENTIALS'))); // Path to your service account file
+        $client->addScope('https://www.googleapis.com/auth/dialogflow');
+
+        $token = $client->fetchAccessTokenWithAssertion();
+
+        return $token['access_token'] ?? null;
+    }
+
+    /**
+     * Send user input to Dialogflow and get response
+     */
+    public function chat(Request $request)
+    {
+        $userMessage = $request->input('message'); // User input from frontend
+        $accessToken = $this->getDialogflowAccessToken();
+
+        if (!$accessToken) {
+            return response()->json(['error' => 'Failed to fetch Dialogflow token'], 500);
+        }
+
+        // Send request to Dialogflow
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type' => 'application/json'
+        ])->post("https://dialogflow.googleapis.com/v2/projects/carpool-web-449009/agent/sessions/123456:detectIntent", [
+            'queryInput' => [
+                'text' => [
+                    'text' => $userMessage,
+                    'languageCode' => 'en'
+                ]
+            ]
+        ]);
+
+        $dialogflowData = $response->json();
+        $parameters = $dialogflowData['queryResult']['parameters'] ?? [];
+
+        return $this->findRide($parameters);
+    }
+    public function findRide($parameters)
+    {
+        $departure = $parameters['departure_location'] ?? null;
+        $destination = $parameters['destination_location'] ?? null;
+        $dateTime = $parameters['departure_date'] ?? null;
+
+        $date = date('Y-m-d', strtotime($dateTime));
 
         if (!$departure || !$destination || !$date) {
             return response()->json([
