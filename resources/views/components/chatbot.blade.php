@@ -9,7 +9,7 @@
     <div id="chatbot-box" class="hidden fixed bottom-24 right-5 w-80 bg-white rounded-lg shadow-xl border border-gray-300">
         <!-- Chatbot Header -->
         <div class="flex justify-between items-center bg-blue-600 text-white p-3 rounded-t-lg">
-            <span class="font-bold">Ride Finder Bot</span>
+            <span class="font-bold">Ride finder bot</span>
             <button id="chatbot-close" class="text-xl"><x-bladewind::icon name="x-circle" /></button>
         </div>
 
@@ -92,7 +92,8 @@
 
                 let data = await response.json();
                 if (data && data.fulfillmentMessages) {
-                    appendMessage("Bot", data.fulfillmentMessages[0].text.text[0]);
+                    let botMessage = data.fulfillmentMessages[0].text.text[0];
+                    appendMessage("Bot", formatMessage(botMessage));
                     saveChatHistory();
                 }
             } catch (error) {
@@ -100,6 +101,11 @@
                 appendMessage("Bot", "Sorry, something went wrong.");
                 saveChatHistory();
             }
+        }
+
+        function formatMessage(message) {
+            // Use regex to detect URLs in the message
+            return message.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-600 underline">$1</a>');
         }
 
         // Function to append a message to the chat

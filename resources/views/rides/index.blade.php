@@ -148,6 +148,7 @@
                 @endif
 
             </div>
+
             <div id="content_2" class="fixed right-0 w-1/2 h-screen">
                 <div id="map" class="h-full"></div>
             </div>
@@ -166,19 +167,75 @@
             content_1.classList.toggle('overflow-auto');
             content_2.classList.toggle('hidden');
         }
-
-        var map = L.map('map').setView([4.3348, 101.1351], 15); //Default location and zoom
-
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        L.marker([4.3348, 101.1351]).addTo(map)
-            .bindPopup('A pretty CSS popup.<br> Easily customizable.')
-            .openPopup();
-
     </script>
+
+    <script>
+        function initMap() {
+            let defaultLocation = { lat: 4.3348, lng: 101.1351 }; // Default location (San Francisco)
+
+            let map = new google.maps.Map(document.getElementById("map"), {
+                center: defaultLocation,
+                zoom: 15,
+            });
+
+            // Try to get user's location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        let userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        };
+                        map.setCenter(userLocation);
+                    },
+                    () => {
+                        console.log("Geolocation not allowed, using default location.");
+                    }
+                );
+            }
+
+            let rides_json = {!! json_encode($rides) !!};
+
+            let rides = rides_json.data;
+
+            let infoWindow = new google.maps.InfoWindow();
+
+            rides.forEach((ride) => {
+                let service = new google.maps.places.PlacesService(map);
+                service.getDetails({ placeId: ride.departure_id }, (result, status) => {
+                    if (status === google.maps.places.PlacesServiceStatus.OK) {
+                        let marker = new google.maps.Marker({
+                            map,
+                            position: result.geometry.location,
+                            title: ride.id,
+                        });
+
+                        marker.addListener("click", () => {
+                            infoWindow.setContent(`<h4>${ride.id}</h4><p>${ride.departure_address}</p>`);
+                            infoWindow.open(map, marker);
+                        });
+                    }
+                });
+            });
+        }
+
+        window.onload = initMap;
+    </script>
+
+{{--    <script>--}}
+{{--        var map = L.map('map').setView([4.3348, 101.1351], 15); //Default location and zoom--}}
+
+{{--        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {--}}
+{{--            maxZoom: 19,--}}
+{{--            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'--}}
+{{--        }).addTo(map);--}}
+
+{{--        L.marker([4.3348, 101.1351]).addTo(map)--}}
+{{--            .bindPopup('A pretty CSS popup.<br> Easily customizable.')--}}
+{{--            .openPopup();--}}
+
+{{--    </script>--}}
+
     <script>
         function updatePrice(rideId) {
             $.ajax({
