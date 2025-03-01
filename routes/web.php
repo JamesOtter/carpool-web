@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RideController;
 use App\Http\Controllers\SessionController;
@@ -13,7 +13,7 @@ Route::get('/', function () {
     return view('home');
 });
 
-//Route::resource('rides', RideController::class);
+//Rides
 Route::get('/rides', [RideController::class, 'index'])
     ->name('rides.index');
 Route::get('/rides/create', [RideController::class, 'create'])
@@ -34,15 +34,29 @@ Route::delete('/rides/{id}', [RideController::class, 'destroy'])
 Route::post('/get-price', [RideController::class, 'getPrice'])
     ->name('get.price');
 
+//Dashboard
 Route::get('/dashboard', function () {
     return view('dashboard', [
         'rides' => Ride::with('user', 'offer')
             ->where('user_id', auth()->id())
             ->latest()
             ->get(),
+        'bookings' => Booking::with('sender', 'receiver', 'ride')
+            ->where('sender_id', auth()->id())
+            ->latest()
+            ->get()
     ]);
 })->middleware('auth');
 
+//Booking
+Route::get('/bookings/create', [BookingController::class, 'create'])
+    ->name('bookings.create')
+    ->middleware('auth');
+Route::post('/bookings', [BookingController::class, 'store'])
+    ->name('bookings.store')
+    ->middleware('auth');
+
+//Login
 Route::get('/login', [SessionController::class, 'create'])
     ->name('login')
     ->middleware('guest');
@@ -52,6 +66,7 @@ Route::get('/logout', [SessionController::class, 'destroy'])
     ->name('logout')
     ->middleware('auth');
 
+//Register
 Route::get('/register', [RegisterController::class, 'create'])
     ->name('register')
     ->middleware('guest');

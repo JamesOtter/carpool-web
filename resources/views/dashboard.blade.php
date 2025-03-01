@@ -17,9 +17,12 @@
                     <x-bladewind::tab-heading name="manage-rides" active="true"
                                               icon="cog-6-tooth"
                                               label="Manage Rides" />
-                    <x-bladewind::tab-heading name="manage-booking"
-                                              label="Manage Booking"
-                                              icon="bell" />
+                    <x-bladewind::tab-heading name="incoming-booking"
+                                              label="Incoming Booking"
+                                              icon="arrow-right-end-on-rectangle" />
+                    <x-bladewind::tab-heading name="outgoing-booking"
+                                              label="Outgoing Booking"
+                                              icon="arrow-left-start-on-rectangle" />
                 </x-slot>
                 <x-bladewind::tab-body>
                     <x-bladewind::tab-content name="manage-rides" active="true">
@@ -261,16 +264,119 @@
                             <x-bladewind::empty-state
                                 message="There are no rides available"
                                 heading="Post Ride Now"
-                                button_label="Post Ride"
-                                onclick="window.location.href='{{ route('rides.create') }}'"
                             >
+                                <button
+                                    class="m-2 px-3 py-1 bg-blue-500 text-white font-semibold rounded-md"
+                                    onclick="window.location.href='/rides/create'"
+                                >
+                                    Post Ride
+                                </button>
                             </x-bladewind::empty-state>
                         @endif
                     </x-bladewind::tab-content>
 
-                    <x-bladewind::tab-content name="manage-booking">
-                        <p>Booking listing should be here</p>
+                    <x-bladewind::tab-content name="incoming-booking">
+                        @if($bookings->count())
+                            <x-bladewind::table>
+                                <x-slot name="header">
+                                    <th>Id</th>
+                                    <th>Ride Id</th>
+                                    <th>Sender Name</th>
+                                    <th>Receiver Name</th>
+                                    <th>Status</th>
+                                    <th>Updated at</th>
+                                    <th>Actions</th>
+                                </x-slot>
+
+                                @foreach($bookings as $booking)
+                                    <tr>
+                                        <td>{{ $booking->id }}</td>
+                                        <td>{{ $booking->ride_id }}</td>
+                                        <td>{{ $booking->sender->name }}</td>
+                                        <td>{{ $booking->receiver->name }}</td>
+                                        <td>{{ $booking->status }}</td>
+                                        <td>{{ $booking->updated_at->diffForHumans() }}</td>
+                                        <td>
+                                            <div class="flex gap-3">
+                                                <button class="px-2 py-1 bg-green-500 rounded-md text-white hover:bg-green-600 hover:shadow-md">
+                                                    Accept
+                                                </button>
+                                                <button class="px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md">
+                                                    Decline
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+
+                            </x-bladewind::table>
+
+                        @else
+                            <x-bladewind::empty-state
+                                message="There are no bookings available"
+                                heading="Book Ride Now"
+                            >
+                                <button
+                                    class="m-2 px-3 py-1 bg-blue-500 text-white font-semibold rounded-md"
+                                    onclick="window.location.href='/rides'"
+                                >
+                                    Browse Ride
+                                </button>
+                            </x-bladewind::empty-state>
+                        @endif
                     </x-bladewind::tab-content>
+
+                    <x-bladewind::tab-content name="outgoing-booking">
+                        @if($bookings->count())
+                            <x-bladewind::table>
+                                <x-slot name="header">
+                                    <th>Id</th>
+                                    <th>Ride Id</th>
+                                    <th>Sender Name</th>
+                                    <th>Receiver Name</th>
+                                    <th>Status</th>
+                                    <th>Updated at</th>
+                                    <th>Actions</th>
+                                </x-slot>
+
+                                @foreach($bookings as $booking)
+                                    <tr>
+                                        <td>{{ $booking->id }}</td>
+                                        <td>{{ $booking->ride_id }}</td>
+                                        <td>{{ $booking->sender->name }}</td>
+                                        <td>{{ $booking->receiver->name }}</td>
+                                        <td>{{ $booking->status }}</td>
+                                        <td>{{ $booking->updated_at->diffForHumans() }}</td>
+                                        <td>
+                                            <div class="flex gap-3">
+                                                <button class="px-2 py-1 bg-green-500 rounded-md text-white hover:bg-green-600 hover:shadow-md">
+                                                    Accept
+                                                </button>
+                                                <button class="px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md">
+                                                    Decline
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+
+                            </x-bladewind::table>
+
+                        @else
+                            <x-bladewind::empty-state
+                                message="There are no bookings available"
+                                heading="Book Ride Now"
+                            >
+                                <button
+                                    class="m-2 px-3 py-1 bg-blue-500 text-white font-semibold rounded-md"
+                                    onclick="window.location.href='/rides'"
+                                >
+                                    Browse Ride
+                                </button>
+                            </x-bladewind::empty-state>
+                        @endif
+                    </x-bladewind::tab-content>
+
                 </x-bladewind::tab-body>
             </x-bladewind::tab-group>
         </div>

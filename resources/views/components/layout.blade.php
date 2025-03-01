@@ -58,7 +58,7 @@
 {{--                        Post ride button--}}
                             <a
                                 href="/rides/create"
-                                class="border-2 border-sky-500 text-sky-500 rounded-xl mx-3 px-3 py-1 hover:shadow-md hover:shadow-blue-500/50 hover:text-blue-500/80 hover:border-blue-500/80"
+                                class="border-2 border-sky-500 text-sky-500 rounded-xl mx-3 px-3 py-1 hover:shadow-md hover:shadow-gray-500/50 hover:text-blue-500/80 hover:border-blue-500/80"
                             >
                                 <x-bladewind::icon name="plus-circle" type="outline" />Post a ride
                             </a>
@@ -210,9 +210,9 @@
                 title: "Confirm Logout?",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes"
+                confirmButtonColor: "#ea2b2b",
+                cancelButtonColor: "rgba(124,124,124,0.85)",
+                confirmButtonText: "Logout"
             }).then((result) => {
                 if (result.isConfirmed) {
                     const Toast = Swal.mixin({

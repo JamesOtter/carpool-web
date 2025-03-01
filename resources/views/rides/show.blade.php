@@ -124,7 +124,26 @@
                 </div>
 
                 <div class="grid col-span-3 gap-3">
-                    <p>Driver / Rider information</p>
+                    <div>
+                        <div>
+                            <p>Driver / Rider information</p>
+                        </div>
+
+                        @auth
+                            <form id="booking-form" action="/bookings" method="POST" class="flex flex-row">
+                                @csrf
+
+                                <input type="number" name="ride_id" class="hidden" value="{{ $ride->id }}">
+                                <input type="number" name="receiver_id" class="hidden" value="{{ $ride->user_id }}">
+
+                                <button id="btnBook" class="grid bg-green-500 text-white rounded-xl w-full justify-items-center font-bold py-2 hover:bg-green-600 hover:shadow-md hover:shadow-gray-400">
+                                    Book Now
+                                </button>
+                            </form>
+                        @endauth
+
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -166,86 +185,170 @@
             // Initialize the map after the page loads
             window.onload = initMap;
         </script>
-            <script>
-                function updatePrice(rideId) {
-                    $.ajax({
-                        url: "/get-price",
-                        method: 'POST',
-                        data: {
-                            ride_id: rideId,
-                            _token: '{{ csrf_token() }}' // Laravel CSRF token
-                        },
-                        success: function(response) {
-                            // Update the price on the page
-                            $('#base-price-' + rideId).text(response.base_price.toFixed(2));
-                            $('#surge-price-' + rideId).text(response.surge_price.toFixed(2));
-                            $('#total-price-' + rideId).text(response.total_price.toFixed(2));
-                        },
-                        error: function(xhr) {
-                            console.error('Error fetching price:', xhr.responseText);
-                            const Toast = Swal.mixin({
-                                toast: true,
-                                position: "top",
-                                showConfirmButton: false,
-                                timer: 3000,
-                                timerProgressBar: true,
-                                didOpen: (toast) => {
-                                    toast.onmouseenter = Swal.stopTimer;
-                                    toast.onmouseleave = Swal.resumeTimer;
+        <script>
+            //handle booking
+            $(document).ready(function(){
+                $('#booking-form').on('submit', function(event){
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: "Confirm your ride booking?",
+                        text: "This will send a booking request.",
+                        icon: "question",
+                        showCancelButton: true,
+                        confirmButtonColor: "#2ac315",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Book Now"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+                            Swal.fire({
+                                title: 'Loading...',
+                                text: 'Please wait while we process your request.',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
                                 }
                             });
-                            Toast.fire({
-                                icon: "Error",
-                                title: "Failed to fetch price"
+
+                            $.ajax({
+                                url: $(this).attr('action'),
+                                method: $(this).attr('method'),
+                                data: $(this).serialize(),
+                                dataType: "json",
+                                success: function(response) {
+                                    Swal.close();
+                                    if(response.success) {
+                                        const Toast = Swal.mixin({
+                                            toast: true,
+                                            position: "top",
+                                            showConfirmButton: false,
+                                            timer: 2000,
+                                            timerProgressBar: true,
+                                            didOpen: (toast) => {
+                                                toast.onmouseenter = Swal.stopTimer;
+                                                toast.onmouseleave = Swal.resumeTimer;
+                                            }
+                                        });
+                                        Toast.fire({
+                                            icon: "success",
+                                            title: "Ride booked successfully. Redirecting to Rides page..."
+                                        });
+                                        setTimeout(function () {
+                                            window.location.replace('/rides');
+                                        }, 2000);
+                                    }else{
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Failed to book ride. Please try again.',
+                                            text: response.message
+                                        });
+                                    }
+                                },
+                                error: function(xhr) {
+                                    Swal.close();
+
+                                    if(xhr.status === 0){
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Failed to create ride.</br>Please try again.',
+                                            text: `Error ${xhr.status}: No internet connection or Server is down.`
+                                        });
+                                    }else{
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Failed to book ride.</br>Please try again.',
+                                            text: `Error ${xhr.status}: ${xhr.statusText}`
+                                        });
+                                    }
+                                }
                             });
                         }
                     });
-                }
-
-                //Update prices on page load
-                $(document).ready(function() {
-                    updatePrice({{ $ride->id }});
-
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: "top",
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
-                        didOpen: (toast) => {
-                            toast.onmouseenter = Swal.stopTimer;
-                            toast.onmouseleave = Swal.resumeTimer;
-                        }
-                    });
-                    Toast.fire({
-                        icon: "success",
-                        title: "Price Refreshed"
-                    });
                 });
+            });
 
-                // Update prices every 60 seconds (optional)
-                {{--setInterval(function() {--}}
-                {{--    @foreach($rides as $ride)--}}
-                {{--    updatePrice({{ $ride->id }});--}}
-                {{--    @endforeach--}}
+        </script>
+        <script>
+            function updatePrice(rideId) {
+                $.ajax({
+                    url: "/get-price",
+                    method: 'POST',
+                    data: {
+                        ride_id: rideId,
+                        _token: '{{ csrf_token() }}' // Laravel CSRF token
+                    },
+                    success: function(response) {
+                        // Update the price on the page
+                        $('#base-price-' + rideId).text(response.base_price.toFixed(2));
+                        $('#surge-price-' + rideId).text(response.surge_price.toFixed(2));
+                        $('#total-price-' + rideId).text(response.total_price.toFixed(2));
+                    },
+                    error: function(xhr) {
+                        console.error('Error fetching price:', xhr.responseText);
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: "top",
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.onmouseenter = Swal.stopTimer;
+                                toast.onmouseleave = Swal.resumeTimer;
+                            }
+                        });
+                        Toast.fire({
+                            icon: "Error",
+                            title: "Failed to fetch price"
+                        });
+                    }
+                });
+            }
 
-                {{--    const Toast = Swal.mixin({--}}
-                {{--        toast: true,--}}
-                {{--        position: "top",--}}
-                {{--        showConfirmButton: false,--}}
-                {{--        timer: 3000,--}}
-                {{--        timerProgressBar: true,--}}
-                {{--        didOpen: (toast) => {--}}
-                {{--            toast.onmouseenter = Swal.stopTimer;--}}
-                {{--            toast.onmouseleave = Swal.resumeTimer;--}}
-                {{--        }--}}
-                {{--    });--}}
-                {{--    Toast.fire({--}}
-                {{--        icon: "success",--}}
-                {{--        title: "Price Refreshed"--}}
-                {{--    });--}}
-                {{--}, 60000); // 60 seconds--}}
-            </script>
+            //Update prices on page load
+            $(document).ready(function() {
+                updatePrice({{ $ride->id }});
+
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                Toast.fire({
+                    icon: "success",
+                    title: "Price Refreshed"
+                });
+            });
+
+            // Update prices every 60 seconds (optional)
+            {{--setInterval(function() {--}}
+            {{--    @foreach($rides as $ride)--}}
+            {{--    updatePrice({{ $ride->id }});--}}
+            {{--    @endforeach--}}
+
+            {{--    const Toast = Swal.mixin({--}}
+            {{--        toast: true,--}}
+            {{--        position: "top",--}}
+            {{--        showConfirmButton: false,--}}
+            {{--        timer: 3000,--}}
+            {{--        timerProgressBar: true,--}}
+            {{--        didOpen: (toast) => {--}}
+            {{--            toast.onmouseenter = Swal.stopTimer;--}}
+            {{--            toast.onmouseleave = Swal.resumeTimer;--}}
+            {{--        }--}}
+            {{--    });--}}
+            {{--    Toast.fire({--}}
+            {{--        icon: "success",--}}
+            {{--        title: "Price Refreshed"--}}
+            {{--    });--}}
+            {{--}, 60000); // 60 seconds--}}
+        </script>
     @endsection
 
 </x-layout>
