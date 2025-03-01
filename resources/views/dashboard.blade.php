@@ -276,24 +276,25 @@
                     </x-bladewind::tab-content>
 
                     <x-bladewind::tab-content name="incoming-booking">
-                        @if($bookings->count())
+
+                        @if($incoming_bookings->count())
                             <x-bladewind::table>
                                 <x-slot name="header">
                                     <th>Id</th>
                                     <th>Ride Id</th>
                                     <th>Sender Name</th>
-                                    <th>Receiver Name</th>
+                                    <th>Receiver</th>
                                     <th>Status</th>
                                     <th>Updated at</th>
                                     <th>Actions</th>
                                 </x-slot>
 
-                                @foreach($bookings as $booking)
+                                @foreach($incoming_bookings as $booking)
                                     <tr>
                                         <td>{{ $booking->id }}</td>
                                         <td>{{ $booking->ride_id }}</td>
                                         <td>{{ $booking->sender->name }}</td>
-                                        <td>{{ $booking->receiver->name }}</td>
+                                        <td>You</td>
                                         <td>{{ $booking->status }}</td>
                                         <td>{{ $booking->updated_at->diffForHumans() }}</td>
                                         <td>
@@ -313,47 +314,44 @@
 
                         @else
                             <x-bladewind::empty-state
-                                message="There are no bookings available"
-                                heading="Book Ride Now"
+                                message="There are no incoming bookings"
+                                heading="Post more ride"
                             >
                                 <button
                                     class="m-2 px-3 py-1 bg-blue-500 text-white font-semibold rounded-md"
-                                    onclick="window.location.href='/rides'"
+                                    onclick="window.location.href='/rides/create'"
                                 >
-                                    Browse Ride
+                                    Post Ride Now
                                 </button>
                             </x-bladewind::empty-state>
                         @endif
                     </x-bladewind::tab-content>
 
                     <x-bladewind::tab-content name="outgoing-booking">
-                        @if($bookings->count())
+                        @if($outgoing_bookings->count())
                             <x-bladewind::table>
                                 <x-slot name="header">
                                     <th>Id</th>
                                     <th>Ride Id</th>
-                                    <th>Sender Name</th>
+                                    <th>Sender</th>
                                     <th>Receiver Name</th>
                                     <th>Status</th>
                                     <th>Updated at</th>
                                     <th>Actions</th>
                                 </x-slot>
 
-                                @foreach($bookings as $booking)
+                                @foreach($outgoing_bookings as $booking)
                                     <tr>
                                         <td>{{ $booking->id }}</td>
                                         <td>{{ $booking->ride_id }}</td>
-                                        <td>{{ $booking->sender->name }}</td>
+                                        <td>You</td>
                                         <td>{{ $booking->receiver->name }}</td>
                                         <td>{{ $booking->status }}</td>
                                         <td>{{ $booking->updated_at->diffForHumans() }}</td>
                                         <td>
                                             <div class="flex gap-3">
-                                                <button class="px-2 py-1 bg-green-500 rounded-md text-white hover:bg-green-600 hover:shadow-md">
-                                                    Accept
-                                                </button>
                                                 <button class="px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md">
-                                                    Decline
+                                                    Cancel booking
                                                 </button>
                                             </div>
                                         </td>

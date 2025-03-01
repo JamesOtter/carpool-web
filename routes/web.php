@@ -41,10 +41,14 @@ Route::get('/dashboard', function () {
             ->where('user_id', auth()->id())
             ->latest()
             ->get(),
-        'bookings' => Booking::with('sender', 'receiver', 'ride')
+        'outgoing_bookings' => Booking::with('sender', 'receiver', 'ride')
             ->where('sender_id', auth()->id())
             ->latest()
-            ->get()
+            ->get(),
+        'incoming_bookings' => Booking::with('sender', 'receiver', 'ride')
+            ->where('receiver_id', auth()->id())
+            ->latest()
+            ->get(),
     ]);
 })->middleware('auth');
 
