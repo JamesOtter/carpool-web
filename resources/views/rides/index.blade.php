@@ -142,7 +142,7 @@
                         message="There are no rides available"
                         heading="Post Ride Now"
                         button_label="Post Ride"
-                        onclick="window.location.href='{{ route('rides.create') }}'"
+                        onclick="window.location.href='/rides/create'"
                     >
                     </x-bladewind::empty-state>
                 @endif
