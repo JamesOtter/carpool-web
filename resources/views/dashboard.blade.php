@@ -61,8 +61,10 @@
                                         <td>
                                             @if($ride->status === 'active')
                                                 <x-bladewind::tag label="Active" color="green" rounded="true" class="font-semibold" />
-                                            @else
-                                                <x-bladewind::tag label="Inactive" color="red" rounded="true" class="font-semibold" />
+                                            @elseif($ride->status === 'booked')
+                                                <x-bladewind::tag label="Booked" color="yellow" rounded="true" class="font-semibold" />
+                                            @elseif($ride->status === 'expired')
+                                                <x-bladewind::tag label="Expired" color="red" rounded="true" class="font-semibold" />
                                             @endif
                                         </td>
                                         <td>
@@ -295,22 +297,30 @@
                                         <td>{{ $booking->ride_id }}</td>
                                         <td>{{ $booking->sender->name }}</td>
                                         <td>You</td>
-                                        <td>{{ $booking->status }}</td>
+                                        <td>
+                                            @if($booking->status === 'pending')
+                                                <x-bladewind::tag label="Pending" color="yellow" rounded="true" class="font-semibold" />
+                                            @elseif($booking->status === 'accepted')
+                                                <x-bladewind::tag label="Accepted" color="green" rounded="true" class="font-semibold" />
+                                            @elseif($booking->status === 'declined')
+                                                <x-bladewind::tag label="Declined" color="red" rounded="true" class="font-semibold" />
+                                            @endif
+                                        </td>
                                         <td>{{ $booking->updated_at->diffForHumans() }}</td>
                                         <td>
+                                            @if($booking->status === 'pending')
                                             <form id="edit-booking-form-{{ $booking->id }}" action="/bookings/{{ $booking->id }}" method="POST">
                                                 @csrf
                                                 @method('patch')
 
-                                                <input type="hidden" name="action" id="action" value="">
-                                                <input type="text" name="testAttr" value="testing" class="hidden">
+                                                <input type="hidden" name="action" id="action-{{ $booking->id }}" value="">
 
                                                 <div class="flex gap-3">
                                                     <button
                                                         type="submit"
                                                         class="accept-btn px-2 py-1 bg-green-500 rounded-md text-white hover:bg-green-600 hover:shadow-md"
                                                         data-booking-id="{{ $booking->id }}"
-                                                        onclick="document.getElementById('action').value='accept'"
+                                                        onclick="document.getElementById('action-{{ $booking->id }}').value='accept'"
                                                     >
                                                         Accept
                                                     </button>
@@ -319,14 +329,13 @@
                                                         type="submit"
                                                         class="decline-btn px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md"
                                                         data-booking-id="{{ $booking->id }}"
-                                                        onclick="document.getElementById('action').value='decline'"
+                                                        onclick="document.getElementById('action-{{ $booking->id }}').value='decline'"
                                                     >
                                                         Decline
                                                     </button>
                                                 </div>
-
                                             </form>
-
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -367,14 +376,24 @@
                                         <td>{{ $booking->ride_id }}</td>
                                         <td>You</td>
                                         <td>{{ $booking->receiver->name }}</td>
-                                        <td>{{ $booking->status }}</td>
+                                        <td>
+                                            @if($booking->status === 'pending')
+                                                <x-bladewind::tag label="Pending" color="yellow" rounded="true" class="font-semibold" />
+                                            @elseif($booking->status === 'accepted')
+                                                <x-bladewind::tag label="Accepted" color="green" rounded="true" class="font-semibold" />
+                                            @elseif($booking->status === 'declined')
+                                                <x-bladewind::tag label="Declined" color="red" rounded="true" class="font-semibold" />
+                                            @endif
+                                        </td>
                                         <td>{{ $booking->updated_at->diffForHumans() }}</td>
                                         <td>
+                                            @if($booking->status === 'pending')
                                             <div class="flex gap-3">
                                                 <button class="px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md">
                                                     Cancel booking
                                                 </button>
                                             </div>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach

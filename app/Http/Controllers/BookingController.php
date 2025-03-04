@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\Ride;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -68,16 +69,37 @@ class BookingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Booking $booking)
+    public function update(Request $request, $id)
     {
+        $booking = Booking::findOrFail($id);
 
         if($request->action === 'accept'){
-            dd('accepted');
+
+            $booking->update([
+                'status' => 'accepted'
+            ]);
+
+            // Decline all other bookings with the same ride_id
+            $otherBookings = Booking::where('ride_id', $booking->ride_id)
+                                    ->where('id', '!=', $booking->id)
+                                    ->get();
+
+            foreach ($otherBookings as $otherBooking) {
+                $otherBooking->update(['status' => 'declined']);
+            }
+
+            //update ride status
+            $ride = Ride::findOrFail($booking->ride_id);
+            $ride->update(['status' => 'booked']);
+
         }elseif($request->action === 'decline'){
-            dd('declined');
+
+            $booking->update([
+                'status' => 'declined'
+            ]);
         }
 
-        dd('error');
+        return response()->json(['success' => true]);
     }
 
     /**
