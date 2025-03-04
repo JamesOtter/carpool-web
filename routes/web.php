@@ -59,6 +59,9 @@ Route::get('/bookings/create', [BookingController::class, 'create'])
 Route::post('/bookings', [BookingController::class, 'store'])
     ->name('bookings.store')
     ->middleware('auth');
+Route::patch('/bookings/{id}', [BookingController::class, 'update'])
+    ->name('bookings.update')
+    ->middleware('auth');
 
 //Login
 Route::get('/login', [SessionController::class, 'create'])

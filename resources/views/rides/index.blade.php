@@ -176,6 +176,7 @@
             let map = new google.maps.Map(document.getElementById("map"), {
                 center: defaultLocation,
                 zoom: 15,
+                mapTypeControl: false,
             });
 
             // Try to get user's location
@@ -190,6 +191,21 @@
                     },
                     () => {
                         console.log("Geolocation not allowed, using default location.");
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: "top",
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.onmouseenter = Swal.stopTimer;
+                                toast.onmouseleave = Swal.resumeTimer;
+                            }
+                        });
+                        Toast.fire({
+                            icon: "info",
+                            title: "Geolocation not allowed, using default location."
+                        });
                     }
                 );
             }

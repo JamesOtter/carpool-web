@@ -298,14 +298,35 @@
                                         <td>{{ $booking->status }}</td>
                                         <td>{{ $booking->updated_at->diffForHumans() }}</td>
                                         <td>
-                                            <div class="flex gap-3">
-                                                <button class="px-2 py-1 bg-green-500 rounded-md text-white hover:bg-green-600 hover:shadow-md">
-                                                    Accept
-                                                </button>
-                                                <button class="px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md">
-                                                    Decline
-                                                </button>
-                                            </div>
+                                            <form id="edit-booking-form-{{ $booking->id }}" action="/bookings/{{ $booking->id }}" method="POST">
+                                                @csrf
+                                                @method('patch')
+
+                                                <input type="hidden" name="action" id="action" value="">
+                                                <input type="text" name="testAttr" value="testing" class="hidden">
+
+                                                <div class="flex gap-3">
+                                                    <button
+                                                        type="submit"
+                                                        class="accept-btn px-2 py-1 bg-green-500 rounded-md text-white hover:bg-green-600 hover:shadow-md"
+                                                        data-booking-id="{{ $booking->id }}"
+                                                        onclick="document.getElementById('action').value='accept'"
+                                                    >
+                                                        Accept
+                                                    </button>
+
+                                                    <button
+                                                        type="submit"
+                                                        class="decline-btn px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md"
+                                                        data-booking-id="{{ $booking->id }}"
+                                                        onclick="document.getElementById('action').value='decline'"
+                                                    >
+                                                        Decline
+                                                    </button>
+                                                </div>
+
+                                            </form>
+
                                         </td>
                                     </tr>
                                 @endforeach
@@ -448,9 +469,6 @@
                 $('.bw-button').on('click', function(event) {
                     event.preventDefault();
 
-                    let rideId = $(this).data('ride-id');
-                    let form = $("#edit-ride-form-" + rideId);
-
                     Swal.fire({
                         title: 'Loading...',
                         text: 'Please wait while we process your request.',
@@ -459,6 +477,9 @@
                             Swal.showLoading();
                         }
                     });
+
+                    let rideId = $(this).data('ride-id');
+                    let form = $("#edit-ride-form-" + rideId);
 
                     $.ajax({
                         url: form.attr('action'),
@@ -548,6 +569,15 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
 
+                            Swal.fire({
+                                title: 'Loading...',
+                                text: 'Please wait while we process your request.',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+
                             let rideId = $(this).data('ride-id');
                             let form = $("#delete-ride-form-" + rideId);
 
@@ -606,6 +636,177 @@
                         }
                     });
                 });
+            });
+        </script>
+        <script>
+            $(document).ready(function () {
+
+                $(".accept-btn").on('click', function(event){
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: "Accept booking?",
+                        text: "This will automatically decline other same booking.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#18c51a",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Accept"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+                            Swal.fire({
+                                title: 'Loading...',
+                                text: 'Please wait while we process your request.',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+
+                            let bookingId = $(this).data('booking-id');
+                            let form = $("#edit-booking-form-" + bookingId);
+
+                            $.ajax({
+                                url: form.attr('action'),
+                                method: form.attr('method'),
+                                data: form.serialize(),
+                                dataType: "json",
+                                success: function(response) {
+                                    Swal.close();
+
+                                    if(response.success) {
+                                        const Toast = Swal.mixin({
+                                            toast: true,
+                                            position: "top",
+                                            showConfirmButton: false,
+                                            timer: 2000,
+                                            timerProgressBar: true,
+                                            didOpen: (toast) => {
+                                                toast.onmouseenter = Swal.stopTimer;
+                                                toast.onmouseleave = Swal.resumeTimer;
+                                            }
+                                        });
+                                        Toast.fire({
+                                            icon: "success",
+                                            title: "Booking accepted successfully. Redirecting to Dashboard..."
+                                        });
+                                        setTimeout(function () {
+                                            window.location.replace('/dashboard');
+                                        }, 2000);
+                                    }else{
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Failed to accept booking. Please try again.',
+                                            text: response.message
+                                        });
+                                    }
+                                },
+                                error: function(xhr) {
+                                    Swal.close();
+
+                                    if(xhr.status === 0){
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Failed to accept booking.</br>Please try again.',
+                                            text: `Error ${xhr.status}: No internet connection or Server is down.`
+                                        });
+                                    }else{
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Failed to accept booking.</br>Please try again.',
+                                            text: `Error ${xhr.status}: ${xhr.statusText}`
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+
+                $(".decline-btn").on('click', function(event){
+                    event.preventDefault();
+
+                    Swal.fire({
+                        title: "Decline booking?",
+                        text: "You won't be able to revert this!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#777777",
+                        confirmButtonText: "Decline"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+                            Swal.fire({
+                                title: 'Loading...',
+                                text: 'Please wait while we process your request.',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+
+                            let bookingId = $(this).data('booking-id');
+                            let form = $("#edit-booking-form-" + bookingId);
+
+                            $.ajax({
+                                url: form.attr('action'),
+                                method: form.attr('method'),
+                                data: form.serialize(),
+                                dataType: "json",
+                                success: function(response) {
+                                    Swal.close();
+
+                                    if(response.success) {
+                                        const Toast = Swal.mixin({
+                                            toast: true,
+                                            position: "top",
+                                            showConfirmButton: false,
+                                            timer: 2000,
+                                            timerProgressBar: true,
+                                            didOpen: (toast) => {
+                                                toast.onmouseenter = Swal.stopTimer;
+                                                toast.onmouseleave = Swal.resumeTimer;
+                                            }
+                                        });
+                                        Toast.fire({
+                                            icon: "success",
+                                            title: "Booking declined successfully. Redirecting to Dashboard..."
+                                        });
+                                        setTimeout(function () {
+                                            window.location.replace('/dashboard');
+                                        }, 2000);
+                                    }else{
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Failed to decline booking. Please try again.',
+                                            text: response.message
+                                        });
+                                    }
+                                },
+                                error: function(xhr) {
+                                    Swal.close();
+
+                                    if(xhr.status === 0){
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Failed to decline booking.</br>Please try again.',
+                                            text: `Error ${xhr.status}: No internet connection or Server is down.`
+                                        });
+                                    }else{
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Failed to decline booking.</br>Please try again.',
+                                            text: `Error ${xhr.status}: ${xhr.statusText}`
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+                })
+
             });
         </script>
     @endsection

@@ -70,7 +70,14 @@ class BookingController extends Controller
      */
     public function update(Request $request, Booking $booking)
     {
-        //
+
+        if($request->action === 'accept'){
+            dd('accepted');
+        }elseif($request->action === 'decline'){
+            dd('declined');
+        }
+
+        dd('error');
     }
 
     /**
