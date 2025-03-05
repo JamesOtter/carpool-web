@@ -286,6 +286,7 @@
                                     <th>Ride Id</th>
                                     <th>Sender Name</th>
                                     <th>Receiver</th>
+                                    <th>Departure Date</th>
                                     <th>Status</th>
                                     <th>Updated at</th>
                                     <th>Actions</th>
@@ -297,6 +298,7 @@
                                         <td>{{ $booking->ride_id }}</td>
                                         <td>{{ $booking->sender->name }}</td>
                                         <td>You</td>
+                                        <td>{{ $booking->ride->departure_date }}</td>
                                         <td>
                                             @if($booking->status === 'pending')
                                                 <x-bladewind::tag label="Pending" color="yellow" rounded="true" class="font-semibold" />
@@ -365,6 +367,7 @@
                                     <th>Ride Id</th>
                                     <th>Sender</th>
                                     <th>Receiver Name</th>
+                                    <th>Departure Date</th>
                                     <th>Status</th>
                                     <th>Updated at</th>
                                     <th>Actions</th>
@@ -376,6 +379,7 @@
                                         <td>{{ $booking->ride_id }}</td>
                                         <td>You</td>
                                         <td>{{ $booking->receiver->name }}</td>
+                                        <td>{{ $booking->ride->departure_date }}</td>
                                         <td>
                                             @if($booking->status === 'pending')
                                                 <x-bladewind::tag label="Pending" color="yellow" rounded="true" class="font-semibold" />
@@ -388,11 +392,20 @@
                                         <td>{{ $booking->updated_at->diffForHumans() }}</td>
                                         <td>
                                             @if($booking->status === 'pending')
-                                            <div class="flex gap-3">
-                                                <button class="px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md">
-                                                    Cancel booking
-                                                </button>
-                                            </div>
+                                                <form id="cancel-booking-form-{{ $booking->id }}" action="/bookings/{{ $booking->id }}" method="POST">
+                                                    @csrf
+                                                    @method('delete')
+
+                                                    <div class="flex gap-3">
+                                                        <button
+                                                            type="submit"
+                                                            data-booking-id="{{ $booking->id }}"
+                                                            class="cancel-booking-btn px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md"
+                                                        >
+                                                            Cancel booking
+                                                        </button>
+                                                    </div>
+                                                </form>
                                             @endif
                                         </td>
                                     </tr>
@@ -582,8 +595,8 @@
                         text: "You won't be able to revert this!",
                         icon: "warning",
                         showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
-                        cancelButtonColor: "#d33",
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#d777777",
                         confirmButtonText: "Yes, delete it!"
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -826,6 +839,89 @@
                     });
                 })
 
+                $(document).ready(function() {
+                    $('.cancel-booking-btn').on('click', function (event) {
+                        event.preventDefault();
+
+                        Swal.fire({
+                            title: "Cancel this booking?",
+                            text: "You won't be able to revert this!",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#d33",
+                            cancelButtonColor: "#777777",
+                            confirmButtonText: "Cancel Booking"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                                Swal.fire({
+                                    title: 'Loading...',
+                                    text: 'Please wait while we process your request.',
+                                    allowOutsideClick: false,
+                                    didOpen: () => {
+                                        Swal.showLoading();
+                                    }
+                                });
+
+                                let bookingId = $(this).data('booking-id');
+                                let form = $("#cancel-booking-form-" + bookingId);
+
+                                $.ajax({
+                                    url: form.attr('action'),
+                                    method: form.attr('method'),
+                                    data: form.serialize(),
+                                    dataType: "json",
+                                    success: function(response) {
+                                        Swal.close();
+                                        if(response.success) {
+                                            const Toast = Swal.mixin({
+                                                toast: true,
+                                                position: "top",
+                                                showConfirmButton: false,
+                                                timer: 2000,
+                                                timerProgressBar: true,
+                                                didOpen: (toast) => {
+                                                    toast.onmouseenter = Swal.stopTimer;
+                                                    toast.onmouseleave = Swal.resumeTimer;
+                                                }
+                                            });
+                                            Toast.fire({
+                                                icon: "success",
+                                                title: "Booking cancelled successfully. Redirecting to Dashboard..."
+                                            });
+                                            setTimeout(function () {
+                                                window.location.replace('/dashboard');
+                                            }, 2000);
+                                        }else{
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Failed to cancel booking. Please try again.',
+                                                text: response.message
+                                            });
+                                        }
+                                    },
+                                    error: function(xhr) {
+                                        Swal.close();
+
+                                        if(xhr.status === 0){
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Failed to cancel booking.</br>Please try again.',
+                                                text: `Error ${xhr.status}: No internet connection or Server is down.`
+                                            });
+                                        }else{
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Failed to cancel booking.</br>Please try again.',
+                                                text: `Error ${xhr.status}: ${xhr.statusText}`
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    });
+                })
             });
         </script>
     @endsection

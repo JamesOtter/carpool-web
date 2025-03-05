@@ -62,6 +62,9 @@ Route::post('/bookings', [BookingController::class, 'store'])
 Route::patch('/bookings/{id}', [BookingController::class, 'update'])
     ->name('bookings.update')
     ->middleware('auth');
+Route::delete('/bookings/{id}', [BookingController::class, 'destroy'])
+    ->name('bookings.destroy')
+    ->middleware('auth');
 
 //Login
 Route::get('/login', [SessionController::class, 'create'])
