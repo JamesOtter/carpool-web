@@ -30,12 +30,29 @@ class BookingController extends Controller
      */
     public function store(Request $request)
     {
-
         $request->validate([
             'ride_id' => 'required',
             'receiver_id' => 'required',
         ]);
 
+        //Prevent same user submit multiple same booking
+        $sameBooking = Booking::where('ride_id', $request->ride_id)
+                            ->where('status', '!=', 'declined')
+                            ->where('sender_id', Auth::id());
+
+        if($sameBooking->exists()){
+            return response()->json(['success' => false, 'message' => 'You already booked this ride. Check your dashboard.']);
+        }
+
+        //prevent user book their own ride
+        $ownRide = Ride::where('id', $request->ride_id)
+                        ->where('user_id', Auth::id());
+
+        if($ownRide->exists()){
+            return response()->json(['success' => false, 'message' => 'You cannot book your own ride.']);
+        }
+
+        //Create booking
         try {
             $booking = Booking::create([
                 'ride_id' => $request->ride_id,
