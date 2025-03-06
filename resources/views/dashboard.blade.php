@@ -306,6 +306,8 @@
                                                 <x-bladewind::tag label="Accepted" color="green" rounded="true" class="font-semibold" />
                                             @elseif($booking->status === 'declined')
                                                 <x-bladewind::tag label="Declined" color="red" rounded="true" class="font-semibold" />
+                                            @elseif($booking->status === 'expired')
+                                                <x-bladewind::tag label="Expired" color="gray" rounded="true" class="font-semibold" />
                                             @endif
                                         </td>
                                         <td>{{ $booking->updated_at->diffForHumans() }}</td>
@@ -387,6 +389,8 @@
                                                 <x-bladewind::tag label="Accepted" color="green" rounded="true" class="font-semibold" />
                                             @elseif($booking->status === 'declined')
                                                 <x-bladewind::tag label="Declined" color="red" rounded="true" class="font-semibold" />
+                                            @elseif($booking->status === 'expired')
+                                                <x-bladewind::tag label="Expired" color="gray" rounded="true" class="font-semibold" />
                                             @endif
                                         </td>
                                         <td>{{ $booking->updated_at->diffForHumans() }}</td>

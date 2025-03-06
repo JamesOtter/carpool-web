@@ -12,3 +12,4 @@ Artisan::command('inspire', function () {
 
 //Define schedule tasks
 Schedule::command('rides:expire')->everyMinute();
+Schedule::command('bookings:expire')->everyMinute();
