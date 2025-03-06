@@ -27,23 +27,21 @@
                 <x-bladewind::tab-body>
                     <x-bladewind::tab-content name="manage-rides" active="true">
                         @if($rides->count())
-                            <x-bladewind::table>
+                            <x-bladewind::table
+                                searchable="true"
+                            >
                                 <x-slot name="header">
-                                    <th>ID</th>
                                     <th>Ride Type</th>
                                     <th>Departure Address</th>
                                     <th>Destination Address</th>
                                     <th>Departure Date</th>
                                     <th>Departure Time</th>
-                                    <th>Number of Passenger</th>
-                                    <th>Base Price (RM)</th>
                                     <th>Updated at</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </x-slot>
                                 @foreach($rides as $ride)
                                     <tr>
-                                        <td>{{ $ride->id }}</td>
                                         <td>
                                             @if($ride->ride_type === 'request')
                                                 <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="orange" rounded="true" class="font-semibold" />
@@ -55,8 +53,6 @@
                                         <td>{{ $ride->destination_address }}</td>
                                         <td>{{ $ride->departure_date }}</td>
                                         <td>{{ $ride->departure_time }}</td>
-                                        <td>{{ $ride->number_of_passenger }}</td>
-                                        <td>{{ $ride->price }}</td>
                                         <td>{{ $ride->updated_at->diffForHumans() }}</td>
                                         <td>
                                             @if($ride->status === 'active')
@@ -71,7 +67,120 @@
                                             <div class="flex">
                                                 <div>
                                                     <button
-                                                       class="edit-button px-3 py-1 mr-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
+                                                        class="view-ride-btn px-3 py-1 rounded-md bg-blue-500 text-white hover:bg-blue-600"
+                                                        onclick="showModal('view-ride-{{ $ride->id }}')"
+                                                    >
+                                                        View
+                                                    </button>
+                                                    <x-bladewind::modal
+                                                        name="view-ride-{{ $ride->id }}"
+                                                        blur_size="small"
+                                                        size="xl"
+                                                        ok_button_label=""
+                                                        cancel_button_label=""
+                                                        show_close_icon="true"
+                                                        title="Viewing Ride"
+                                                        close_after_action="false"
+                                                    >
+                                                        <x-bladewind::card
+                                                            compact="true"
+                                                            has_shadow="true"
+                                                            class="mb-2 mr-2"
+                                                        >
+                                                            <x-bladewind::timeline-group
+                                                                position="left"
+                                                                stacked="true"
+                                                                color="pink"
+                                                                anchor="big"
+                                                                completed="true"
+                                                            >
+                                                                <x-bladewind::timeline
+                                                                    date="Departure"
+                                                                    icon="map-pin"
+                                                                    content="{{ $ride->departure_address }}"
+                                                                />
+                                                                <x-bladewind::timeline
+                                                                    date="Destination"
+                                                                    icon="flag"
+                                                                    content="{{ $ride->destination_address }}"
+                                                                />
+                                                            </x-bladewind::timeline-group>
+
+                                                            <hr class="my-2">
+
+                                                            <div class="flex flex-auto gap-4">
+                                                                <div class="flex flex-auto gap-2">
+                                                                    <x-bladewind::icon name="clock" />
+                                                                    <div class="text-slate-500">
+                                                                        {{ \Carbon\Carbon::parse($ride->departure_date)->format('D, M j, Y') }}
+                                                                        {{ \Carbon\Carbon::parse($ride->departure_time)->format('h:i A') }}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="flex flex-auto gap-2">
+                                                                    <x-bladewind::icon name="banknotes" class="text-green-500"/>
+                                                                    <div class="text-slate-500 grid-rows-3">
+                                                                        <p>Base Price: RM <span id="base-price-{{ $ride->id }}">{{ $ride->price }}</span></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="flex flex-auto gap-2">
+                                                                    <x-bladewind::icon name="users" />
+                                                                    <div class="text-slate-500">
+                                                                        {{ $ride->number_of_passenger }} Seats
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    @if($ride->ride_type === 'request')
+                                                                        <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="orange" rounded="true" class="font-semibold" />
+                                                                    @else
+                                                                        <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="cyan" rounded="true" class="font-semibold" />
+                                                                    @endif
+                                                                </div>
+                                                                <div>
+                                                                    @if($ride->status === 'active')
+                                                                        <x-bladewind::tag label="Active" color="green" rounded="true" class="font-semibold" />
+                                                                    @elseif($ride->status === 'booked')
+                                                                        <x-bladewind::tag label="Booked" color="yellow" rounded="true" class="font-semibold" />
+                                                                    @elseif($ride->status === 'expired')
+                                                                        <x-bladewind::tag label="Expired" color="red" rounded="true" class="font-semibold" />
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                            @if($ride->ride_type === 'offer')
+                                                                <hr class="my-2">
+                                                                <div class="my-4">
+                                                                    <p class="font-bold text-gray-600 my-1">
+                                                                        Vehicle details
+                                                                    </p>
+                                                                    <div class="flex gap-4">
+                                                                        <div class="flex gap-1">
+                                                                            <div class="font-semibold">Vehicle number: </div>{{ $ride->offer->vehicle_number }}
+                                                                        </div>
+                                                                        <div class="flex gap-1">
+                                                                            <div class="font-semibold">Vehicle model: </div>{{ $ride->offer->vehicle_model }}
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            @endif
+                                                            <hr class="my-2">
+                                                            <div>
+                                                                <p class="font-bold text-gray-600 my-2">
+                                                                    Description
+                                                                </p>
+                                                                <x-bladewind::textarea
+                                                                    class="text-gray-500"
+                                                                    name="view-description-{{ $ride->id }}"
+                                                                    rows="6"
+                                                                    selected_value="{{ $ride->description }}"
+                                                                    disabled="true"
+                                                                />
+                                                            </div>
+                                                        </x-bladewind::card>
+                                                    </x-bladewind::modal>
+                                                </div>
+                                                <div>
+                                                    <button
+                                                       class="edit-button px-3 py-1 mx-2 rounded-md bg-orange-500 text-white hover:bg-orange-600"
                                                        onclick="showModal('edit-ride-{{ $ride->id }}')"
                                                     >
                                                         Edit
@@ -83,7 +192,7 @@
                                                         ok_button_label=""
                                                         cancel_button_label=""
                                                         show_close_icon="true"
-                                                        title="Editing Ride - {{ $ride->id }}"
+                                                        title="Editing Ride"
                                                         close_after_action="false"
                                                     >
                                                         <form action="/rides/{{ $ride->id }}" method="POST" id="edit-ride-form-{{ $ride->id }}">
@@ -280,7 +389,9 @@
                     <x-bladewind::tab-content name="incoming-booking">
 
                         @if($incoming_bookings->count())
-                            <x-bladewind::table>
+                            <x-bladewind::table
+                                searchable="true"
+                            >
                                 <x-slot name="header">
                                     <th>Id</th>
                                     <th>Ride Id</th>
@@ -363,7 +474,9 @@
 
                     <x-bladewind::tab-content name="outgoing-booking">
                         @if($outgoing_bookings->count())
-                            <x-bladewind::table>
+                            <x-bladewind::table
+                                searchable="true"
+                            >
                                 <x-slot name="header">
                                     <th>Id</th>
                                     <th>Ride Id</th>
