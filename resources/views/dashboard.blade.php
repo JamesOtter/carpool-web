@@ -423,34 +423,44 @@
                                         </td>
                                         <td>{{ $booking->updated_at->diffForHumans() }}</td>
                                         <td>
-                                            @if($booking->status === 'pending')
-                                            <form id="edit-booking-form-{{ $booking->id }}" action="/bookings/{{ $booking->id }}" method="POST">
-                                                @csrf
-                                                @method('patch')
-
-                                                <input type="hidden" name="action" id="action-{{ $booking->id }}" value="">
-
-                                                <div class="flex gap-3">
+                                            <div class="flex gap-2">
+                                                <a href="{{ route('rides.show', $booking->ride_id) }}">
                                                     <button
-                                                        type="submit"
-                                                        class="accept-btn px-2 py-1 bg-green-500 rounded-md text-white hover:bg-green-600 hover:shadow-md"
-                                                        data-booking-id="{{ $booking->id }}"
-                                                        onclick="document.getElementById('action-{{ $booking->id }}').value='accept'"
+                                                        class="view-booking-btn px-2 py-1 bg-blue-500 rounded-md text-white hover:bg-blue-600 hover:shadow-md"
                                                     >
-                                                        Accept
+                                                        View
                                                     </button>
+                                                </a>
 
-                                                    <button
-                                                        type="submit"
-                                                        class="decline-btn px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md"
-                                                        data-booking-id="{{ $booking->id }}"
-                                                        onclick="document.getElementById('action-{{ $booking->id }}').value='decline'"
-                                                    >
-                                                        Decline
-                                                    </button>
-                                                </div>
-                                            </form>
-                                            @endif
+                                                @if($booking->status === 'pending')
+                                                <form id="edit-booking-form-{{ $booking->id }}" action="/bookings/{{ $booking->id }}" method="POST">
+                                                    @csrf
+                                                    @method('patch')
+
+                                                    <input type="hidden" name="action" id="action-{{ $booking->id }}" value="">
+
+                                                    <div class="flex gap-2">
+                                                        <button
+                                                            type="submit"
+                                                            class="accept-btn px-2 py-1 bg-green-500 rounded-md text-white hover:bg-green-600 hover:shadow-md"
+                                                            data-booking-id="{{ $booking->id }}"
+                                                            onclick="document.getElementById('action-{{ $booking->id }}').value='accept'"
+                                                        >
+                                                            Accept
+                                                        </button>
+
+                                                        <button
+                                                            type="submit"
+                                                            class="decline-btn px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md"
+                                                            data-booking-id="{{ $booking->id }}"
+                                                            onclick="document.getElementById('action-{{ $booking->id }}').value='decline'"
+                                                        >
+                                                            Decline
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                                @endif
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -508,22 +518,31 @@
                                         </td>
                                         <td>{{ $booking->updated_at->diffForHumans() }}</td>
                                         <td>
-                                            @if($booking->status === 'pending')
-                                                <form id="cancel-booking-form-{{ $booking->id }}" action="/bookings/{{ $booking->id }}" method="POST">
-                                                    @csrf
-                                                    @method('delete')
+                                            <div class="flex gap-2">
+                                                <a href="{{ route('rides.show', $booking->ride_id) }}">
+                                                    <button
+                                                        class="view-booking-btn px-2 py-1 bg-blue-500 rounded-md text-white hover:bg-blue-600 hover:shadow-md"
+                                                    >
+                                                        View
+                                                    </button>
+                                                </a>
+                                                @if($booking->status === 'pending')
+                                                    <form id="cancel-booking-form-{{ $booking->id }}" action="/bookings/{{ $booking->id }}" method="POST">
+                                                        @csrf
+                                                        @method('delete')
 
-                                                    <div class="flex gap-3">
-                                                        <button
-                                                            type="submit"
-                                                            data-booking-id="{{ $booking->id }}"
-                                                            class="cancel-booking-btn px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md"
-                                                        >
-                                                            Cancel booking
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            @endif
+                                                        <div class="flex gap-2">
+                                                            <button
+                                                                type="submit"
+                                                                data-booking-id="{{ $booking->id }}"
+                                                                class="cancel-booking-btn px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md"
+                                                            >
+                                                                Cancel booking
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                @endif
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
