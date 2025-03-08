@@ -172,7 +172,7 @@
                                                                     name="view-description-{{ $ride->id }}"
                                                                     rows="6"
                                                                     selected_value="{{ $ride->description }}"
-                                                                    disabled="true"
+                                                                    readonly="true"
                                                                 />
                                                             </div>
                                                         </x-bladewind::card>

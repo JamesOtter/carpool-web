@@ -140,12 +140,72 @@
                             />
                         </div>
                     </div>
+                    <div class="mb-2">
+                        <x-bladewind::toggle label="Make recurring ride" label_position="right" />
+                    </div>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="grow">
+                            @php
+                                $recurrence_pattern = [
+                                    [ 'label' => 'Daily', 'value' => 'daily' ],
+                                    [ 'label' => 'Weekly', 'value' => 'weekly' ],
+                                    [ 'label' => 'Monthly', 'value' => 'monthly' ],
+                                ];
+                            @endphp
+                            <label for="">Recurrence pattern</label>
+                            <x-bladewind::select
+                                name="recurrence_pattern"
+                                placeholder="Recurrence Pattern"
+                                :data="$recurrence_pattern"
+                                required="true"
+                            />
+                        </div>
+                        <div class="grow">
+                            @php
+                                $recurrence_days = [
+                                    [ 'label' => 'Monday', 'value' => 'monday' ],
+                                    [ 'label' => 'Tuesday', 'value' => 'tuesday' ],
+                                    [ 'label' => 'Wednesday', 'value' => 'wednesday' ],
+                                    [ 'label' => 'Thursday', 'value' => 'thursday' ],
+                                    [ 'label' => 'Friday', 'value' => 'friday' ],
+                                    [ 'label' => 'Saturday', 'value' => 'saturday' ],
+                                    [ 'label' => 'Sunday', 'value' => 'sunday' ],
+                                ];
+                            @endphp
+                            <label for="">Recurrence days</label>
+                            <x-bladewind::select
+                                name="recurrence_days"
+                                placeholder="Recurrence Days"
+                                :data="$recurrence_days"
+                                required="true"
+                                multiple="true"
+                            />
+                        </div>
+                        <div class="grow">
+                            <label for="">Start date</label>
+                            <x-bladewind::datepicker
+                                min_date="{{ \Carbon\Carbon::yesterday()->format('Y-m-d') }}"
+                                placeholder="Select a date"
+                                required="true"
+                                name="start_date"
+                            />
+                        </div>
+                        <div class="grow">
+                            <label for="">End date</label>
+                            <x-bladewind::datepicker
+                                min_date="{{ \Carbon\Carbon::yesterday()->format('Y-m-d') }}"
+                                placeholder="Select a date"
+                                required="true"
+                                name="end_date"
+                            />
+                        </div>
+                    </div>
                     <div>
                         <label for="">Description</label>
                         <x-bladewind::textarea
                             name="description"
                             placeholder="Add more description about your ride"
-                            rows="10"
+                            rows="6"
                         />
                     </div>
                 </div>
