@@ -214,8 +214,6 @@
 
             let rides = rides_json.data;
 
-            let infoWindow = new google.maps.InfoWindow();
-
             rides.forEach((ride) => {
                 let service = new google.maps.places.PlacesService(map);
                 service.getDetails({ placeId: ride.departure_id }, (result, status) => {
@@ -227,7 +225,25 @@
                         });
 
                         marker.addListener("click", () => {
-                            infoWindow.setContent(`<h4>${ride.id}</h4><p>${ride.departure_address}</p>`);
+                            let content = `
+                                <div style="min-width: 300px; min-height: 180px; padding: 5px;">
+                                    <h3><strong>From</strong></h3>
+                                    <p>${ride.departure_address}</p>
+                                    <br>
+                                    <h3><strong>To</strong></h3>
+                                    <p>${ride.destination_address}</p>
+                                    <br>
+                                    <a href="/rides/${ride.id}"
+                                       style="display: inline-block; padding: 6px 10px; background: #007bff; color: white; font-weight: bold; border-radius: 4px; text-decoration: none; text-align: center;">
+                                        View Details
+                                    </a>
+                                </div>
+                            `;
+
+                            let infoWindow = new google.maps.InfoWindow({
+                                content: content,
+                                maxWidth: 350, // Adjust width to prevent wrapping
+                            });
                             infoWindow.open(map, marker);
                         });
                     }
