@@ -45,6 +45,7 @@ class RideController extends Controller
     }
     public function store(Request $request)
     {
+        dd($request);
         $request->validate([
             'ride_type' => 'required|in:request,offer',
             'departure_address' => 'required|string|max:255',

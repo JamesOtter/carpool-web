@@ -54,7 +54,7 @@
                     </div>
 
                     <div class="flex flex-wrap gap-4">
-                        <div class="grow">
+                        <div id="departure_date_content" class="grow">
                             <label for="">Select a date</label>
                             <x-bladewind::datepicker
                                 min_date="{{ \Carbon\Carbon::yesterday()->format('Y-m-d') }}"
@@ -141,9 +141,9 @@
                         </div>
                     </div>
                     <div class="mb-2">
-                        <x-bladewind::toggle label="Make recurring ride" label_position="right" />
+                        <x-bladewind::toggle label="Make recurring ride" label_position="right" onclick="toggleRecurring()"/>
                     </div>
-                    <div class="flex flex-wrap gap-4">
+                    <div id="recurring-ride-content" class="flex flex-wrap gap-4 hidden">
                         <div class="grow">
                             @php
                                 $recurrence_pattern = [
@@ -160,7 +160,7 @@
                                 required="true"
                             />
                         </div>
-                        <div class="grow">
+                        <div id="recurrence-days-content" class="grow">
                             @php
                                 $recurrence_days = [
                                     [ 'label' => 'Monday', 'value' => 'monday' ],
@@ -258,6 +258,38 @@
         </script>
 
         <script>
+            function toggleRecurring(){
+                const recurring_content = document.getElementById('recurring-ride-content');
+                const departureDate_content = document.getElementById('departure_date_content');
+
+                recurring_content.classList.toggle("hidden");
+                departureDate_content.classList.toggle("hidden");
+            }
+
+            document.addEventListener("DOMContentLoaded", function(){
+                let recurrencePatternSelect = document.querySelector(".bw-recurrence_pattern");
+                let recurrenceDaysDiv = document.getElementById("recurrence-days-content");
+
+                console.log("Dropdown Element:", recurrencePatternSelect);
+
+
+                function toggleRecurrenceDays() {
+                    if (recurrencePatternSelect.value === "daily") {
+                        recurrenceDaysDiv.classList.add("hidden"); // Hide the div
+                    } else {
+                        recurrenceDaysDiv.classList.remove("hidden"); // Show the div
+                    }
+                }
+
+                recurrencePatternSelect.addEventListener("change", toggleRecurrenceDays);
+
+                toggleRecurrenceDays();
+            });
+
+        </script>
+
+        <script>
+            //submit form
             $(document).ready(function() {
                 $('#clear-all').on('click', function(event) {
                     event.preventDefault();

@@ -8,7 +8,6 @@ use App\Models\Booking;
 use App\Models\Ride;
 use Illuminate\Support\Facades\Route;
 
-
 Route::get('/', function () {
     return view('home');
 });
