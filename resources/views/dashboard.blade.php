@@ -52,7 +52,7 @@
                                         <td>{{ $ride->departure_address }}</td>
                                         <td>{{ $ride->destination_address }}</td>
                                         <td>{{ $ride->departure_date }}</td>
-                                        <td>{{ $ride->departure_time }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($ride->departure_time)->format('h:i A') }}</td>
                                         <td>{{ $ride->updated_at->diffForHumans() }}</td>
                                         <td>
                                             @if($ride->status === 'active')
@@ -469,7 +469,7 @@
 
                         @else
                             <x-bladewind::empty-state
-                                message="There are no incoming bookings"
+                                message="There are no incoming bookings available"
                                 heading="Post more ride"
                             >
                                 <button
@@ -551,7 +551,7 @@
 
                         @else
                             <x-bladewind::empty-state
-                                message="There are no bookings available"
+                                message="There are no outgoing bookings available"
                                 heading="Book Ride Now"
                             >
                                 <button

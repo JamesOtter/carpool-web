@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\RecurringRideController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RideController;
 use App\Http\Controllers\SessionController;
@@ -21,8 +22,9 @@ Route::get('/rides/create', [RideController::class, 'create'])
 Route::post('/rides', [RideController::class, 'store'])
     ->name('rides.store')
     ->middleware('auth');
-Route::get('/rides/{id}', [RideController::class, 'show'])
+Route::get('/rides/{ride}', [RideController::class, 'show'])
     ->name('rides.show');
+
 //Route::get('/rides/{id}/edit', [RideController::class, 'edit'])->name('rides.edit');
 Route::patch('/rides/{id}', [RideController::class, 'update'])
     ->name('rides.update')
@@ -32,6 +34,10 @@ Route::delete('/rides/{id}', [RideController::class, 'destroy'])
     ->middleware('auth');
 Route::post('/get-price', [RideController::class, 'getPrice'])
     ->name('get.price');
+
+//Recurring Ride
+Route::get('/recurring-rides/{recurringRide}', [RecurringRideController::class, 'show'])
+    ->name('recurring-rides.show');
 
 //Dashboard
 Route::get('/dashboard', function () {

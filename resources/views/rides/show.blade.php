@@ -2,7 +2,7 @@
     @section('custom-css')
     @endsection
 
-    @section('title', 'Details Page')
+    @section('title', 'Ride Details')
 
     @section('heading')
             <div class="pb-3 md:px-32">
@@ -36,7 +36,7 @@
 
             <div id="map" style="width: 100%; height: 500px;"></div>
 
-            <div class="grid grid-cols-10 gap-4 mt-5">
+            <div class="grid grid-cols-10 gap-4 mt-5 mb-5">
                 <div class="grid col-span-7 gap-3 border-r-2 border-gray-300 pr-5">
                     <x-bladewind::card compact="true">
                         <x-bladewind::timeline-group
@@ -118,6 +118,21 @@
                             <p>Base Price: RM <span id="base-price-{{ $ride->id }}">{{ $ride->price }}</span></p>
                             <p>Surge Price: RM <span id="surge-price-{{ $ride->id }}">0.00</span></p>
                             <p>Total Price: RM <span id="total-price-{{ $ride->id }}">{{ $ride->price }}</span></p>
+                        </div>
+                    </x-bladewind::card>
+
+                    <x-bladewind::card compact="true">
+                        <div class="ml-2">
+                            <div class="font-bold text-lg mb-2">
+                                Description
+                            </div>
+                            <div>
+                                @if($ride->description)
+                                    {!! nl2br(e($ride->description)) !!}
+                                @else
+                                    No description
+                                @endif
+                            </div>
                         </div>
                     </x-bladewind::card>
 

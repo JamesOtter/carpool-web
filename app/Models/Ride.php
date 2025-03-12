@@ -12,6 +12,7 @@ class Ride extends Model
     protected $fillable = [
         'user_id',
         'ride_type',
+        'recurring_id',
         'departure_address',
         'departure_id',
         'destination_address',
@@ -39,5 +40,10 @@ class Ride extends Model
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    public function recurringRide()
+    {
+        return $this->belongsTo(RecurringRide::class, 'recurring_id');
     }
 }

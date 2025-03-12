@@ -71,9 +71,14 @@
     @section('content')
         <div id="content_wrapper" class="flex h-screen">
             <div id="content_1" class="w-1/2 max-h-screen overflow-auto">
-                @if($rides->count())
-                    @foreach($rides as $ride)
-                        <a href="{{ route('rides.show', $ride->id) }}" class="block">
+                @if($sortedRides->count())
+                    @foreach($sortedRides as $rideData)
+                        @if($rideData['type'] === 'regular')
+                            <a href="{{ route('rides.show', $rideData['ride']->id) }}" class="block">
+                        @else
+                            <a href="{{ route('recurring-rides.show', $rideData['ride']->recurringRide->id) }}" class="block">
+                        @endif
+{{--                        <a href="{{ route('rides.show', $rideData['ride']->id) }}" class="block">--}}
                             <x-bladewind::card
                                 compact="true"
                                 has_shadow="true"
@@ -90,53 +95,68 @@
                                     <x-bladewind::timeline
                                         date="Departure"
                                         icon="map-pin"
-                                        content="{{ $ride->departure_address }}"
+                                        content="{{ $rideData['ride']->departure_address }}"
                                     />
                                     <x-bladewind::timeline
                                         date="Destination"
                                         icon="flag"
-                                        content="{{ $ride->destination_address }}"
+                                        content="{{ $rideData['ride']->destination_address }}"
                                     />
                                 </x-bladewind::timeline-group>
-
                                 <hr class="my-2">
                                 <div class="flex flex-auto gap-4">
                                     <div class="flex flex-auto gap-2">
                                         <x-bladewind::icon name="clock" />
-                                        <div class="text-slate-500">
-                                            {{ \Carbon\Carbon::parse($ride->departure_date)->format('D, M j, Y') }}
-                                            {{ \Carbon\Carbon::parse($ride->departure_time)->format('h:i A') }}
-                                        </div>
+                                        @if($rideData['type'] === 'regular')
+                                            <div class="text-slate-500">
+                                                {{ \Carbon\Carbon::parse($rideData['ride']->departure_date)->format('D, M j, Y') }}
+                                                {{ \Carbon\Carbon::parse($rideData['ride']->departure_time)->format('h:i A') }}
+                                            </div>
+                                        @else
+                                            <div class="text-slate-500">
+                                                <p>Start date: {{ \Carbon\Carbon::parse($rideData['ride']->recurringRide->start_date)->format('D, M j, Y') }}</p>
+                                                <p>End date: {{ \Carbon\Carbon::parse($rideData['ride']->recurringRide->end_date)->format('D, M j, Y') }}</p>
+                                                <p>Time: {{ \Carbon\Carbon::parse($rideData['ride']->departure_time)->format('h:i A') }}</p>
+                                            </div>
+                                        @endif
+
                                     </div>
                                     <div class="flex flex-auto gap-2">
                                         <x-bladewind::icon name="banknotes" class="text-green-500"/>
                                         <div class="text-slate-500 grid-rows-3">
-                                            <p>Base Price: RM <span id="base-price-{{ $ride->id }}">{{ $ride->price }}</span></p>
-                                            <p>Surge Price: RM <span id="surge-price-{{ $ride->id }}">0.00</span></p>
-                                            <p>Total Price: RM <span id="total-price-{{ $ride->id }}">{{ $ride->price }}</span></p>
+                                            <p>Base Price: RM <span id="base-price-{{ $rideData['ride']->id }}">{{ $rideData['ride']->price }}</span></p>
+                                            <p>Surge Price: RM <span id="surge-price-{{ $rideData['ride']->id }}">0.00</span></p>
+                                            <p>Total Price: RM <span id="total-price-{{ $rideData['ride']->id }}">{{ $rideData['ride']->price }}</span></p>
                                         </div>
                                     </div>
                                     <div class="flex flex-auto gap-2">
                                         <x-bladewind::icon name="users" />
                                         <div class="text-slate-500">
-                                            {{ $ride->number_of_passenger }} Seats
+                                            {{ $rideData['ride']->number_of_passenger }} Seats
                                         </div>
                                     </div>
                                     <div>
-                                        @if($ride->ride_type === 'request')
-                                            <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="orange" rounded="true" class="font-semibold" />
-                                        @else
-                                            <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="cyan" rounded="true" class="font-semibold" />
-                                        @endif
+                                        <div>
+                                            @if($rideData['ride']->ride_type === 'request')
+                                                <x-bladewind::tag label="Ride {{ $rideData['ride']->ride_type }}" color="orange" rounded="true" class="font-semibold" />
+                                            @else
+                                                <x-bladewind::tag label="Ride {{ $rideData['ride']->ride_type }}" color="cyan" rounded="true" class="font-semibold" />
+                                            @endif
+                                        </div>
+                                        <div>
+                                            @if($rideData['type'] === 'recurring')
+                                                <x-bladewind::tag label="Recurring" color="purple" rounded="true" class="font-semibold" />
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </x-bladewind::card>
                         </a>
                     @endforeach
                     <!-- This is the pagination navigation links -->
-                    <div class="mr-2">
-                        {{ $rides->appends(request()->query())->links() }}
-                    </div>
+{{--                    <div class="mr-2">--}}
+{{--                        {{ $rides->appends(request()->query())->links() }}--}}
+{{--                    </div>--}}
                 @else
                     <x-bladewind::empty-state
                         message="There are no rides available"
@@ -210,30 +230,39 @@
                 );
             }
 
-            let rides_json = {!! json_encode($rides) !!};
+            let sortedRides = Object.values({!! json_encode($sortedRides, JSON_HEX_TAG) !!});
 
-            let rides = rides_json.data;
+            console.log(sortedRides)
 
-            rides.forEach((ride) => {
+            sortedRides.forEach((rideData) => {
                 let service = new google.maps.places.PlacesService(map);
-                service.getDetails({ placeId: ride.departure_id }, (result, status) => {
+
+                console.log("Adding marker for:", rideData.ride.departure_id);
+                service.getDetails({ placeId: rideData.ride.departure_id }, (result, status) => {
+                    console.log("Google Places API Status:", status);
+                    console.log("Result:", result);
+
                     if (status === google.maps.places.PlacesServiceStatus.OK) {
                         let marker = new google.maps.Marker({
                             map,
                             position: result.geometry.location,
-                            title: ride.id,
+                            title: rideData.ride.id,
                         });
 
                         marker.addListener("click", () => {
+                            let rideUrl = rideData.type === "recurring"
+                                ? `/recurring-rides/${rideData.ride.recurring_id}`
+                                : `/rides/${rideData.ride.id}`;
+
                             let content = `
                                 <div style="min-width: 300px; min-height: 180px; padding: 5px;">
                                     <h3><strong>From</strong></h3>
-                                    <p>${ride.departure_address}</p>
+                                    <p>${rideData.ride.departure_address}</p>
                                     <br>
                                     <h3><strong>To</strong></h3>
-                                    <p>${ride.destination_address}</p>
+                                    <p>${rideData.ride.destination_address}</p>
                                     <br>
-                                    <a href="/rides/${ride.id}"
+                                    <a href="${rideUrl}"
                                        style="display: inline-block; padding: 6px 10px; background: #007bff; color: white; font-weight: bold; border-radius: 4px; text-decoration: none; text-align: center;">
                                         View Details
                                     </a>
@@ -306,8 +335,8 @@
 
         //Update prices on page load
         $(document).ready(function() {
-            @foreach($rides as $ride)
-                updatePrice({{ $ride->id }});
+            @foreach($sortedRides as $rideData)
+                updatePrice({{ $rideData['ride']->id }});
             @endforeach
 
             const Toast = Swal.mixin({

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('rides', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('recurring_id')->nullable()->constrained('recurring_rides')->onDelete('cascade');
             $table->enum('ride_type', ['request', 'offer']);
             $table->string('departure_address');
             $table->string('departure_id');

@@ -141,7 +141,7 @@
                         </div>
                     </div>
                     <div class="mb-2">
-                        <x-bladewind::toggle label="Make recurring ride" label_position="right" onclick="toggleRecurring()"/>
+                        <x-bladewind::toggle label="Make recurring ride" label_position="right" name="recurring-toggle" onclick="toggleRecurring()"/>
                     </div>
                     <div id="recurring-ride-content" class="flex flex-wrap gap-4 hidden">
                         <div class="grow">
@@ -149,7 +149,6 @@
                                 $recurrence_pattern = [
                                     [ 'label' => 'Daily', 'value' => 'daily' ],
                                     [ 'label' => 'Weekly', 'value' => 'weekly' ],
-                                    [ 'label' => 'Monthly', 'value' => 'monthly' ],
                                 ];
                             @endphp
                             <label for="">Recurrence pattern</label>
