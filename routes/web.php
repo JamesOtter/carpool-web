@@ -24,8 +24,6 @@ Route::post('/rides', [RideController::class, 'store'])
     ->middleware('auth');
 Route::get('/rides/{ride}', [RideController::class, 'show'])
     ->name('rides.show');
-
-//Route::get('/rides/{id}/edit', [RideController::class, 'edit'])->name('rides.edit');
 Route::patch('/rides/{id}', [RideController::class, 'update'])
     ->name('rides.update')
     ->middleware('auth');
@@ -41,26 +39,33 @@ Route::get('/recurring-rides/{recurringRide}', [RecurringRideController::class, 
 
 //Dashboard
 Route::get('/dashboard', function () {
+    $userId = auth()->id();
+
     return view('dashboard', [
-        'rides' => Ride::with('user', 'offer')
-            ->where('user_id', auth()->id())
-            ->latest()
-            ->get(),
-        'outgoing_bookings' => Booking::with('sender', 'receiver', 'ride')
-            ->where('sender_id', auth()->id())
-            ->latest()
-            ->get(),
-        'incoming_bookings' => Booking::with('sender', 'receiver', 'ride')
-            ->where('receiver_id', auth()->id())
-            ->latest()
-            ->get(),
+        'rides' => Ride::with('user', 'offer', 'recurringRide')
+            ->where('user_id', $userId)
+            ->get()
+            ->groupBy(function ($ride) {
+                return $ride->recurring_id ?? 'single_' . $ride->id;
+            }),
+        'incoming_bookings' => Booking::with('sender', 'receiver', 'ride.recurringRide')
+            ->where('receiver_id', $userId)
+            ->get()
+            ->groupBy(function ($booking) {
+                $groupKey = $booking->ride->recurring_id ?? 'single_' . $booking->ride_id;
+                return $booking->status === 'declined' ? 'rejected_' . $groupKey : 'active_' . $groupKey;
+            }),
+        'outgoing_bookings' => Booking::with('sender', 'receiver', 'ride.recurringRide')
+            ->where('sender_id', $userId)
+            ->get()
+            ->groupBy(function ($booking) {
+                $groupKey = $booking->ride->recurring_id ?? 'single_' . $booking->ride_id;
+                return $booking->status === 'declined' ? 'rejected_' . $groupKey : 'active_' . $groupKey;
+            }),
     ]);
 })->middleware('auth');
 
 //Booking
-Route::get('/bookings/create', [BookingController::class, 'create'])
-    ->name('bookings.create')
-    ->middleware('auth');
 Route::post('/bookings', [BookingController::class, 'store'])
     ->name('bookings.store')
     ->middleware('auth');

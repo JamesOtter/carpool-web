@@ -34,32 +34,62 @@
                                     <th>Ride Type</th>
                                     <th>Departure Address</th>
                                     <th>Destination Address</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
                                     <th>Departure Date</th>
                                     <th>Departure Time</th>
-                                    <th>Updated at</th>
+                                    <th>Created at</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </x-slot>
-                                @foreach($rides as $ride)
+                                @foreach($rides as $groupKey => $rideGroup)
+                                    @php
+                                        $isRecurring = is_numeric($groupKey); // Recurring rides have a numeric group key
+                                        $firstRide = $rideGroup->first(); // Get the first ride in the group
+                                    @endphp
+
                                     <tr>
                                         <td>
-                                            @if($ride->ride_type === 'request')
-                                                <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="orange" rounded="true" class="font-semibold" />
+                                            @if($firstRide->ride_type === 'request')
+                                                <x-bladewind::tag label="Ride {{ $firstRide->ride_type }}" color="orange" rounded="true" class="font-semibold" />
                                             @else
-                                                <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="cyan" rounded="true" class="font-semibold" />
+                                                <x-bladewind::tag label="Ride {{ $firstRide->ride_type }}" color="cyan" rounded="true" class="font-semibold" />
                                             @endif
                                         </td>
-                                        <td>{{ $ride->departure_address }}</td>
-                                        <td>{{ $ride->destination_address }}</td>
-                                        <td>{{ $ride->departure_date }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($ride->departure_time)->format('h:i A') }}</td>
-                                        <td>{{ $ride->updated_at->diffForHumans() }}</td>
+                                        <td>{{ $firstRide->departure_address }}</td>
+                                        <td>{{ $firstRide->destination_address }}</td>
                                         <td>
-                                            @if($ride->status === 'active')
+                                            @if($isRecurring)
+                                                {{ $firstRide->recurringRide->start_date }}
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($isRecurring)
+                                                {{ $firstRide->recurringRide->end_date }}
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($isRecurring)
+                                                @foreach($rideGroup as $ride)
+                                                    {{ $ride->departure_date }}
+                                                    <br>
+                                                @endforeach
+                                            @else
+                                                {{ $firstRide->departure_date }}
+                                            @endif
+                                        </td>
+                                        <td>{{ \Carbon\Carbon::parse($firstRide->departure_time)->format('h:i A') }}</td>
+                                        <td>{{ $firstRide->created_at->diffForHumans() }}</td>
+                                        <td>
+                                            @if($firstRide->status === 'active')
                                                 <x-bladewind::tag label="Active" color="green" rounded="true" class="font-semibold" />
-                                            @elseif($ride->status === 'booked')
+                                            @elseif($firstRide->status === 'booked')
                                                 <x-bladewind::tag label="Booked" color="yellow" rounded="true" class="font-semibold" />
-                                            @elseif($ride->status === 'expired')
+                                            @elseif($firstRide->status === 'expired')
                                                 <x-bladewind::tag label="Expired" color="red" rounded="true" class="font-semibold" />
                                             @endif
                                         </td>
@@ -68,12 +98,12 @@
                                                 <div>
                                                     <button
                                                         class="view-ride-btn px-3 py-1 rounded-md bg-blue-500 text-white hover:bg-blue-600"
-                                                        onclick="showModal('view-ride-{{ $ride->id }}')"
+                                                        onclick="showModal('view-ride-{{ $firstRide->id }}')"
                                                     >
                                                         View
                                                     </button>
                                                     <x-bladewind::modal
-                                                        name="view-ride-{{ $ride->id }}"
+                                                        name="view-ride-{{ $firstRide->id }}"
                                                         blur_size="small"
                                                         size="xl"
                                                         ok_button_label=""
@@ -97,12 +127,12 @@
                                                                 <x-bladewind::timeline
                                                                     date="Departure"
                                                                     icon="map-pin"
-                                                                    content="{{ $ride->departure_address }}"
+                                                                    content="{{ $firstRide->departure_address }}"
                                                                 />
                                                                 <x-bladewind::timeline
                                                                     date="Destination"
                                                                     icon="flag"
-                                                                    content="{{ $ride->destination_address }}"
+                                                                    content="{{ $firstRide->destination_address }}"
                                                                 />
                                                             </x-bladewind::timeline-group>
 
@@ -112,40 +142,51 @@
                                                                 <div class="flex flex-auto gap-2">
                                                                     <x-bladewind::icon name="clock" />
                                                                     <div class="text-slate-500">
-                                                                        {{ \Carbon\Carbon::parse($ride->departure_date)->format('D, M j, Y') }}
-                                                                        {{ \Carbon\Carbon::parse($ride->departure_time)->format('h:i A') }}
+                                                                        @if($isRecurring)
+                                                                            <p>Start date: {{ \Carbon\Carbon::parse($firstRide->recurringRide->start_date)->format('D, M j, Y') }}</p>
+                                                                            <p>End date: {{ \Carbon\Carbon::parse($firstRide->recurringRide->end_date)->format('D, M j, Y') }}</p>
+                                                                            <p>Time: {{ \Carbon\Carbon::parse($firstRide->departure_time)->format('h:i A') }}</p>
+                                                                        @else
+                                                                            {{ \Carbon\Carbon::parse($firstRide->departure_date)->format('D, M j, Y') }}
+                                                                            {{ \Carbon\Carbon::parse($firstRide->departure_time)->format('h:i A') }}
+                                                                        @endif
                                                                     </div>
                                                                 </div>
                                                                 <div class="flex flex-auto gap-2">
                                                                     <x-bladewind::icon name="banknotes" class="text-green-500"/>
                                                                     <div class="text-slate-500 grid-rows-3">
-                                                                        <p>Base Price: RM <span id="base-price-{{ $ride->id }}">{{ $ride->price }}</span></p>
+                                                                        <p>Base Price: RM <span id="base-price-{{ $firstRide->id }}">{{ $firstRide->price }}</span></p>
                                                                     </div>
                                                                 </div>
                                                                 <div class="flex flex-auto gap-2">
                                                                     <x-bladewind::icon name="users" />
                                                                     <div class="text-slate-500">
-                                                                        {{ $ride->number_of_passenger }} Seats
+                                                                        {{ $firstRide->number_of_passenger }} Seats
                                                                     </div>
                                                                 </div>
                                                                 <div>
-                                                                    @if($ride->ride_type === 'request')
-                                                                        <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="orange" rounded="true" class="font-semibold" />
+                                                                    @if($firstRide->ride_type === 'request')
+                                                                        <x-bladewind::tag label="Ride {{ $firstRide->ride_type }}" color="orange" rounded="true" class="font-semibold" />
                                                                     @else
-                                                                        <x-bladewind::tag label="Ride {{ $ride->ride_type }}" color="cyan" rounded="true" class="font-semibold" />
+                                                                        <x-bladewind::tag label="Ride {{ $firstRide->ride_type }}" color="cyan" rounded="true" class="font-semibold" />
                                                                     @endif
                                                                 </div>
                                                                 <div>
-                                                                    @if($ride->status === 'active')
+                                                                    @if($isRecurring)
+                                                                        <x-bladewind::tag label="Recurring" color="purple" rounded="true" class="font-semibold" />
+                                                                    @endif
+                                                                </div>
+                                                                <div>
+                                                                    @if($firstRide->status === 'active')
                                                                         <x-bladewind::tag label="Active" color="green" rounded="true" class="font-semibold" />
-                                                                    @elseif($ride->status === 'booked')
+                                                                    @elseif($firstRide->status === 'booked')
                                                                         <x-bladewind::tag label="Booked" color="yellow" rounded="true" class="font-semibold" />
-                                                                    @elseif($ride->status === 'expired')
+                                                                    @elseif($firstRide->status === 'expired')
                                                                         <x-bladewind::tag label="Expired" color="red" rounded="true" class="font-semibold" />
                                                                     @endif
                                                                 </div>
                                                             </div>
-                                                            @if($ride->ride_type === 'offer')
+                                                            @if($firstRide->ride_type === 'offer')
                                                                 <hr class="my-2">
                                                                 <div class="my-4">
                                                                     <p class="font-bold text-gray-600 my-1">
@@ -153,10 +194,10 @@
                                                                     </p>
                                                                     <div class="flex gap-4">
                                                                         <div class="flex gap-1">
-                                                                            <div class="font-semibold">Vehicle number: </div>{{ $ride->offer->vehicle_number }}
+                                                                            <div class="font-semibold">Vehicle number: </div>{{ $firstRide->offer->vehicle_number }}
                                                                         </div>
                                                                         <div class="flex gap-1">
-                                                                            <div class="font-semibold">Vehicle model: </div>{{ $ride->offer->vehicle_model }}
+                                                                            <div class="font-semibold">Vehicle model: </div>{{ $firstRide->offer->vehicle_model }}
                                                                         </div>
                                                                     </div>
 
@@ -169,9 +210,9 @@
                                                                 </p>
                                                                 <x-bladewind::textarea
                                                                     class="text-gray-500"
-                                                                    name="view-description-{{ $ride->id }}"
+                                                                    name="view-description-{{ $firstRide->id }}"
                                                                     rows="6"
-                                                                    selected_value="{{ $ride->description }}"
+                                                                    selected_value="{{ $firstRide->description }}"
                                                                     readonly="true"
                                                                 />
                                                             </div>
@@ -181,12 +222,12 @@
                                                 <div>
                                                     <button
                                                        class="edit-button px-3 py-1 mx-2 rounded-md bg-orange-500 text-white hover:bg-orange-600"
-                                                       onclick="showModal('edit-ride-{{ $ride->id }}')"
+                                                       onclick="showModal('edit-ride-{{ $firstRide->id }}')"
                                                     >
                                                         Edit
                                                     </button>
                                                     <x-bladewind::modal
-                                                        name="edit-ride-{{ $ride->id }}"
+                                                        name="edit-ride-{{ $firstRide->id }}"
                                                         blur_size="small"
                                                         size="xl"
                                                         ok_button_label=""
@@ -195,7 +236,7 @@
                                                         title="Editing Ride"
                                                         close_after_action="false"
                                                     >
-                                                        <form action="/rides/{{ $ride->id }}" method="POST" id="edit-ride-form-{{ $ride->id }}">
+                                                        <form action="/rides/{{ $firstRide->id }}" method="POST" id="edit-ride-form-{{ $firstRide->id }}">
                                                             @csrf
                                                             @method('patch')
 
@@ -203,15 +244,15 @@
                                                                 <div class="grow">
                                                                     <label for="">Departure</label>
                                                                     <x-location-input
-                                                                        name="departure_address-{{ $ride->id }}"
+                                                                        name="departure_address-{{ $firstRide->id }}"
                                                                         placeholder="Enter departure address"
-                                                                        id="departure_address_{{ $ride->id }}"
+                                                                        id="departure_address_{{ $firstRide->id }}"
                                                                         required="true"
                                                                         :need_id="true"
-                                                                        place_id="departure_id_{{ $ride->id }}"
-                                                                        old_place_id_value="{{ $ride->departure_id }}"
-                                                                        ride_id_value="{{ $ride->id }}"
-                                                                        value="{!! $ride->departure_address !!}"
+                                                                        place_id="departure_id_{{ $firstRide->id }}"
+                                                                        old_place_id_value="{{ $firstRide->departure_id }}"
+                                                                        ride_id_value="{{ $firstRide->id }}"
+                                                                        value="{!! $firstRide->departure_address !!}"
                                                                     />
                                                                 </div>
 
@@ -222,111 +263,113 @@
                                                                 <div class="grow">
                                                                     <label for="">Destination</label>
                                                                     <x-location-input
-                                                                        name="destination_address-{{ $ride->id }}"
+                                                                        name="destination_address-{{ $firstRide->id }}"
                                                                         placeholder="Enter destination address"
-                                                                        id="destination_address_{{ $ride->id }}"
+                                                                        id="destination_address_{{ $firstRide->id }}"
                                                                         required="true"
                                                                         :need_id="true"
-                                                                        place_id="destination_id_{{ $ride->id }}"
-                                                                        old_place_id_value="{{ $ride->destination_id }}"
-                                                                        ride_id_value="{{ $ride->id }}"
-                                                                        value="{!! $ride->destination_address !!}"
+                                                                        place_id="destination_id_{{ $firstRide->id }}"
+                                                                        old_place_id_value="{{ $firstRide->destination_id }}"
+                                                                        ride_id_value="{{ $firstRide->id }}"
+                                                                        value="{!! $firstRide->destination_address !!}"
                                                                     />
                                                                 </div>
                                                             </div>
 
                                                             <div class="flex gap-4">
-                                                                <div class="grow">
-                                                                    <label for="">Select a date</label>
-                                                                    <x-bladewind::datepicker
-                                                                        min_date="{{ \Carbon\Carbon::yesterday()->format('Y-m-d') }}"
-                                                                        placeholder="Select a date"
-                                                                        required="true"
-                                                                        name="departure_date-{{ $ride->id }}"
-                                                                        default_date="{{ $ride->departure_date }}"
-                                                                    />
-                                                                </div>
+                                                                @if(!$isRecurring)
+                                                                    <div class="grow">
+                                                                        <label for="">Departure Date</label>
+                                                                        <x-bladewind::datepicker
+                                                                            min_date="{{ \Carbon\Carbon::yesterday()->format('Y-m-d') }}"
+                                                                            placeholder="Select a date"
+                                                                            required="true"
+                                                                            name="departure_date-{{ $firstRide->id }}"
+                                                                            default_date="{{ $firstRide->departure_date }}"
+                                                                        />
+                                                                    </div>
+                                                                @endif
                                                                 <div>
                                                                     <div>
-                                                                        <label for="">Select a time</label>
+                                                                        <label for="">Departure Time</label>
                                                                     </div>
                                                                     <div>
                                                                         <x-bladewind::timepicker
                                                                             format="24"
                                                                             required="true"
-                                                                            name="departure_time-{{ $ride->id }}"
-                                                                            selected_value="{{ $ride->departure_time }}"
+                                                                            name="departure_time-{{ $firstRide->id }}"
+                                                                            selected_value="{{ $firstRide->departure_time }}"
                                                                         />
                                                                     </div>
                                                                 </div>
                                                                 <div class="hidden">
                                                                     @php
-                                                                        $ride_type = [
+                                                                        $firstRide_type = [
                                                                             [ 'label' => 'Request', 'value' => 'request' ],
                                                                             [ 'label' => 'Offer', 'value' => 'offer' ],
                                                                         ];
                                                                     @endphp
                                                                     <label for="">Ride type</label>
                                                                     <x-bladewind::select
-                                                                        name="ride_type-{{ $ride->id }}"
+                                                                        name="ride_type-{{ $firstRide->id }}"
                                                                         placeholder="Ride type"
-                                                                        :data="$ride_type"
+                                                                        :data="$firstRide_type"
                                                                         required="true"
-                                                                        selected_value="{{ $ride->ride_type }}"
+                                                                        selected_value="{{ $firstRide->ride_type }}"
                                                                     />
                                                                 </div>
                                                                 <div class="grow">
                                                                     <label for="">Number of passenger</label>
                                                                     <x-bladewind::input
-                                                                        name="number_of_passenger-{{ $ride->id }}"
+                                                                        name="number_of_passenger-{{ $firstRide->id }}"
                                                                         numeric="true"
                                                                         placeholder="No. of Passenger"
                                                                         prefix="users"
                                                                         prefix_is_icon="true"
                                                                         required="true"
-                                                                        value="{{ $ride->number_of_passenger }}"
+                                                                        value="{{ $firstRide->number_of_passenger }}"
                                                                     />
                                                                 </div>
 
                                                                 <div class="grow">
                                                                     <label for="">Base Price</label>
                                                                     <x-bladewind::input
-                                                                        name="price-{{ $ride->id }}"
+                                                                        name="price-{{ $firstRide->id }}"
                                                                         placeholder="0.00"
                                                                         prefix="RM"
                                                                         transparent_prefix="false"
                                                                         required="true"
                                                                         numeric="true"
-                                                                        value="{{ $ride->price }}"
+                                                                        value="{{ $firstRide->price }}"
                                                                     />
                                                                 </div>
                                                             </div>
 
                                                             <div>
-                                                                <input type="hidden" name="distance_{{ $ride->id }}" id="distance_{{ $ride->id }}" value="{{ $ride->distance }}">
+                                                                <input type="hidden" name="distance_{{ $firstRide->id }}" id="distance_{{ $firstRide->id }}" value="{{ $firstRide->distance }}">
                                                             </div>
 
                                                             <div>
-                                                                <input type="hidden" name="duration_{{ $ride->id }}" id="duration_{{ $ride->id }}" value="{{ $ride->duration }}">
+                                                                <input type="hidden" name="duration_{{ $firstRide->id }}" id="duration_{{ $firstRide->id }}" value="{{ $firstRide->duration }}">
                                                             </div>
 
                                                             <div class="flex flex-wrap gap-4">
-                                                                <div class="grow hidden" id="vehicle_plate_number_field_{{ $ride->id }}">
+                                                                <div class="grow hidden" id="vehicle_plate_number_field_{{ $firstRide->id }}">
                                                                     <label for="">Vehicle number</label>
                                                                     <x-bladewind::input
-                                                                        name="vehicle_number-{{ $ride->id }}"
+                                                                        name="vehicle_number-{{ $firstRide->id }}"
                                                                         placeholder="Enter vehicle plate number"
                                                                         required="true"
-                                                                        value="{{ $ride->offer->vehicle_number ?? null}}"
+                                                                        value="{{ $firstRide->offer->vehicle_number ?? null}}"
                                                                     />
                                                                 </div>
-                                                                <div class="grow hidden" id="vehicle_model_field_{{ $ride->id }}">
+                                                                <div class="grow hidden" id="vehicle_model_field_{{ $firstRide->id }}">
                                                                     <label for="">Vehicle Model</label>
                                                                     <x-bladewind::input
-                                                                        name="vehicle_model-{{ $ride->id }}"
+                                                                        name="vehicle_model-{{ $firstRide->id }}"
                                                                         placeholder="Enter vehicle model"
                                                                         required="true"
-                                                                        value="{{ $ride->offer->vehicle_model ?? null}}"
+                                                                        value="{{ $firstRide->offer->vehicle_model ?? null}}"
                                                                     />
                                                                 </div>
                                                             </div>
@@ -334,19 +377,19 @@
                                                             <div>
                                                                 <label for="">Description</label>
                                                                 <x-bladewind::textarea
-                                                                    name="description-{{ $ride->id }}"
+                                                                    name="description-{{ $firstRide->id }}"
                                                                     placeholder="Add more description about your ride"
                                                                     rows="10"
-                                                                    selected_value="{{ $ride->description }}"
+                                                                    selected_value="{{ $firstRide->description }}"
                                                                 />
                                                             </div>
                                                             <div class="grid justify-items-end">
                                                                 <x-bladewind::button
-                                                                    name="btn-save-{{ $ride->id }}"
+                                                                    name="btn-save-{{ $firstRide->id }}"
                                                                     radius="medium"
                                                                     has_spinner="true"
                                                                     class="shadow-md shadow-blue-200 hover:shadow-blue-400"
-                                                                    data-ride-id="{{ $ride->id }}"
+                                                                    data-ride-id="{{ $firstRide->id }}"
                                                                 >
                                                                     Save Changes
                                                                 </x-bladewind::button>
@@ -357,11 +400,11 @@
                                                 <div>
                                                     <button
                                                         class="delete-button px-3 py-1 rounded-md bg-red-500 text-white hover:bg-red-600"
-                                                        data-ride-id="{{ $ride->id }}"
+                                                        data-ride-id="{{ $firstRide->id }}"
                                                     >
                                                         Delete
                                                     </button>
-                                                    <form id="delete-ride-form-{{ $ride->id }}" method="POST" action="/rides/{{ $ride->id }}" class="hidden">
+                                                    <form id="delete-ride-form-{{ $firstRide->id }}" method="POST" action="/rides/{{ $firstRide->id }}" class="hidden">
                                                         @csrf
                                                         @method('delete')
                                                     </form>
@@ -389,76 +432,179 @@
                     <x-bladewind::tab-content name="incoming-booking">
 
                         @if($incoming_bookings->count())
+{{--                            <x-bladewind::table--}}
+{{--                                searchable="true"--}}
+{{--                            >--}}
+{{--                                <x-slot name="header">--}}
+{{--                                    <th>Sender Name</th>--}}
+{{--                                    <th>Receiver</th>--}}
+{{--                                    <th>Departure Date</th>--}}
+{{--                                    <th>Status</th>--}}
+{{--                                    <th>Updated at</th>--}}
+{{--                                    <th>Actions</th>--}}
+{{--                                </x-slot>--}}
+
+{{--                                @foreach($incoming_bookings as $booking)--}}
+{{--                                    <tr>--}}
+{{--                                        <td>{{ $booking->sender->name }}</td>--}}
+{{--                                        <td>You</td>--}}
+{{--                                        <td>{{ $booking->ride->departure_date }}</td>--}}
+{{--                                        <td>--}}
+{{--                                            @if($booking->status === 'pending')--}}
+{{--                                                <x-bladewind::tag label="Pending" color="yellow" rounded="true" class="font-semibold" />--}}
+{{--                                            @elseif($booking->status === 'accepted')--}}
+{{--                                                <x-bladewind::tag label="Accepted" color="green" rounded="true" class="font-semibold" />--}}
+{{--                                            @elseif($booking->status === 'declined')--}}
+{{--                                                <x-bladewind::tag label="Declined" color="red" rounded="true" class="font-semibold" />--}}
+{{--                                            @elseif($booking->status === 'expired')--}}
+{{--                                                <x-bladewind::tag label="Expired" color="gray" rounded="true" class="font-semibold" />--}}
+{{--                                            @endif--}}
+{{--                                        </td>--}}
+{{--                                        <td>{{ $booking->updated_at->diffForHumans() }}</td>--}}
+{{--                                        <td>--}}
+{{--                                            <div class="flex gap-2">--}}
+{{--                                                <a href="{{ route('rides.show', $booking->ride_id) }}">--}}
+{{--                                                    <button--}}
+{{--                                                        class="view-booking-btn px-2 py-1 bg-blue-500 rounded-md text-white hover:bg-blue-600 hover:shadow-md"--}}
+{{--                                                    >--}}
+{{--                                                        View--}}
+{{--                                                    </button>--}}
+{{--                                                </a>--}}
+
+{{--                                                @if($booking->status === 'pending')--}}
+{{--                                                    <form id="edit-booking-form-{{ $booking->id }}" action="/bookings/{{ $booking->id }}" method="POST">--}}
+{{--                                                        @csrf--}}
+{{--                                                        @method('patch')--}}
+
+{{--                                                        <input type="hidden" name="action" id="action-{{ $booking->id }}" value="">--}}
+
+{{--                                                        <div class="flex gap-2">--}}
+{{--                                                            <button--}}
+{{--                                                                type="submit"--}}
+{{--                                                                class="accept-btn px-2 py-1 bg-green-500 rounded-md text-white hover:bg-green-600 hover:shadow-md"--}}
+{{--                                                                data-booking-id="{{ $booking->id }}"--}}
+{{--                                                                onclick="document.getElementById('action-{{ $booking->id }}').value='accept'"--}}
+{{--                                                            >--}}
+{{--                                                                Accept--}}
+{{--                                                            </button>--}}
+
+{{--                                                            <button--}}
+{{--                                                                type="submit"--}}
+{{--                                                                class="decline-btn px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md"--}}
+{{--                                                                data-booking-id="{{ $booking->id }}"--}}
+{{--                                                                onclick="document.getElementById('action-{{ $booking->id }}').value='decline'"--}}
+{{--                                                            >--}}
+{{--                                                                Decline--}}
+{{--                                                            </button>--}}
+{{--                                                        </div>--}}
+{{--                                                    </form>--}}
+{{--                                                @endif--}}
+{{--                                            </div>--}}
+{{--                                        </td>--}}
+{{--                                    </tr>--}}
+{{--                                @endforeach--}}
+
+{{--                            </x-bladewind::table>--}}
+
                             <x-bladewind::table
                                 searchable="true"
                             >
                                 <x-slot name="header">
-                                    <th>Id</th>
-                                    <th>Ride Id</th>
                                     <th>Sender Name</th>
                                     <th>Receiver</th>
                                     <th>Departure Date</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
                                     <th>Status</th>
                                     <th>Updated at</th>
                                     <th>Actions</th>
                                 </x-slot>
 
-                                @foreach($incoming_bookings as $booking)
+                                @foreach($incoming_bookings as $groupKey => $bookings)
+                                    @php
+                                        $firstBooking = $bookings->first(); // Get the first booking in the group
+//                                        $isRecurring = is_numeric($groupKey); // If numeric, it’s a recurring ride
+                                        $isRecurring = is_numeric(str_replace(['active_', 'rejected_'], '', $groupKey)); // Extract numeric recurring ID
+                                        $isRejectedGroup = str_starts_with($groupKey, 'rejected_'); // Check if it's a rejected booking
+                                    @endphp
                                     <tr>
-                                        <td>{{ $booking->id }}</td>
-                                        <td>{{ $booking->ride_id }}</td>
-                                        <td>{{ $booking->sender->name }}</td>
+                                        <td>{{ $firstBooking->sender->name }}</td>
                                         <td>You</td>
-                                        <td>{{ $booking->ride->departure_date }}</td>
                                         <td>
-                                            @if($booking->status === 'pending')
+                                            @if($isRecurring)
+                                                @foreach($bookings as $booking)
+                                                    {{ $booking->ride->departure_date }}
+                                                    <br>
+                                                @endforeach
+                                            @else
+                                                {{ $firstBooking->ride->departure_date }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($isRecurring)
+                                                {{ $firstBooking->ride->recurringRide->start_date }}
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($isRecurring)
+                                                {{ $firstBooking->ride->recurringRide->end_date }}
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($firstBooking->status === 'pending')
                                                 <x-bladewind::tag label="Pending" color="yellow" rounded="true" class="font-semibold" />
-                                            @elseif($booking->status === 'accepted')
+                                            @elseif($firstBooking->status === 'accepted')
                                                 <x-bladewind::tag label="Accepted" color="green" rounded="true" class="font-semibold" />
-                                            @elseif($booking->status === 'declined')
+                                            @elseif($firstBooking->status === 'declined')
                                                 <x-bladewind::tag label="Declined" color="red" rounded="true" class="font-semibold" />
-                                            @elseif($booking->status === 'expired')
+                                            @elseif($firstBooking->status === 'expired')
                                                 <x-bladewind::tag label="Expired" color="gray" rounded="true" class="font-semibold" />
                                             @endif
                                         </td>
-                                        <td>{{ $booking->updated_at->diffForHumans() }}</td>
+                                        <td>{{ $firstBooking->updated_at->diffForHumans() }}</td>
                                         <td>
                                             <div class="flex gap-2">
-                                                <a href="{{ route('rides.show', $booking->ride_id) }}">
-                                                    <button
-                                                        class="view-booking-btn px-2 py-1 bg-blue-500 rounded-md text-white hover:bg-blue-600 hover:shadow-md"
-                                                    >
-                                                        View
-                                                    </button>
-                                                </a>
-
-                                                @if($booking->status === 'pending')
-                                                <form id="edit-booking-form-{{ $booking->id }}" action="/bookings/{{ $booking->id }}" method="POST">
-                                                    @csrf
-                                                    @method('patch')
-
-                                                    <input type="hidden" name="action" id="action-{{ $booking->id }}" value="">
-
-                                                    <div class="flex gap-2">
-                                                        <button
-                                                            type="submit"
-                                                            class="accept-btn px-2 py-1 bg-green-500 rounded-md text-white hover:bg-green-600 hover:shadow-md"
-                                                            data-booking-id="{{ $booking->id }}"
-                                                            onclick="document.getElementById('action-{{ $booking->id }}').value='accept'"
-                                                        >
-                                                            Accept
+                                                @if($isRecurring)
+                                                    <a href="{{ route('recurring-rides.show', $firstBooking->ride->recurring_id) }}">
+                                                        <button class="px-2 py-1 bg-blue-500 rounded-md text-white hover:bg-blue-600 hover:shadow-md">
+                                                            View Recurring Ride
                                                         </button>
-
-                                                        <button
-                                                            type="submit"
-                                                            class="decline-btn px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md"
-                                                            data-booking-id="{{ $booking->id }}"
-                                                            onclick="document.getElementById('action-{{ $booking->id }}').value='decline'"
-                                                        >
-                                                            Decline
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('rides.show', $firstBooking->ride_id) }}">
+                                                        <button class="px-2 py-1 bg-blue-500 rounded-md text-white hover:bg-blue-600 hover:shadow-md">
+                                                            View Ride
                                                         </button>
-                                                    </div>
-                                                </form>
+                                                    </a>
+                                                @endif
+
+                                                @if($firstBooking->status === 'pending')
+                                                    <form id="edit-booking-form-{{ $firstBooking->id }}" action="/bookings/{{ $firstBooking->id }}" method="POST">
+                                                        @csrf
+                                                        @method('patch')
+
+                                                        <input type="hidden" name="action" id="action-{{ $firstBooking->id }}" value="">
+
+                                                        <div class="flex gap-2">
+                                                            <button type="submit"
+                                                                    class="accept-btn px-2 py-1 bg-green-500 rounded-md text-white hover:bg-green-600 hover:shadow-md"
+                                                                    data-booking-id="{{ $firstBooking->id }}"
+                                                                    onclick="document.getElementById('action-{{ $firstBooking->id }}').value='accept'">
+                                                                Accept
+                                                            </button>
+
+                                                            <button type="submit"
+                                                                    class="decline-btn px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md"
+                                                                    data-booking-id="{{ $firstBooking->id }}"
+                                                                    onclick="document.getElementById('action-{{ $firstBooking->id }}').value='decline'">
+                                                                Decline
+                                                            </button>
+                                                        </div>
+                                                    </form>
                                                 @endif
                                             </div>
                                         </td>
@@ -488,53 +634,87 @@
                                 searchable="true"
                             >
                                 <x-slot name="header">
-                                    <th>Id</th>
-                                    <th>Ride Id</th>
                                     <th>Sender</th>
                                     <th>Receiver Name</th>
                                     <th>Departure Date</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
                                     <th>Status</th>
                                     <th>Updated at</th>
                                     <th>Actions</th>
                                 </x-slot>
 
-                                @foreach($outgoing_bookings as $booking)
+                                @foreach($outgoing_bookings as $groupKey => $bookings)
+                                    @php
+                                        $firstBooking = $bookings->first(); // Get the first booking in the group
+//                                        $isRecurring = is_numeric($groupKey); // If numeric, it’s a recurring ride
+                                        $isRecurring = is_numeric(str_replace(['active_', 'rejected_'], '', $groupKey)); // Extract numeric recurring ID
+                                        $isRejectedGroup = str_starts_with($groupKey, 'rejected_'); // Check if it's a rejected booking
+                                    @endphp
                                     <tr>
-                                        <td>{{ $booking->id }}</td>
-                                        <td>{{ $booking->ride_id }}</td>
                                         <td>You</td>
-                                        <td>{{ $booking->receiver->name }}</td>
-                                        <td>{{ $booking->ride->departure_date }}</td>
+                                        <td>{{ $firstBooking->receiver->name }}</td>
                                         <td>
-                                            @if($booking->status === 'pending')
+                                            @if($isRecurring)
+                                                @foreach($bookings as $booking)
+                                                    {{ $booking->ride->departure_date }}
+                                                    <br>
+                                                @endforeach
+                                            @else
+                                                {{ $firstBooking->ride->departure_date }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($isRecurring)
+                                                {{ $firstBooking->ride->recurringRide->start_date }}
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($isRecurring)
+                                                {{ $firstBooking->ride->recurringRide->end_date }}
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($firstBooking->status === 'pending')
                                                 <x-bladewind::tag label="Pending" color="yellow" rounded="true" class="font-semibold" />
-                                            @elseif($booking->status === 'accepted')
+                                            @elseif($firstBooking->status === 'accepted')
                                                 <x-bladewind::tag label="Accepted" color="green" rounded="true" class="font-semibold" />
-                                            @elseif($booking->status === 'declined')
+                                            @elseif($firstBooking->status === 'declined')
                                                 <x-bladewind::tag label="Declined" color="red" rounded="true" class="font-semibold" />
-                                            @elseif($booking->status === 'expired')
+                                            @elseif($firstBooking->status === 'expired')
                                                 <x-bladewind::tag label="Expired" color="gray" rounded="true" class="font-semibold" />
                                             @endif
                                         </td>
-                                        <td>{{ $booking->updated_at->diffForHumans() }}</td>
+                                        <td>{{ $firstBooking->updated_at->diffForHumans() }}</td>
                                         <td>
                                             <div class="flex gap-2">
-                                                <a href="{{ route('rides.show', $booking->ride_id) }}">
-                                                    <button
-                                                        class="view-booking-btn px-2 py-1 bg-blue-500 rounded-md text-white hover:bg-blue-600 hover:shadow-md"
-                                                    >
-                                                        View
-                                                    </button>
-                                                </a>
-                                                @if($booking->status === 'pending')
-                                                    <form id="cancel-booking-form-{{ $booking->id }}" action="/bookings/{{ $booking->id }}" method="POST">
+                                                @if($isRecurring)
+                                                    <a href="{{ route('recurring-rides.show', $firstBooking->ride->recurring_id) }}">
+                                                        <button class="px-2 py-1 bg-blue-500 rounded-md text-white hover:bg-blue-600 hover:shadow-md">
+                                                            View Recurring Ride
+                                                        </button>
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('rides.show', $firstBooking->ride_id) }}">
+                                                        <button class="px-2 py-1 bg-blue-500 rounded-md text-white hover:bg-blue-600 hover:shadow-md">
+                                                            View Ride
+                                                        </button>
+                                                    </a>
+                                                @endif
+
+                                                @if($firstBooking->status === 'pending')
+                                                    <form id="cancel-booking-form-{{ $firstBooking->id }}" action="/bookings/{{ $firstBooking->id }}" method="POST">
                                                         @csrf
                                                         @method('delete')
 
                                                         <div class="flex gap-2">
                                                             <button
                                                                 type="submit"
-                                                                data-booking-id="{{ $booking->id }}"
+                                                                data-booking-id="{{ $firstBooking->id }}"
                                                                 class="cancel-booking-btn px-2 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 hover:shadow-md"
                                                             >
                                                                 Cancel booking
@@ -807,8 +987,8 @@
             });
         </script>
         <script>
+            //Handle accept booking
             $(document).ready(function () {
-
                 $(".accept-btn").on('click', function(event){
                     event.preventDefault();
 

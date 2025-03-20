@@ -195,13 +195,16 @@ class RideController extends Controller
 
     public function edit($id)
     {
-        $ride = Ride::findOrFail($id);
-        return view('rides.edit', compact('ride'));
+//        $ride = Ride::findOrFail($id);
+//        return view('rides.edit', compact('ride'));
     }
 
     public function update(Request $request, $id)
     {
         $ride = Ride::findOrFail($id);
+
+        // Determine if the ride is part of a recurring ride
+        $isRecurring = $ride->recurring_id !== null;
 
         $inputData = [];
         foreach ($request->all() as $key => $value) {
@@ -210,45 +213,106 @@ class RideController extends Controller
             $inputData[$cleanKey] = $value;
         }
 
-        $validatedData = Validator::make($inputData, [
+        // Validation rules
+        $validationRules = [
             'ride_type' => 'required|in:request,offer',
             'departure_address' => 'required|string|max:255',
             'departure_id' => 'required|string',
             'destination_address' => 'required|string|max:255',
             'destination_id' => 'required|string',
-            'departure_date' => 'required|date',
             'departure_time' => 'required|date_format:H:i:s',
             'number_of_passenger' => 'required|integer|min:1',
             'distance' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:0',
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-        ]);
+        ];
+
+        // Only validate departure_date if it's a single ride (not recurring)
+        if (!$isRecurring) {
+            $validationRules['departure_date'] = 'required|date';
+        }
+
+        $validatedData = Validator::make($inputData, $validationRules);
 
         if ($validatedData->fails()) {
             return response()->json(['success' => false, 'errors' => $validatedData->errors()], 422);
         }
 
-        $ride->update($validatedData->validated());
-
-        if ($ride->ride_type === 'offer' && isset($inputData['vehicle_number'], $inputData['vehicle_model'])) {
-            $offer = $ride->offer;
-            $offer->update([
-                'vehicle_number' => $inputData['vehicle_number'],
-                'vehicle_model' => $inputData['vehicle_model'],
-            ]);
+        // If the ride is part of a recurring ride, update all rides with the same recurring_id
+        if ($isRecurring) {
+            Ride::where('recurring_id', $ride->recurring_id)
+                ->update(collect($validatedData->validated())->except('departure_date')->toArray());
+        } else {
+            // Update only the selected ride
+            $ride->update($validatedData->validated());
         }
+
+        // Update vehicle details if it's an offer ride
+        if ($ride->ride_type === 'offer' && isset($inputData['vehicle_number'], $inputData['vehicle_model'])) {
+            Ride::where('recurring_id', $ride->recurring_id)->each(function ($ride) use ($inputData) {
+                $ride->offer->update([
+                    'vehicle_number' => $inputData['vehicle_number'],
+                    'vehicle_model' => $inputData['vehicle_model'],
+                ]);
+            });
+        }
+
+//        $validatedData = Validator::make($inputData, [
+//            'ride_type' => 'required|in:request,offer',
+//            'departure_address' => 'required|string|max:255',
+//            'departure_id' => 'required|string',
+//            'destination_address' => 'required|string|max:255',
+//            'destination_id' => 'required|string',
+//            'departure_date' => 'required|date',
+//            'departure_time' => 'required|date_format:H:i:s',
+//            'number_of_passenger' => 'required|integer|min:1',
+//            'distance' => 'required|numeric|min:0',
+//            'duration' => 'required|integer|min:0',
+//            'price' => 'required|numeric|min:0',
+//            'description' => 'nullable|string',
+//        ]);
+//
+//        if ($validatedData->fails()) {
+//            return response()->json(['success' => false, 'errors' => $validatedData->errors()], 422);
+//        }
+//
+//        $ride->update($validatedData->validated());
+//
+//        if ($ride->ride_type === 'offer' && isset($inputData['vehicle_number'], $inputData['vehicle_model'])) {
+//            $offer = $ride->offer;
+//            $offer->update([
+//                'vehicle_number' => $inputData['vehicle_number'],
+//                'vehicle_model' => $inputData['vehicle_model'],
+//            ]);
+//        }
 
         return response()->json(['success' => true]);
     }
 
     public function destroy($id)
     {
+//        $ride = Ride::findOrFail($id);
+//
+//        $ride->delete();
+//
+//        return response()->json(['success' => true]);
+
         $ride = Ride::findOrFail($id);
 
-        $ride->delete();
+        try {
+            if ($ride->recurring_id) {
+                // Delete all rides in the recurring series
+                Ride::where('recurring_id', $ride->recurring_id)->delete();
+            } else {
+                // Delete only the selected ride
+                $ride->delete();
+            }
 
-        return response()->json(['success' => true]);
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to delete ride.', 'error' => $e->getMessage()], 500);
+        }
     }
 
     public function getPrice(Request $request)

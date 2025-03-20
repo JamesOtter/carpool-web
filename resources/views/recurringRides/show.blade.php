@@ -5,12 +5,12 @@
     @section('title', 'Ride Details')
 
     @section('heading')
-            <div class="pb-3 md:px-32">
-                <x-breadcrumbs :breadcrumbs="[
+        <div class="pb-3 md:px-32">
+            <x-breadcrumbs :breadcrumbs="[
                     ['name' => 'Rides', 'link' => '/rides'],
                     ['name' => 'Details', 'link' => null],
                 ]"/>
-            </div>
+        </div>
     @endsection
 
     @section('content')
@@ -21,22 +21,23 @@
                         <x-bladewind::icon name="calendar" />
                     </div>
                     <div class="pt-1 font-bold">
-                        {{ \Carbon\Carbon::parse($ride->departure_date)->format('l, M j, Y') }}
+                        <p>Start Date: {{ \Carbon\Carbon::parse($recurringRide->start_date)->format('M j, Y') }}</p>
+                        <p>End Date: {{ \Carbon\Carbon::parse($recurringRide->end_date)->format('M j, Y') }}</p>
                     </div>
                 </div>
-                <div class="flex gap-4 bg-white border-2 border-gray-200 rounded-md p-4 text-blue-950 text-2xl font-serif tracking-wider shadow-sm">
+                <div class="flex gap-4 bg-white border-2 border-gray-200 rounded-md p-4 text-blue-950 text-2xl font-serif tracking-wider shadow-sm items-center">
                     <div>
                         <x-bladewind::icon name="clock" />
                     </div>
                     <div class="font-bold">
-                        {{ \Carbon\Carbon::parse($ride->departure_time)->format('h:i A') }}
+                        {{ \Carbon\Carbon::parse($firstRide->departure_time)->format('h:i A') }}
                     </div>
                 </div>
             </div>
 
             <div id="map" style="width: 100%; height: 500px;"></div>
 
-            <div class="grid grid-cols-10 gap-4 mt-5 mb-5">
+            <div class="grid grid-cols-10 gap-4 mt-5">
                 <div class="grid col-span-7 gap-3 border-r-2 border-gray-300 pr-5">
                     <x-bladewind::card compact="true">
                         <x-bladewind::timeline-group
@@ -49,12 +50,12 @@
                             <x-bladewind::timeline
                                 date="Departure"
                                 icon="map-pin"
-                                content="{{ $ride->departure_address }}"
+                                content="{{ $firstRide->departure_address }}"
                             />
                             <x-bladewind::timeline
                                 date="Destination"
                                 icon="flag"
-                                content="{{ $ride->destination_address }}"
+                                content="{{ $firstRide->destination_address }}"
                             />
                         </x-bladewind::timeline-group>
                     </x-bladewind::card>
@@ -63,7 +64,7 @@
                         <x-bladewind::card compact="true" class="flex-auto">
                             <div class="mx-2">
                                 <div class="text-5xl text-center font-bold text-blue-950 py-6">
-                                    {{ $ride->number_of_passenger }}
+                                    {{ $firstRide->number_of_passenger }}
                                 </div>
 
                                 <div class="flex gap-2 text-gray-500 mb-3 text-center place-content-center">
@@ -77,7 +78,7 @@
                             <div class="mx-2">
                                 <div class="flex place-content-center text-blue-950 py-6 gap-3">
                                     <div class="text-5xl font-bold">
-                                        {{ $ride->distance }}
+                                        {{ $firstRide->distance }}
                                     </div>
                                     <div class="place-content-end text-lg">
                                         km
@@ -94,7 +95,7 @@
                             <div class="mx-2">
                                 <div class="flex place-content-center text-blue-950 py-6 gap-3">
                                     <div class="text-5xl font-bold">
-                                        {{ $ride->duration }}
+                                        {{ $firstRide->duration }}
                                     </div>
                                     <div class="place-content-end text-lg">
                                         min(s)
@@ -117,15 +118,15 @@
 
                             <div class="flex flex-auto gap-3 items-center">
                                 <div>
-                                    <p class="font-semibold">Base Price</p> RM <span id="base-price-{{ $ride->id }}">{{ $ride->price }}</span>
+                                    <p class="font-semibold">Base Price</p> RM <span id="base-price-{{ $firstRide->id }}">{{ $firstRide->price }}</span>
                                 </div>
                                 <div>+</div>
                                 <div>
-                                    <p class="font-semibold">Surge Price</p> RM <span id="surge-price-{{ $ride->id }}">0.00</span>
+                                    <p class="font-semibold">Surge Price</p> RM <span id="surge-price-{{ $firstRide->id }}">0.00</span>
                                 </div>
                                 <div>=</div>
                                 <div>
-                                    <p class="font-semibold">Total Price</p> RM <span id="total-price-{{ $ride->id }}">{{ $ride->price }}</span>
+                                    <p class="font-semibold">Total Price</p> RM <span id="total-price-{{ $firstRide->id }}">{{ $firstRide->price }}</span>
                                 </div>
                             </div>
                         </div>
@@ -133,16 +134,39 @@
 
                     <x-bladewind::card compact="true">
                         <div class="ml-2">
-                            <div class="font-bold text-lg mb-2">
+                            <div class="font-bold text-lg mb-2 text-gray-600">
+                                Included Rides
+                            </div>
+                            <div class="flex flex-auto gap-4">
+                                @foreach($recurringRide->rides as $index => $ride)
+                                    <div class="px-5 pt-4 shadow-sm border-2 rounded-md">
+                                        <p class="font-semibold">
+                                            Ride #{{ $loop->iteration }}
+                                        </p>
+                                        <p>
+                                            <x-bladewind::icon name="calendar" class="text-blue-800" /> {{ \Carbon\Carbon::parse($ride->departure_date)->format('M j, Y') }}
+                                        </p>
+                                        <br>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                        </div>
+                    </x-bladewind::card>
+
+                    <x-bladewind::card compact="true">
+                        <div class="ml-2">
+                            <div class="font-bold text-lg mb-2 text-gray-600">
                                 Description
                             </div>
                             <div>
-                                @if($ride->description)
-                                    {!! nl2br(e($ride->description)) !!}
+                                @if($firstRide->description)
+                                    {!! nl2br(e($firstRide->description)) !!}
                                 @else
                                     No description
                                 @endif
                             </div>
+
                         </div>
                     </x-bladewind::card>
 
@@ -158,8 +182,8 @@
                             <form id="booking-form" action="/bookings" method="POST" class="flex flex-row">
                                 @csrf
 
-                                <input type="number" name="ride_id" class="hidden" value="{{ $ride->id }}">
-                                <input type="number" name="receiver_id" class="hidden" value="{{ $ride->user_id }}">
+                                <input type="number" name="recurring_id" class="hidden" value="{{ $firstRide->recurring_id }}">
+                                <input type="number" name="receiver_id" class="hidden" value="{{ $firstRide->user_id }}">
 
                                 <button id="btnBook" class="grid bg-green-500 text-white rounded-xl w-full justify-items-center font-bold py-2 hover:bg-green-600 hover:shadow-md hover:shadow-gray-400">
                                     Book Now
@@ -189,8 +213,8 @@
                 directionsRenderer.setMap(map);
 
                 // Fetch departure and destination from Laravel
-                var departurePlaceId = "{{ $ride->departure_id }}";
-                var destinationPlaceId = "{{ $ride->destination_id }}";
+                var departurePlaceId = "{{ $firstRide->departure_id }}";
+                var destinationPlaceId = "{{ $firstRide->destination_id }}";
 
                 var request = {
                     origin: { placeId: departurePlaceId },
@@ -217,7 +241,7 @@
                     event.preventDefault();
 
                     Swal.fire({
-                        title: "Confirm your ride booking?",
+                        title: "Confirm your recurring ride booking?",
                         text: "This will send a booking request.",
                         icon: "question",
                         showCancelButton: true,
@@ -257,7 +281,7 @@
                                         });
                                         Toast.fire({
                                             icon: "success",
-                                            title: "Ride booked successfully. Redirecting to Rides page..."
+                                            title: "Recurring ride booked successfully. Redirecting to Rides page..."
                                         });
                                         setTimeout(function () {
                                             window.location.replace('/rides');
@@ -265,7 +289,7 @@
                                     }else{
                                         Swal.fire({
                                             icon: 'error',
-                                            title: 'Failed to book ride. Please try again.',
+                                            title: 'Failed to book recurring ride. Please try again.',
                                             text: response.message
                                         });
                                     }
@@ -332,7 +356,7 @@
 
             //Update prices on page load
             $(document).ready(function() {
-                updatePrice({{ $ride->id }});
+                updatePrice({{ $firstRide->id }});
 
                 const Toast = Swal.mixin({
                     toast: true,
@@ -377,3 +401,4 @@
     @endsection
 
 </x-layout>
+
