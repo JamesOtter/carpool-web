@@ -23,6 +23,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+
     @yield('custom-css')
 
     <title>@yield('title')</title>
@@ -33,14 +34,15 @@
 </head>
 
 <body class="h-full">
-    <div class="min-h-full">
+    <div class="flex flex-col min-h-full">
         <nav class="bg-gray-800">
             <div class="mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex h-16 items-center justify-between">
                     <div class="flex items-center">
                         <div class="shrink-0">
                             <a href="/">
-                                <img class="size-8" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company">
+                                <p class="text-white font-extrabold text-xl border-2 border-white rounded-xl px-3 py-1">.CarPool<x-bladewind::icon name="users" class="pl-1"/></p>
+{{--                                <img class="size-8" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company">--}}
                             </a>
                         </div>
                         <div class="hidden md:block">
@@ -58,9 +60,9 @@
 {{--                        Post ride button--}}
                             <a
                                 href="/rides/create"
-                                class="border-2 border-sky-500 text-sky-500 rounded-xl mx-3 px-3 py-1 hover:shadow-md hover:shadow-gray-500/50 hover:text-blue-500/80 hover:border-blue-500/80"
+                                class="text-sky-500 font-bold rounded-xl mx-3 px-3 py-1 hover:shadow-md hover:border hover:shadow-gray-500/50 hover:text-blue-500/80 hover:border-blue-500/80"
                             >
-                                <x-bladewind::icon name="plus-circle" type="outline" />Post a ride
+                                <x-bladewind::icon name="plus-circle" type="outline" />Post Ride
                             </a>
 
                             @auth
@@ -184,16 +186,39 @@
             </div>
         </header>
 
-        <main>
+        <main class="flex-grow">
             <div class="mx-auto px-4 py-2 sm:px-6 lg:px-8">
                 @yield('content')
             </div>
 
             @include('components.chatbot')
         </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-6 rounded-xl m-2">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <!-- Copyright Notice -->
+                    <div class="mb-4 md:mb-0">
+                        <p class="text-sm">
+                            &copy; {{ date('Y') }} CarPool. All rights reserved.
+                        </p>
+                    </div>
+
+                    <!-- Footer Links -->
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-sm hover:text-gray-400">Privacy Policy</a>
+                        <a href="#" class="text-sm hover:text-gray-400">Terms of Service</a>
+                        <a href="#" class="text-sm hover:text-gray-400">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script
         async
         defer

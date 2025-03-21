@@ -169,7 +169,7 @@
 
             </div>
 
-            <div id="content_2" class="fixed right-0 w-1/2 h-screen">
+            <div id="content_2" class="right-0 w-1/2 h-screen">
                 <div id="map" class="h-full"></div>
             </div>
         </div>
@@ -191,12 +191,13 @@
 
     <script>
         function initMap() {
-            let defaultLocation = { lat: 4.3348, lng: 101.1351 }; // Default location (San Francisco)
+            let defaultLocation = { lat: 4.3348, lng: 101.1351 }; // Default location UTAR
 
             let map = new google.maps.Map(document.getElementById("map"), {
                 center: defaultLocation,
                 zoom: 15,
                 mapTypeControl: false,
+                streetViewControl: false,
             });
 
             // Try to get user's location
@@ -232,15 +233,10 @@
 
             let sortedRides = Object.values({!! json_encode($sortedRides, JSON_HEX_TAG) !!});
 
-            console.log(sortedRides)
-
             sortedRides.forEach((rideData) => {
                 let service = new google.maps.places.PlacesService(map);
 
-                console.log("Adding marker for:", rideData.ride.departure_id);
                 service.getDetails({ placeId: rideData.ride.departure_id }, (result, status) => {
-                    console.log("Google Places API Status:", status);
-                    console.log("Result:", result);
 
                     if (status === google.maps.places.PlacesServiceStatus.OK) {
                         let marker = new google.maps.Marker({

@@ -55,6 +55,11 @@
                                             @else
                                                 <x-bladewind::tag label="Ride {{ $firstRide->ride_type }}" color="cyan" rounded="true" class="font-semibold" />
                                             @endif
+
+                                            @if($isRecurring)
+                                                <br>
+                                                <x-bladewind::tag label="Recurring" color="purple" rounded="true" class="font-semibold" />
+                                            @endif
                                         </td>
                                         <td>{{ $firstRide->departure_address }}</td>
                                         <td>{{ $firstRide->destination_address }}</td>
@@ -571,13 +576,13 @@
                                                 @if($isRecurring)
                                                     <a href="{{ route('recurring-rides.show', $firstBooking->ride->recurring_id) }}">
                                                         <button class="px-2 py-1 bg-blue-500 rounded-md text-white hover:bg-blue-600 hover:shadow-md">
-                                                            View Recurring Ride
+                                                            View
                                                         </button>
                                                     </a>
                                                 @else
                                                     <a href="{{ route('rides.show', $firstBooking->ride_id) }}">
                                                         <button class="px-2 py-1 bg-blue-500 rounded-md text-white hover:bg-blue-600 hover:shadow-md">
-                                                            View Ride
+                                                            View
                                                         </button>
                                                     </a>
                                                 @endif
@@ -695,13 +700,13 @@
                                                 @if($isRecurring)
                                                     <a href="{{ route('recurring-rides.show', $firstBooking->ride->recurring_id) }}">
                                                         <button class="px-2 py-1 bg-blue-500 rounded-md text-white hover:bg-blue-600 hover:shadow-md">
-                                                            View Recurring Ride
+                                                            View
                                                         </button>
                                                     </a>
                                                 @else
                                                     <a href="{{ route('rides.show', $firstBooking->ride_id) }}">
                                                         <button class="px-2 py-1 bg-blue-500 rounded-md text-white hover:bg-blue-600 hover:shadow-md">
-                                                            View Ride
+                                                            View
                                                         </button>
                                                     </a>
                                                 @endif

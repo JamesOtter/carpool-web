@@ -78,7 +78,11 @@ class ChatbotController extends Controller
             ->first();
 
         if ($ride) {
-            $rideLink = route('rides.show', ['id' => $ride->id]);
+            if ($ride->recurring_id) {
+                $rideLink = route('recurring-rides.show', ['recurringRide' => $ride->recurring_id]);
+            } else {
+                $rideLink = route('rides.show', ['ride' => $ride->id]);
+            }
 
             return response()->json([
                 'fulfillmentMessages' => [

@@ -52,7 +52,9 @@
                             />
                         </div>
                     </div>
-
+                    <div class="mb-2">
+                        <x-bladewind::toggle label="Make recurring ride" label_position="right" name="recurring-toggle" onclick="toggleRecurring()"/>
+                    </div>
                     <div class="flex flex-wrap gap-4">
                         <div id="departure_date_content" class="grow">
                             <label for="">Select a date</label>
@@ -140,9 +142,6 @@
                             />
                         </div>
                     </div>
-                    <div class="mb-2">
-                        <x-bladewind::toggle label="Make recurring ride" label_position="right" name="recurring-toggle" onclick="toggleRecurring()"/>
-                    </div>
                     <div id="recurring-ride-content" class="flex flex-wrap gap-4 hidden">
                         <div class="grow">
                             @php
@@ -184,7 +183,7 @@
                             <label for="">Start date</label>
                             <x-bladewind::datepicker
                                 min_date="{{ \Carbon\Carbon::yesterday()->format('Y-m-d') }}"
-                                placeholder="Select a date"
+                                placeholder="From"
                                 required="true"
                                 name="start_date"
                             />
@@ -192,8 +191,8 @@
                         <div class="grow">
                             <label for="">End date</label>
                             <x-bladewind::datepicker
-                                min_date="{{ \Carbon\Carbon::yesterday()->format('Y-m-d') }}"
-                                placeholder="Select a date"
+                                min_date="{{ \Carbon\Carbon::today()->format('Y-m-d') }}"
+                                placeholder="To"
                                 required="true"
                                 name="end_date"
                             />
@@ -268,9 +267,6 @@
             document.addEventListener("DOMContentLoaded", function(){
                 let recurrencePatternSelect = document.querySelector(".bw-recurrence_pattern");
                 let recurrenceDaysDiv = document.getElementById("recurrence-days-content");
-
-                console.log("Dropdown Element:", recurrencePatternSelect);
-
 
                 function toggleRecurrenceDays() {
                     if (recurrencePatternSelect.value === "daily") {

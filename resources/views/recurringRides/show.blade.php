@@ -111,29 +111,6 @@
 
                     <x-bladewind::card compact="true">
                         <div class="ml-2">
-                            <div class="flex gap-2 mb-3">
-                                <p class="font-bold text-lg text-gray-600">Price Breakdown</p>
-                                <x-bladewind::icon name="banknotes" class="text-green-500"/>
-                            </div>
-
-                            <div class="flex flex-auto gap-3 items-center">
-                                <div>
-                                    <p class="font-semibold">Base Price</p> RM <span id="base-price-{{ $firstRide->id }}">{{ $firstRide->price }}</span>
-                                </div>
-                                <div>+</div>
-                                <div>
-                                    <p class="font-semibold">Surge Price</p> RM <span id="surge-price-{{ $firstRide->id }}">0.00</span>
-                                </div>
-                                <div>=</div>
-                                <div>
-                                    <p class="font-semibold">Total Price</p> RM <span id="total-price-{{ $firstRide->id }}">{{ $firstRide->price }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </x-bladewind::card>
-
-                    <x-bladewind::card compact="true">
-                        <div class="ml-2">
                             <div class="font-bold text-lg mb-2 text-gray-600">
                                 Included Rides
                             </div>
@@ -174,9 +151,62 @@
 
                 <div class="grid col-span-3 gap-3">
                     <div>
-                        <div>
-                            <p>Driver / Rider information</p>
-                        </div>
+                        <x-bladewind::card compact="true" class="mb-4">
+                            <div class="ml-2">
+                                <div class="flex gap-2 mb-4">
+                                    <p class="font-bold text-lg text-gray-600">Price Breakdown</p>
+                                    <x-bladewind::icon name="banknotes" class="text-green-500"/>
+                                </div>
+
+                                <div>
+                                    <div class="grid grid-cols-2 gap-4 mx-2">
+                                        <div class="font-semibold">Base Price</div>
+                                        <div>RM <span id="base-price-{{ $firstRide->id }}">{{ $firstRide->price }}</span></div>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-4 mx-2">
+                                        <div ></div>
+                                        <div>+</div>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-4 mx-2">
+                                        <div class="font-semibold">Surge Price</div>
+                                        <div>RM <span id="surge-price-{{ $firstRide->id }}">0.00</span></div>
+                                    </div>
+
+                                    <hr class="my-3 mx-2">
+
+                                    <div class="grid grid-cols-2 gap-4 mx-2">
+                                        <p class="font-bold">Total Price</p>
+                                        <div class="font-bold">RM <span id="total-price-{{ $firstRide->id }}">{{ $firstRide->price }}</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </x-bladewind::card>
+
+                        <x-bladewind::card compact="true" class="mb-4">
+                            <div>
+                                <div class="text-lg font-bold text-gray-600 mb-2">
+                                    Driver / Rider information
+                                </div>
+                                <div>
+                                    <x-bladewind::contact-card
+                                        name="{{ $firstRide->user->name }}"
+                                        mobile="+{{ $firstRide->user->contact_number }}"
+                                        image="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                        position="{{ $firstRide->ride_type == 'request' ? 'Rider' : 'Driver' }}"
+                                        birthday="{{ \Carbon\Carbon::parse($firstRide->user->created_at)->format('Y-M-d') }}" />
+                                </div>
+                                <div class="justify-self-center mt-5">
+                                    <a href="https://wa.me/{{ $firstRide->user->contact_number }}?text=Hello, I'm interested in your carpool trip!" target="_blank" class="text-white">
+                                        <button class="flex gap-3 border rounded-xl py-2 px-6 bg-green-500 hover:shadow-md hover:bg-green-600">
+                                            <x-bladewind::icon type="solid" name="phone" class="border-2 border-white rounded-full p-1"/>
+                                            <p class="font-bold">Chat on WhatsApp</p>
+                                        </button>
+                                    </a>
+                                </div>
+                            </div>
+                        </x-bladewind::card>
 
                         @auth
                             <form id="booking-form" action="/bookings" method="POST" class="flex flex-row">
@@ -185,7 +215,7 @@
                                 <input type="number" name="recurring_id" class="hidden" value="{{ $firstRide->recurring_id }}">
                                 <input type="number" name="receiver_id" class="hidden" value="{{ $firstRide->user_id }}">
 
-                                <button id="btnBook" class="grid bg-green-500 text-white rounded-xl w-full justify-items-center font-bold py-2 hover:bg-green-600 hover:shadow-md hover:shadow-gray-400">
+                                <button id="btnBook" class="grid bg-blue-500 text-white rounded-xl w-full justify-items-center font-bold py-2 hover:bg-blue-600 hover:shadow-md hover:shadow-gray-400">
                                     Book Now
                                 </button>
                             </form>
