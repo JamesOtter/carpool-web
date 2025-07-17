@@ -1,5 +1,5 @@
 <!-- Chatbot Button and Container -->
-<div id="chatbot-container" class="fixed bottom-8 right-8 z-50">
+<div id="chatbot-container" class="fixed bottom-20 right-10 z-50">
     <!-- Chatbot Icon Button -->
     <button id="chatbot-toggle" class="bg-blue-600 text-white p-3 rounded-full shadow-lg transition-transform duration-300 hover:scale-105">
         <x-bladewind::icon name="chat-bubble-left-ellipsis" />

@@ -5,6 +5,7 @@ use App\Http\Controllers\RecurringRideController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RideController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\TimetableRideController;
 use App\Models\Booking;
 use App\Models\Ride;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,17 @@ Route::post('/get-price', [RideController::class, 'getPrice'])
 //Recurring Ride
 Route::get('/recurring-rides/{recurringRide}', [RecurringRideController::class, 'show'])
     ->name('recurring-rides.show');
+
+//Timetable Ride
+Route::get('/timetable-rides/create', [TimetableRideController::class, 'create'])
+    ->name('timetable-rides.create')
+    ->middleware('auth');
+Route::post('/timetable-rides', [TimetableRideController::class, 'store'])
+    ->name('timetable-rides.store')
+    ->middleware('auth');
+Route::post('/upload-timetable', [TimetableRideController::class, 'uploadTimetable'])
+    ->name('upload.timetable')
+    ->middleware('auth');
 
 //Dashboard
 Route::get('/dashboard', function () {

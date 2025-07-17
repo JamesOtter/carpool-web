@@ -13,6 +13,7 @@ class Ride extends Model
         'user_id',
         'ride_type',
         'recurring_id',
+        'timetable_id',
         'departure_address',
         'departure_id',
         'destination_address',
@@ -45,5 +46,10 @@ class Ride extends Model
     public function recurringRide()
     {
         return $this->belongsTo(RecurringRide::class, 'recurring_id');
+    }
+
+    public function timetableRide()
+    {
+        return $this->belongsTo(TimetableRide::class, 'timetable_id');
     }
 }

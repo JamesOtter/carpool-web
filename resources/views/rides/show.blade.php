@@ -39,7 +39,7 @@
             <div class="grid grid-cols-10 gap-4 mt-5 mb-5">
                 <div class="grid col-span-7 gap-3 border-r-2 border-gray-300 pr-5">
                     <x-bladewind::card compact="true">
-                        <x-bladewind::timeline-group
+                        <x-bladewind::timelines
                             position="left"
                             stacked="true"
                             color="pink"
@@ -56,7 +56,7 @@
                                 icon="flag"
                                 content="{{ $ride->destination_address }}"
                             />
-                        </x-bladewind::timeline-group>
+                        </x-bladewind::timelines>
                     </x-bladewind::card>
 
                     <div class="flex gap-5">

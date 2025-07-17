@@ -1,7 +1,6 @@
 <x-layout>
     @section('custom-css')
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     @endsection
 
     @section('title', 'Search Rides')
@@ -85,7 +84,7 @@
                                 hover_effect="true"
                                 class="mb-2 mr-2 hover:border-indigo-800"
                             >
-                                <x-bladewind::timeline-group
+                                <x-bladewind::timelines
                                     position="left"
                                     stacked="true"
                                     color="pink"
@@ -102,7 +101,7 @@
                                         icon="flag"
                                         content="{{ $rideData['ride']->destination_address }}"
                                     />
-                                </x-bladewind::timeline-group>
+                                </x-bladewind::timelines>
                                 <hr class="my-2">
                                 <div class="flex flex-auto gap-4">
                                     <div class="flex flex-auto gap-2">
@@ -198,6 +197,7 @@
                 zoom: 15,
                 mapTypeControl: false,
                 streetViewControl: false,
+                mapId: "7c985f4c6ade2d49931dbd91",
             });
 
             // Try to get user's location
@@ -233,16 +233,24 @@
 
             let sortedRides = Object.values({!! json_encode($sortedRides, JSON_HEX_TAG) !!});
 
-            sortedRides.forEach((rideData) => {
-                let service = new google.maps.places.PlacesService(map);
+            sortedRides.forEach((rideData,i) => {
 
-                service.getDetails({ placeId: rideData.ride.departure_id }, (result, status) => {
+                (async () => {
 
-                    if (status === google.maps.places.PlacesServiceStatus.OK) {
-                        let marker = new google.maps.Marker({
+                    const place = new google.maps.places.Place({
+                        id: rideData.ride.departure_id,
+                        requestedLanguage: "en", // optional
+                    });
+
+                    await place.fetchFields({
+                        fields: ["displayName", "formattedAddress", "location"],
+                    });
+
+                    if (place && place.location) {
+                        let marker = new google.maps.marker.AdvancedMarkerElement({
                             map,
-                            position: result.geometry.location,
-                            title: rideData.ride.id,
+                            position: place.location,
+                            title: rideData.ride.id.toString(),
                         });
 
                         marker.addListener("click", () => {
@@ -251,28 +259,69 @@
                                 : `/rides/${rideData.ride.id}`;
 
                             let content = `
-                                <div style="min-width: 300px; min-height: 180px; padding: 5px;">
-                                    <h3><strong>From</strong></h3>
-                                    <p>${rideData.ride.departure_address}</p>
-                                    <br>
-                                    <h3><strong>To</strong></h3>
-                                    <p>${rideData.ride.destination_address}</p>
-                                    <br>
-                                    <a href="${rideUrl}"
-                                       style="display: inline-block; padding: 6px 10px; background: #007bff; color: white; font-weight: bold; border-radius: 4px; text-decoration: none; text-align: center;">
-                                        View Details
-                                    </a>
-                                </div>
-                            `;
+                                            <div style="min-width: 300px; min-height: 180px; padding: 5px;">
+                                                <h3><strong>From</strong></h3>
+                                                <p>${rideData.ride.departure_address}</p>
+                                                <br>
+                                                <h3><strong>To</strong></h3>
+                                                <p>${rideData.ride.destination_address}</p>
+                                                <br>
+                                                <a href="${rideUrl}"
+                                                   style="display: inline-block; padding: 6px 10px; background: #007bff; color: white; font-weight: bold; border-radius: 4px; text-decoration: none; text-align: center;">
+                                                    View Details
+                                                </a>
+                                            </div>
+                                        `;
 
                             let infoWindow = new google.maps.InfoWindow({
                                 content: content,
-                                maxWidth: 350, // Adjust width to prevent wrapping
+                                maxWidth: 350,
                             });
                             infoWindow.open(map, marker);
                         });
                     }
-                });
+
+                })();
+
+                // let service = new google.maps.places.PlacesService(map);
+                //
+                // service.getDetails({ placeId: rideData.ride.departure_id }, (result, status) => {
+                //
+                //     if (status === google.maps.places.PlacesServiceStatus.OK) {
+                //         let marker = new google.maps.Marker({
+                //             map,
+                //             position: result.geometry.location,
+                //             title: rideData.ride.id,
+                //         });
+                //
+                //         marker.addListener("click", () => {
+                //             let rideUrl = rideData.type === "recurring"
+                //                 ? `/recurring-rides/${rideData.ride.recurring_id}`
+                //                 : `/rides/${rideData.ride.id}`;
+                //
+                //             let content = `
+                //                 <div style="min-width: 300px; min-height: 180px; padding: 5px;">
+                //                     <h3><strong>From</strong></h3>
+                //                     <p>${rideData.ride.departure_address}</p>
+                //                     <br>
+                //                     <h3><strong>To</strong></h3>
+                //                     <p>${rideData.ride.destination_address}</p>
+                //                     <br>
+                //                     <a href="${rideUrl}"
+                //                        style="display: inline-block; padding: 6px 10px; background: #007bff; color: white; font-weight: bold; border-radius: 4px; text-decoration: none; text-align: center;">
+                //                         View Details
+                //                     </a>
+                //                 </div>
+                //             `;
+                //
+                //             let infoWindow = new google.maps.InfoWindow({
+                //                 content: content,
+                //                 maxWidth: 350, // Adjust width to prevent wrapping
+                //             });
+                //             infoWindow.open(map, marker);
+                //         });
+                //     }
+                // });
             });
         }
 

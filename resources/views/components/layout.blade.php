@@ -5,9 +5,9 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="https://cdn.tailwindcss.com"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    <script src="https://cdn.tailwindcss.com"></script>
 {{--    For Ngrok use this--}}
     <script src="https://unpkg.com/alpinejs" defer></script>
     <link href="{{ secure_asset('vendor/bladewind/css/animate.min.css') }}" rel="stylesheet" />
@@ -41,7 +41,7 @@
                     <div class="flex items-center">
                         <div class="shrink-0">
                             <a href="/">
-                                <p class="text-white font-extrabold text-xl border-2 border-white rounded-xl px-3 py-1">.CarPool<x-bladewind::icon name="users" class="pl-1"/></p>
+                                <p class="text-white font-extrabold text-xl border-2 border-white rounded-xl px-3 py-1">.CarPool</p>
 {{--                                <img class="size-8" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company">--}}
                             </a>
                         </div>
@@ -58,6 +58,13 @@
                     <div class="hidden md:block">
                         <div class="ml-4 flex items-center md:ml-6">
 {{--                        Post ride button--}}
+                            <a
+                                href="/timetable-rides/create"
+                                class="text-sky-500 font-bold rounded-xl mx-3 px-3 py-1 hover:shadow-md hover:border hover:shadow-gray-500/50 hover:text-blue-500/80 hover:border-blue-500/80"
+                            >
+                                <x-bladewind::icon name="plus-circle" type="outline" />Timetable Ride
+                            </a>
+
                             <a
                                 href="/rides/create"
                                 class="text-sky-500 font-bold rounded-xl mx-3 px-3 py-1 hover:shadow-md hover:border hover:shadow-gray-500/50 hover:text-blue-500/80 hover:border-blue-500/80"
@@ -222,7 +229,7 @@
     <script
         async
         defer
-        src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initAutocomplete"
+        src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=marker,places&callback=initAutocomplete"
     ></script>
 
     @auth

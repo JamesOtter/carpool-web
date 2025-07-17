@@ -250,12 +250,25 @@ class RideController extends Controller
 
         // Update vehicle details if it's an offer ride
         if ($ride->ride_type === 'offer' && isset($inputData['vehicle_number'], $inputData['vehicle_model'])) {
-            Ride::where('recurring_id', $ride->recurring_id)->each(function ($ride) use ($inputData) {
-                $ride->offer->update([
-                    'vehicle_number' => $inputData['vehicle_number'],
-                    'vehicle_model' => $inputData['vehicle_model'],
-                ]);
-            });
+            if ($isRecurring) {
+                // Update all recurring rides' offer data
+                Ride::where('recurring_id', $ride->recurring_id)->each(function ($r) use ($inputData) {
+                    if ($r->offer) {
+                        $r->offer->update([
+                            'vehicle_number' => $inputData['vehicle_number'],
+                            'vehicle_model' => $inputData['vehicle_model'],
+                        ]);
+                    }
+                });
+            } else {
+                // Update only the single ride's offer data
+                if ($ride->offer) {
+                    $ride->offer->update([
+                        'vehicle_number' => $inputData['vehicle_number'],
+                        'vehicle_model' => $inputData['vehicle_model'],
+                    ]);
+                }
+            }
         }
 
 //        $validatedData = Validator::make($inputData, [

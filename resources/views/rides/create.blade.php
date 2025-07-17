@@ -59,7 +59,7 @@
                         <div id="departure_date_content" class="grow">
                             <label for="">Select a date</label>
                             <x-bladewind::datepicker
-                                min_date="{{ \Carbon\Carbon::yesterday()->format('Y-m-d') }}"
+                                min_date="{{ \Carbon\Carbon::today()->format('Y-m-d') }}"
                                 placeholder="Select a date"
                                 required="true"
                                 name="departure_date"
@@ -182,7 +182,7 @@
                         <div class="grow">
                             <label for="">Start date</label>
                             <x-bladewind::datepicker
-                                min_date="{{ \Carbon\Carbon::yesterday()->format('Y-m-d') }}"
+                                min_date="{{ \Carbon\Carbon::today()->format('Y-m-d') }}"
                                 placeholder="From"
                                 required="true"
                                 name="start_date"
@@ -191,7 +191,7 @@
                         <div class="grow">
                             <label for="">End date</label>
                             <x-bladewind::datepicker
-                                min_date="{{ \Carbon\Carbon::today()->format('Y-m-d') }}"
+                                min_date="{{ \Carbon\Carbon::tomorrow()->format('Y-m-d') }}"
                                 placeholder="To"
                                 required="true"
                                 name="end_date"

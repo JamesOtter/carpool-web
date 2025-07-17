@@ -12,20 +12,20 @@
 
     @section('content')
         <div class="md:px-32">
-            <x-bladewind::tab-group name="manage-tabs" color="indigo">
+            <x-bladewind::tab name="manage-tabs" color="indigo">
                 <x-slot name="headings">
-                    <x-bladewind::tab-heading name="manage-rides" active="true"
+                    <x-bladewind::tab.heading name="manage-rides" active="true"
                                               icon="cog-6-tooth"
                                               label="Manage Rides" />
-                    <x-bladewind::tab-heading name="incoming-booking"
+                    <x-bladewind::tab.heading name="incoming-booking"
                                               label="Incoming Booking"
                                               icon="arrow-right-end-on-rectangle" />
-                    <x-bladewind::tab-heading name="outgoing-booking"
+                    <x-bladewind::tab.heading name="outgoing-booking"
                                               label="Outgoing Booking"
                                               icon="arrow-left-start-on-rectangle" />
                 </x-slot>
-                <x-bladewind::tab-body>
-                    <x-bladewind::tab-content name="manage-rides" active="true">
+                <x-bladewind::tab.body>
+                    <x-bladewind::tab.content name="manage-rides" active="true">
                         @if($rides->count())
                             <x-bladewind::table
                                 searchable="true"
@@ -122,7 +122,7 @@
                                                             has_shadow="true"
                                                             class="mb-2 mr-2"
                                                         >
-                                                            <x-bladewind::timeline-group
+                                                            <x-bladewind::timelines
                                                                 position="left"
                                                                 stacked="true"
                                                                 color="pink"
@@ -139,7 +139,7 @@
                                                                     icon="flag"
                                                                     content="{{ $firstRide->destination_address }}"
                                                                 />
-                                                            </x-bladewind::timeline-group>
+                                                            </x-bladewind::timelines>
 
                                                             <hr class="my-2">
 
@@ -432,9 +432,9 @@
                                 </button>
                             </x-bladewind::empty-state>
                         @endif
-                    </x-bladewind::tab-content>
+                    </x-bladewind::tab.content>
 
-                    <x-bladewind::tab-content name="incoming-booking">
+                    <x-bladewind::tab.content name="incoming-booking">
 
                         @if($incoming_bookings->count())
 {{--                            <x-bladewind::table--}}
@@ -631,9 +631,9 @@
                                 </button>
                             </x-bladewind::empty-state>
                         @endif
-                    </x-bladewind::tab-content>
+                    </x-bladewind::tab.content>
 
-                    <x-bladewind::tab-content name="outgoing-booking">
+                    <x-bladewind::tab.content name="outgoing-booking">
                         @if($outgoing_bookings->count())
                             <x-bladewind::table
                                 searchable="true"
@@ -747,10 +747,10 @@
                                 </button>
                             </x-bladewind::empty-state>
                         @endif
-                    </x-bladewind::tab-content>
+                    </x-bladewind::tab.content>
 
-                </x-bladewind::tab-body>
-            </x-bladewind::tab-group>
+                </x-bladewind::tab.body>
+            </x-bladewind::tab>
         </div>
     @endsection
 
@@ -917,7 +917,7 @@
                         icon: "warning",
                         showCancelButton: true,
                         confirmButtonColor: "#d33",
-                        cancelButtonColor: "#d777777",
+                        cancelButtonColor: "#777777",
                         confirmButtonText: "Yes, delete it!"
                     }).then((result) => {
                         if (result.isConfirmed) {
