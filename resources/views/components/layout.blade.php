@@ -60,14 +60,14 @@
 {{--                        Post ride button--}}
                             <a
                                 href="/timetable-rides/create"
-                                class="text-sky-500 font-bold rounded-xl mx-3 px-3 py-1 hover:shadow-md hover:border hover:shadow-gray-500/50 hover:text-blue-500/80 hover:border-blue-500/80"
+                                class="text-white rounded-xl mx-3 px-3 py-1 border border-white hover:shadow-md  hover:bg-gray-700"
                             >
                                 <x-bladewind::icon name="plus-circle" type="outline" />Timetable Ride
                             </a>
 
                             <a
                                 href="/rides/create"
-                                class="text-sky-500 font-bold rounded-xl mx-3 px-3 py-1 hover:shadow-md hover:border hover:shadow-gray-500/50 hover:text-blue-500/80 hover:border-blue-500/80"
+                                class="text-white rounded-xl mx-3 px-3 py-1 border border-white hover:shadow-md hover:bg-gray-700"
                             >
                                 <x-bladewind::icon name="plus-circle" type="outline" />Post Ride
                             </a>

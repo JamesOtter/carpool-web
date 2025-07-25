@@ -43,20 +43,36 @@
                     :data="$ride_type"
                     value="{{ request('ride_type') }}"
                 />
-                <x-bladewind::input
-                    numeric="true"
-                    label="Min. Passenger"
-                    name="passengers"
-                    value="{{ request('passengers') }}"
-                />
                 <x-bladewind::button
                     size="medium"
                     radius="full"
                     class="col-span-1 place-self-start drop-shadow-sm hover:drop-shadow-lg"
                     can_submit="true"
-                >Filter
+                >
+                    Filter
                 </x-bladewind::button>
-                <div class="mb-3 text-sm text-gray-600 font-medium flex justify-center">
+
+                <div>
+                    <button
+                        class="text-sm font-normal text-white bg-blue-900 rounded-xl px-4 py-2 hover:bg-blue-950 hover:border hover:border-blue-800"
+                        onclick="showModal('large-modal')"
+                    >
+                        Use My Timetable
+                    </button>
+                    <x-bladewind::modal
+                        size="large"
+                        title="Large Modal"
+                        name="large-modal"
+                        blur_size="small"
+                        show_close_icon="true"
+                    >
+                        I am the large modal. If I am not large enough to contain
+                        your needs, check out my xl brother.
+                    </x-bladewind::modal>
+                </div>
+
+
+                <div class="mb-3 text-sm text-gray-600 font-medium flex content-end">
                     <x-bladewind::toggle
                         label="Map toggle"
                         checked="true"

@@ -266,7 +266,7 @@
                         }else{
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Failed to create ride. Please try again.',
+                                title: 'Failed to upload photo. Please try again.',
                                 text: response.message
                             });
                         }
@@ -288,19 +288,19 @@
 
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Failed to create ride. Please try again.',
+                                title: 'Failed to upload photo. Please try again.',
                                 text: errors['timetable'][0]
                             });
                         }else if(xhr.status === 0){
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Failed to create ride.</br>Please try again.',
+                                title: 'Failed to upload photo.</br>Please try again.',
                                 text: `Error ${xhr.status}: No internet connection or Server is down.`
                             });
                         }else{
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Failed to create ride.</br>Please try again.',
+                                title: 'Failed to upload photo.</br>Please try again.',
                                 text: `Error ${xhr.status}: ${xhr.statusText}`
                             });
                         }
@@ -343,7 +343,7 @@
                             });
                             Toast.fire({
                                 icon: "success",
-                                title: "Rides created successfully. Redirecting to Rides page..."
+                                title: "Timetable Rides created successfully. Redirecting to Rides page..."
                             });
                             setTimeout(function () {
                                 window.location.replace('/rides');
@@ -351,7 +351,7 @@
                         }else{
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Failed to create ride. Please try again.',
+                                title: 'Failed to create timetable ride. Please try again.',
                                 text: response.message
                             });
                         }

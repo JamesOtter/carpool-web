@@ -22,8 +22,7 @@ class RideController extends Controller
         $rides->when($request->departure, fn ($query, $departure) => $query->where('departure_address', $departure))
             ->when($request->destination, fn ($query, $destination) => $query->where('destination_address', $destination))
             ->when($request->date, fn ($query, $date) => $query->whereDate('departure_date', $date))
-            ->when($request->ride_type, fn ($query, $ride_type) => $query->where('ride_type', $ride_type))
-            ->when($request->passengers, fn ($query, $passengers) => $query->where('number_of_passenger', '>=', $passengers));
+            ->when($request->ride_type, fn ($query, $ride_type) => $query->where('ride_type', $ride_type));
 
         // Get all rides and group by recurring_id
         $rides = $rides->get()->groupBy('recurring_id');
@@ -138,7 +137,6 @@ class RideController extends Controller
                     // Move to the next day
                     $startDate->addDay();
                 }
-
             }else{
                 // Non-recurring ride
                 $ride = Ride::create([

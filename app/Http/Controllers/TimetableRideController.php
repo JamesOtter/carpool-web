@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Offer;
+use App\Models\RecurringRide;
+use App\Models\Ride;
+use App\Models\TimetableRide;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class TimetableRideController extends Controller
 {
@@ -22,86 +25,102 @@ class TimetableRideController extends Controller
             'timetable' => 'required|image|mimes:jpg,jpeg,png|max:3072'
         ]);
 
-//        // Step 1: Save the uploaded image
+        // Step 1: Save the uploaded image
 //        $image = $request->file('timetable');
 //        $imageName = 'timetable.jpeg'; // or use uniqid().'.jpg' to avoid conflict
-//        $imagePath = storage_path("app/public/{$imageName}");
-//        $image->move(storage_path('app/public'), $imageName);
-//
+//        $imagePath = $image->storeAs('public', $imageName);
+//        $fullPath = storage_path('app/' . $imagePath);
+
 //        // Step 2: Build the python command with image path
 //        $pythonScript = str_replace('\\', '/', base_path('python/main.py'));
 //        $imagePathEscaped = escapeshellarg($imagePath);
 //        $command = "python {$pythonScript} {$imagePathEscaped} 2>&1";
 //        $output = [];
 //        exec($command, $output, $status);
-//
-//        // Step 3: Output Error Handling
+
+        // Step 2: Use Docker to run python script
+//        $dockerImagePath = str_replace('\\', '/', $imagePath); // Convert Windows path to Unix-style
+
+//        $command = "docker run --rm -v \"C:/laragon/www/CarpoolWeb/storage/app/public:/app/storage\" timetable-ocr python main.py /app/storage/timetable.jpeg";
+//        exec($command, $output, $status);
+
+        // Use Fast API to get extracted data
+        $response = Http::attach(
+            'file',                       // Must match FastAPI param name
+            file_get_contents($request->file('timetable')->getRealPath()),
+            $request->file('timetable')->getClientOriginalName()
+        )->post('http://localhost:8010/ocr-timetable');
+
+        // Step 3: Output Error Handling
 //        if ($status !== 0) {
 //            return response()->json(['success' => false, 'message' => 'Python script failed', 'output' => $output]);
 //        }
-//
-//        // Step 4: Get output starting from line 16 (index 15) to filter paddleOCR info
-//        //  Get data as JSON
-//        $filteredOutput = array_slice($output, 15);
-//        $jsonString = implode('', $filteredOutput);
-//        $data = json_decode($jsonString, true);
-//
-//        // Step 5: Delete the image after processing
+        if ($response->failed()) {
+            return response()->json(['success' => false, 'message' => $response->status() . $response->body()]);
+        }
+
+        // Step 4: Get output starting from line 16 (index 15) to filter paddleOCR info (need if direct run python without docker)
+        // Step 4: Get data as JSON
+//        $filteredOutput = array_slice($output, 15);   (need if direct run python without docker)
+//        $jsonString = implode('', $output[0]);
+        $data = $response->json()['data'];
+
+        // Step 5: Delete the image after processing
 //        if (file_exists($imagePath)) {
 //            unlink($imagePath);
 //        }
 
         // Testing data (hard coded)
-        $data = [
-            [
-                "day" => "Mon",
-                "start_time" => "09:00",
-                "end_time" => "10:00",
-                "location" => "N003"
-            ],
-            [
-                "day" => "Mon",
-                "start_time" => "03:00",
-                "end_time" => "04:00",
-                "location" => "N001"
-            ],
-            [
-                "day" => "Mon",
-                "start_time" => "04:00",
-                "end_time" => "06:00",
-                "location" => "N112B(Lab)"
-            ],
-            [
-                "day" => "Tue",
-                "start_time" => "08:00",
-                "end_time" => "10:00",
-                "location" => "LDK2"
-            ],
-            [
-                "day" => "Wed",
-                "start_time" => "12:00",
-                "end_time" => "01:00",
-                "location" => "LDK2"
-            ],
-            [
-                "day" => "Wed",
-                "start_time" => "02:00",
-                "end_time" => "04:00",
-                "location" => "LDK1"
-            ],
-            [
-                "day" => "Wed",
-                "start_time" => "04:00",
-                "end_time" => "06:00",
-                "location" => "LDK2"
-            ],
-            [
-                "day" => "Fri",
-                "start_time" => "11:00",
-                "end_time" => "12:00",
-                "location" => "LDK1"
-            ]
-        ];
+//        $data = [
+//            [
+//                "day" => "Mon",
+//                "start_time" => "09:00",
+//                "end_time" => "10:00",
+//                "location" => "N003"
+//            ],
+//            [
+//                "day" => "Mon",
+//                "start_time" => "03:00",
+//                "end_time" => "04:00",
+//                "location" => "N001"
+//            ],
+//            [
+//                "day" => "Mon",
+//                "start_time" => "04:00",
+//                "end_time" => "06:00",
+//                "location" => "N112B(Lab)"
+//            ],
+//            [
+//                "day" => "Tue",
+//                "start_time" => "08:00",
+//                "end_time" => "10:00",
+//                "location" => "LDK2"
+//            ],
+//            [
+//                "day" => "Wed",
+//                "start_time" => "12:00",
+//                "end_time" => "01:00",
+//                "location" => "LDK2"
+//            ],
+//            [
+//                "day" => "Wed",
+//                "start_time" => "02:00",
+//                "end_time" => "04:00",
+//                "location" => "LDK1"
+//            ],
+//            [
+//                "day" => "Wed",
+//                "start_time" => "04:00",
+//                "end_time" => "06:00",
+//                "location" => "LDK2"
+//            ],
+//            [
+//                "day" => "Fri",
+//                "start_time" => "11:00",
+//                "end_time" => "12:00",
+//                "location" => "LDK1"
+//            ]
+//        ];
 
         // Pre-create rides from data
         $dayMap = [
@@ -221,7 +240,7 @@ class TimetableRideController extends Controller
         return response()->json([
             'success' => true,
             'html_blocks' => $htmlBlocks,
-            'message' => 'Image received!',
+            'message' => 'Image uploaded!',
         ]);
     }
 
@@ -232,9 +251,9 @@ class TimetableRideController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'number_of_passenger' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
-            'vehicle_number' => 'required|string',
-            'vehicle_model' => 'required|string',
+            'price' => 'required|numeric|min:1',
+            'vehicle_number' => 'required|string|max:50',
+            'vehicle_model' => 'required|string|max:50',
             'description' => 'nullable|string',
         ]);
 
@@ -270,9 +289,63 @@ class TimetableRideController extends Controller
             return response()->json(['success' => false, 'message' => 'No rides found!']);
         }
 
+        // Create Timetable Rides
+        $timetableRide = TimetableRide::create([
+            'start_date' => $request['start_date'],
+            'end_date' => $request['end_date'],
+        ]);
 
+        // Create Recurring Rides
+        foreach ($rides as $index => $ride) {
+            $recurringRide = RecurringRide::create([
+                'recurrence_pattern' => "weekly",
+                'recurrence_days' => json_encode([strtolower($ride['day'])]),
+                'start_date' => $request['start_date'],
+                'end_date' => $request['end_date'],
+            ]);
 
-        dd($request);
+            // Then generate actual rides for this pattern
+            $currentDate = Carbon::parse($request['start_date']);
+            $endDate = Carbon::parse($request['end_date']);
+
+            while ($currentDate->lte($endDate)) {
+                if ($currentDate->format('l') === $ride['day']) {
+
+                    // Calculate distance and duration
+                    $distanceAndDuration = $this->getDistanceAndDuration($ride['departure_address'] ?? $request['home_address'], $ride['destination_address'] ?? $request['home_address']);
+                    $distance = round(($distanceAndDuration['distance_value'] / 1000),2);
+                    $duration = round($distanceAndDuration['duration_value'] / 60);
+
+                    $singleRide = Ride::create([
+                        'user_id' => auth()->id(),
+                        'recurring_id' => $recurringRide->id,
+                        'timetable_id' => $timetableRide->id,
+                        'ride_type' => "offer",
+                        'departure_address' => $ride['departure_address'] ?? $request['home_address'],
+                        'departure_id' => $ride['departure_id'] ?? $request['home_id'],
+                        'destination_address' => $ride['destination_address'] ?? $request['home_address'],
+                        'destination_id' => $ride['destination_id'] ?? $request['home_id'],
+                        'departure_date' => $currentDate->toDateString(),
+                        'departure_time' => $ride['departure_time'],
+                        'price' => $request->price,
+                        'number_of_passenger' => $request->number_of_passenger,
+                        'distance' => $distance,
+                        'duration' => $duration,
+                        'description' => $request->description,
+                    ]);
+
+                    Offer::create([
+                        'ride_id' => $singleRide->id,
+                        'vehicle_number' => $request->vehicle_number,
+                        'vehicle_model' => $request->vehicle_model,
+                    ]);
+                }
+
+                $currentDate->addDay();
+            }
+        }
+
+        return response()->json(['success' => true]);
     }
 
     private function to24Hour(string $time): string {
@@ -289,6 +362,72 @@ class TimetableRideController extends Controller
             return str_pad($hour, 2, '0', STR_PAD_LEFT) . ':' . substr($time, 3);
         }
 
-        return $time; // fallback
+        return $time;
+    }
+
+    private function getDistanceAndDuration($origin, $destination)
+    {
+        $apiKey = env('GOOGLE_MAPS_API_KEY');
+
+        $response = Http::get("https://maps.googleapis.com/maps/api/distancematrix/json", [
+            'origins' => $origin,
+            'destinations' => $destination,
+            'key' => $apiKey,
+            'units' => 'metric',
+        ]);
+
+        if (!$response->successful()) {
+            return $response->status();
+        }
+
+        $data = $response->json();
+
+        if ($data['status'] !== 'OK') {
+            return 'API error: ' . $data['status'] . ' url: ' . $response->effectiveUri();
+        }
+
+        $elementStatus = $data['rows'][0]['elements'][0]['status'];
+
+        if ($elementStatus !== 'OK') {
+            return 'Route not found: ' . $elementStatus;
+        }
+
+        if ($data['status'] === 'OK' && $data['rows'][0]['elements'][0]['status'] === 'OK') {
+            $element = $data['rows'][0]['elements'][0];
+
+            return [
+                'distance_text' => $element['distance']['text'],   // e.g., "5.2 km"
+                'distance_value' => $element['distance']['value'], // in meters
+                'duration_text' => $element['duration']['text'],   // e.g., "12 mins"
+                'duration_value' => $element['duration']['value'], // in seconds
+            ];
+        }
+
+        return null;
+    }
+
+    private function isTime($text)
+    {
+        return preg_match('/^\d{1,2}:\d{2}$/', $text);
+    }
+
+    private function isDay($text)
+    {
+        return in_array(strtolower(substr(trim($text), 0, 3)), ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+    }
+
+    private function isClassroomCode($text)
+    {
+        return preg_match('/^[BDEHILNP]/', trim($text));
+    }
+
+    private function boxCenter($box)
+    {
+        $xs = array_column($box, 0);
+        $ys = array_column($box, 1);
+        return [
+            array_sum($xs) / count($xs),
+            array_sum($ys) / count($ys)
+        ];
     }
 }
