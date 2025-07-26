@@ -46,8 +46,10 @@ Route::post('/timetable-rides', [TimetableRideController::class, 'store'])
     ->name('timetable-rides.store')
     ->middleware('auth');
 Route::post('/upload-timetable', [TimetableRideController::class, 'uploadTimetable'])
-    ->name('upload.timetable')
+    ->name('timetable-rides.uploadTimetable')
     ->middleware('auth');
+Route::post('/timetable-search', [TimetableRideController::class, 'timetableSearch'])
+    ->name('timetable-rides.timetableSearch');
 
 //Dashboard
 Route::get('/dashboard', function () {

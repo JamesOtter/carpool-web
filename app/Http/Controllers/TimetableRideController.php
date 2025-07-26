@@ -25,50 +25,23 @@ class TimetableRideController extends Controller
             'timetable' => 'required|image|mimes:jpg,jpeg,png|max:3072'
         ]);
 
-        // Step 1: Save the uploaded image
-//        $image = $request->file('timetable');
-//        $imageName = 'timetable.jpeg'; // or use uniqid().'.jpg' to avoid conflict
-//        $imagePath = $image->storeAs('public', $imageName);
-//        $fullPath = storage_path('app/' . $imagePath);
-
-//        // Step 2: Build the python command with image path
-//        $pythonScript = str_replace('\\', '/', base_path('python/main.py'));
-//        $imagePathEscaped = escapeshellarg($imagePath);
-//        $command = "python {$pythonScript} {$imagePathEscaped} 2>&1";
-//        $output = [];
-//        exec($command, $output, $status);
-
-        // Step 2: Use Docker to run python script
-//        $dockerImagePath = str_replace('\\', '/', $imagePath); // Convert Windows path to Unix-style
-
-//        $command = "docker run --rm -v \"C:/laragon/www/CarpoolWeb/storage/app/public:/app/storage\" timetable-ocr python main.py /app/storage/timetable.jpeg";
-//        exec($command, $output, $status);
-
-        // Use Fast API to get extracted data
-        $response = Http::attach(
-            'file',                       // Must match FastAPI param name
-            file_get_contents($request->file('timetable')->getRealPath()),
-            $request->file('timetable')->getClientOriginalName()
-        )->post('http://localhost:8010/ocr-timetable');
-
-        // Step 3: Output Error Handling
-//        if ($status !== 0) {
-//            return response()->json(['success' => false, 'message' => 'Python script failed', 'output' => $output]);
-//        }
-        if ($response->failed()) {
-            return response()->json(['success' => false, 'message' => $response->status() . $response->body()]);
+        // Extract data from timetable
+        try {
+            $data = $this->extractTimetableData($request->file('timetable'));
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
 
-        // Step 4: Get output starting from line 16 (index 15) to filter paddleOCR info (need if direct run python without docker)
-        // Step 4: Get data as JSON
-//        $filteredOutput = array_slice($output, 15);   (need if direct run python without docker)
-//        $jsonString = implode('', $output[0]);
-        $data = $response->json()['data'];
+        if(empty($data)){
+            return response()->json(['success' => false, 'message' => 'No data extracted.']);
+        }
 
-        // Step 5: Delete the image after processing
-//        if (file_exists($imagePath)) {
-//            unlink($imagePath);
-//        }
+        // Generate rides based on extracted data
+        $rides = $this->generateRidesFromTimetable($data);
+
+        if(empty($rides)){
+            return response()->json(['success' => false, 'message' => 'No rides found.']);
+        }
 
         // Testing data (hard coded)
 //        $data = [
@@ -121,115 +94,6 @@ class TimetableRideController extends Controller
 //                "location" => "LDK1"
 //            ]
 //        ];
-
-        // Pre-create rides from data
-        $dayMap = [
-            'mon' => 'Monday',
-            'tue' => 'Tuesday',
-            'wed' => 'Wednesday',
-            'thu' => 'Thursday',
-            'fri' => 'Friday',
-            'sat' => 'Saturday',
-            'sun' => 'Sunday',
-        ];
-        $locationMap = [
-            'B' => [
-                'name' => 'Block B Learning Complex 1',
-                'address' => 'Learning Complex 1, 31900 Kampar, Perak, Malaysia',
-                'id' => 'ChIJbxusaMDiyjER1i6t32KkbUo'
-            ],
-            'D' => [
-                'name' => 'Block D Faculty of Science (FSc)',
-                'address' => 'Jalan Universiti, Bandar Barat, Jalan Perdana, 31900 Kampar, Perak, Malaysia',
-                'id' => 'ChIJt_UJxsPiyjERfsrlxPeIiYE'
-            ],
-            'E' => [
-                'name' => 'Block E Faculty of Engineering and Green Technology (FEGT)',
-                'address' => 'Jalan Universiti, Bandar Barat, 31900 Kampar, Perak, Malaysia',
-                'id' => 'ChIJg1wLPMHiyjER5uOmhqva0vg'
-            ],
-            'H' => [
-                'name' => 'Block H Faculty of Business and Finance (FBF)',
-                'address' => 'Faculty of Business And Finance (FBF), 31900 Malim Nawar, Perak, Malaysia',
-                'id' => 'ChIJRRmb3MPiyjER5xYG5FMEdKQ'
-            ],
-            'I' => [
-                'name' => 'Block I Lecture Complex I',
-                'address' => 'Lecture Complex I, 31900 Malim Nawar, Perak, Malaysia',
-                'id' => 'ChIJWTBJ2cPiyjERb9_69LB-yV4'
-            ],
-            'L' => [
-                'name' => 'Block L Learning Complex II',
-                'address' => 'Lecture Complex II, Jalan Universiti, Bandar Barat, 31900 Malim Nawar, Perak, Malaysia',
-                'id' => 'ChIJVVWVbMLiyjERizvApllA-w4'
-            ],
-            'N' => [
-                'name' => 'Block N Faculty of Information and Communication Technology (FICT)',
-                'address' => 'Faculty of Information and Communication Technology (FICT), 31900 Kampar, Perak, Malaysia',
-                'id' => 'ChIJ5X7BTuriyjERetAAYQ6P8Ik'
-            ],
-            'P' => [
-                'name' => 'Block P Institute of Chinese Studies (ICS)',
-                'address' => 'Jalan Universiti, Bandar Barat, 31900 Kampar, Perak, Malaysia',
-                'id' => 'ChIJ29qZyMPiyjERcxO7w9AYdxA'
-            ],
-        ];
-        $rides = [];
-        $grouped = collect($data)->groupBy('day');
-
-        foreach ($grouped as $day => $classes) {
-            $sorted = collect($classes)->sortBy(function ($class) {
-                return strtotime($this->to24Hour($class['start_time']));
-            })->values();
-
-            for ($i = 0; $i < $sorted->count(); $i++) {
-                $class = $sorted[$i];
-                $start = Carbon::createFromFormat('H:i', $this->to24Hour($class['start_time']));
-                $end = Carbon::createFromFormat('H:i', $this->to24Hour($class['end_time']));
-
-                // --- Before class check ---
-                $hasConflictBefore = $sorted->some(function ($other) use ($class, $start) {
-                    if ($other === $class) return false;
-                    $otherEnd = Carbon::createFromFormat('H:i', $this->to24Hour($other['end_time']));
-                    return $otherEnd->gt($start->copy()->subHours(2)) && $otherEnd->lte($start);
-                });
-
-                if (!$hasConflictBefore) {
-                    $prefix = strtoupper(substr($class['location'], 0, 1));
-                    $mapped = $locationMap[$prefix] ?? ['name' => null, 'address' => null, 'id' => null];
-
-                    $rides[] = [
-                        "day" => $dayMap[strtolower($day)] ?? ucfirst($day),
-                        "departure_time" => $start->copy()->subMinutes(30)->format('H:i'),
-                        "departure" => null,
-                        "destination" => $mapped['name'],
-                        "destination_address" => $mapped['address'],
-                        "destination_id" => $mapped['id']
-                    ];
-                }
-
-                // --- After class check ---
-                $hasConflictAfter = $sorted->some(function ($other) use ($class, $end) {
-                    if ($other === $class) return false;
-                    $otherStart = Carbon::createFromFormat('H:i', $this->to24Hour($other['start_time']));
-                    return $otherStart->lt($end->copy()->addHours(2)) && $otherStart->gte($end);
-                });
-
-                if (!$hasConflictAfter) {
-                    $prefix = strtoupper(substr($class['location'], 0, 1));
-                    $mapped = $locationMap[$prefix] ?? ['name' => null, 'address' => null, 'id' => null];
-
-                    $rides[] = [
-                        "day" => $dayMap[strtolower($day)] ?? ucfirst($day),
-                        "departure_time" => $end->format('H:i'),
-                        "departure" => $mapped['name'],
-                        "destination" => null,
-                        "departure_address" => $mapped['address'],
-                        "departure_id" => $mapped['id'],
-                    ];
-                }
-            }
-        }
 
         // Create view to display rides
         $htmlBlocks = [];
@@ -348,6 +212,34 @@ class TimetableRideController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function timetableSearch(Request $request){
+        $request->validate([
+            'timetable' => 'required|image|mimes:jpg,jpeg,png|max:3072'
+        ]);
+
+        // Extract data from timetable
+        try {
+            $data = $this->extractTimetableData($request->file('timetable'));
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+
+        if(empty($data)){
+            return response()->json(['success' => false, 'message' => 'No data extracted.']);
+        }
+
+        // Generate rides based on extracted data
+        $rides = $this->generateRidesFromTimetable($data);
+
+        if(empty($rides)){
+            return response()->json(['success' => false, 'message' => 'No rides found.']);
+        }
+
+        session(['timetable_rides' => $rides]);
+
+        return response()->json(['success' => true, 'redirect' => route('rides.index', ['use_timetable' => true])]);
+    }
+
     private function to24Hour(string $time): string {
         $hour = intval(substr($time, 0, 2));
 
@@ -406,28 +298,132 @@ class TimetableRideController extends Controller
         return null;
     }
 
-    private function isTime($text)
+    private function extractTimetableData($uploadedFile)
     {
-        return preg_match('/^\d{1,2}:\d{2}$/', $text);
+        $response = Http::attach(
+            'file', // Must match FastAPI param name
+            file_get_contents($uploadedFile->getRealPath()),
+            $uploadedFile->getClientOriginalName()
+        )->post('http://localhost:8010/ocr-timetable');
+
+        if ($response->failed()) {
+            throw new \Exception("OCR failed: " . $response->status() . ' ' . $response->body());
+        }
+
+        return $response->json()['data'] ?? [];
     }
 
-    private function isDay($text)
+    private function generateRidesFromTimetable(array $data): array
     {
-        return in_array(strtolower(substr(trim($text), 0, 3)), ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
-    }
-
-    private function isClassroomCode($text)
-    {
-        return preg_match('/^[BDEHILNP]/', trim($text));
-    }
-
-    private function boxCenter($box)
-    {
-        $xs = array_column($box, 0);
-        $ys = array_column($box, 1);
-        return [
-            array_sum($xs) / count($xs),
-            array_sum($ys) / count($ys)
+        // Pre-create rides from data
+        $dayMap = [
+            'mon' => 'Monday',
+            'tue' => 'Tuesday',
+            'wed' => 'Wednesday',
+            'thu' => 'Thursday',
+            'fri' => 'Friday',
+            'sat' => 'Saturday',
+            'sun' => 'Sunday',
         ];
+        $locationMap = [
+            'B' => [
+                'name' => 'Block B Learning Complex 1',
+                'address' => 'Learning Complex 1, 31900 Kampar, Perak, Malaysia',
+                'id' => 'ChIJbxusaMDiyjER1i6t32KkbUo'
+            ],
+            'D' => [
+                'name' => 'Block D Faculty of Science (FSc)',
+                'address' => 'Jalan Universiti, Bandar Barat, Jalan Perdana, 31900 Kampar, Perak, Malaysia',
+                'id' => 'ChIJt_UJxsPiyjERfsrlxPeIiYE'
+            ],
+            'E' => [
+                'name' => 'Block E Faculty of Engineering and Green Technology (FEGT)',
+                'address' => 'Jalan Universiti, Bandar Barat, 31900 Kampar, Perak, Malaysia',
+                'id' => 'ChIJg1wLPMHiyjER5uOmhqva0vg'
+            ],
+            'H' => [
+                'name' => 'Block H Faculty of Business and Finance (FBF)',
+                'address' => 'Faculty of Business And Finance (FBF), 31900 Malim Nawar, Perak, Malaysia',
+                'id' => 'ChIJRRmb3MPiyjER5xYG5FMEdKQ'
+            ],
+            'I' => [
+                'name' => 'Block I Lecture Complex I',
+                'address' => 'Lecture Complex I, 31900 Malim Nawar, Perak, Malaysia',
+                'id' => 'ChIJWTBJ2cPiyjERb9_69LB-yV4'
+            ],
+            'L' => [
+                'name' => 'Block L Learning Complex II',
+                'address' => 'Lecture Complex II, Jalan Universiti, Bandar Barat, 31900 Malim Nawar, Perak, Malaysia',
+                'id' => 'ChIJVVWVbMLiyjERizvApllA-w4'
+            ],
+            'N' => [
+                'name' => 'Block N Faculty of Information and Communication Technology (FICT)',
+                'address' => 'Faculty of Information and Communication Technology (FICT), 31900 Kampar, Perak, Malaysia',
+                'id' => 'ChIJ5X7BTuriyjERetAAYQ6P8Ik'
+            ],
+            'P' => [
+                'name' => 'Block P Institute of Chinese Studies (ICS)',
+                'address' => 'Jalan Universiti, Bandar Barat, 31900 Kampar, Perak, Malaysia',
+                'id' => 'ChIJ29qZyMPiyjERcxO7w9AYdxA'
+            ],
+        ];
+        $rides = [];
+        $grouped = collect($data)->groupBy('day');
+
+        foreach ($grouped as $day => $classes) {
+            $sorted = collect($classes)->sortBy(function ($class) {
+                return strtotime($this->to24Hour($class['start_time']));
+            })->values();
+
+            for ($i = 0; $i < $sorted->count(); $i++) {
+                $class = $sorted[$i];
+                $start = Carbon::createFromFormat('H:i', $this->to24Hour($class['start_time']));
+                $end = Carbon::createFromFormat('H:i', $this->to24Hour($class['end_time']));
+
+                // --- Before class check ---
+                $hasConflictBefore = $sorted->some(function ($other) use ($class, $start) {
+                    if ($other === $class) return false;
+                    $otherEnd = Carbon::createFromFormat('H:i', $this->to24Hour($other['end_time']));
+                    return $otherEnd->gt($start->copy()->subHours(2)) && $otherEnd->lte($start);
+                });
+
+                if (!$hasConflictBefore) {
+                    $prefix = strtoupper(substr($class['location'], 0, 1));
+                    $mapped = $locationMap[$prefix] ?? ['name' => null, 'address' => null, 'id' => null];
+
+                    $rides[] = [
+                        "day" => $dayMap[strtolower($day)] ?? ucfirst($day),
+                        "departure_time" => $start->copy()->subMinutes(30)->format('H:i'),
+                        "departure" => null,
+                        "destination" => $mapped['name'],
+                        "destination_address" => $mapped['address'],
+                        "destination_id" => $mapped['id']
+                    ];
+                }
+
+                // --- After class check ---
+                $hasConflictAfter = $sorted->some(function ($other) use ($class, $end) {
+                    if ($other === $class) return false;
+                    $otherStart = Carbon::createFromFormat('H:i', $this->to24Hour($other['start_time']));
+                    return $otherStart->lt($end->copy()->addHours(2)) && $otherStart->gte($end);
+                });
+
+                if (!$hasConflictAfter) {
+                    $prefix = strtoupper(substr($class['location'], 0, 1));
+                    $mapped = $locationMap[$prefix] ?? ['name' => null, 'address' => null, 'id' => null];
+
+                    $rides[] = [
+                        "day" => $dayMap[strtolower($day)] ?? ucfirst($day),
+                        "departure_time" => $end->format('H:i'),
+                        "departure" => $mapped['name'],
+                        "destination" => null,
+                        "departure_address" => $mapped['address'],
+                        "departure_id" => $mapped['id'],
+                    ];
+                }
+            }
+        }
+
+        return $rides;
     }
 }

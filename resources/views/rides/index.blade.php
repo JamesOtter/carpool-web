@@ -7,8 +7,8 @@
 
     @section('heading')
         <div class="flex justify-between">
-            <form method="GET" action="/rides" class="grid grid-cols-9 gap-4">
-                <div class="col-span-2">
+            <form method="GET" action="/rides" class="grid grid-cols-6 gap-4">
+                <div class="">
                     <x-location-input
                         name="departure"
                         label="Departure"
@@ -16,7 +16,7 @@
                         value="{{ request('departure') }}"
                     />
                 </div>
-                <div class="col-span-2">
+                <div class="">
                     <x-location-input
                         name="destination"
                         label="Destination"
@@ -52,26 +52,6 @@
                     Filter
                 </x-bladewind::button>
 
-                <div>
-                    <button
-                        class="text-sm font-normal text-white bg-blue-900 rounded-xl px-4 py-2 hover:bg-blue-950 hover:border hover:border-blue-800"
-                        onclick="showModal('large-modal')"
-                    >
-                        Use My Timetable
-                    </button>
-                    <x-bladewind::modal
-                        size="large"
-                        title="Large Modal"
-                        name="large-modal"
-                        blur_size="small"
-                        show_close_icon="true"
-                    >
-                        I am the large modal. If I am not large enough to contain
-                        your needs, check out my xl brother.
-                    </x-bladewind::modal>
-                </div>
-
-
                 <div class="mb-3 text-sm text-gray-600 font-medium flex content-end">
                     <x-bladewind::toggle
                         label="Map toggle"
@@ -80,6 +60,52 @@
                     />
                 </div>
             </form>
+            <div>
+                <button
+                    type="button"
+                    class="text-sm font-normal text-white tracking-normal bg-blue-900 rounded-xl px-4 py-2 hover:bg-blue-950 hover:border hover:border-blue-800"
+                    onclick="showModal('upload-timetable-modal')"
+                >
+                    Use My Timetable
+                </button>
+                <x-bladewind::modal
+                    size="large"
+                    title="Timetable-based ride search"
+                    name="upload-timetable-modal"
+                    blur_size="small"
+                    ok_button_label=""
+                    cancel_button_label=""
+                    show_close_icon="true"
+                    close_after_action="false"
+                >
+                    <form
+                        action="/timetable-search"
+                        method="POST"
+                        id="upload-timetable"
+                        enctype="multipart/form-data"
+                    >
+                        @csrf
+
+                        <div>
+                            <x-bladewind.filepicker
+                                name="timetable"
+                                placeholder_line1="Upload UTAR timetable here"
+                                max_file_size="3mb"
+                                accepted_file_types="image/*"
+                            />
+                        </div>
+                        <div class="place-self-center">
+                            <x-bladewind::button
+                                radius="medium"
+                                can_submit="true"
+                            >
+                                Upload
+                            </x-bladewind::button>
+                        </div>
+
+                    </form>
+                </x-bladewind::modal>
+            </div>
         </div>
     @endsection
 
@@ -440,5 +466,77 @@
         {{--    });--}}
         {{--}, 60000); // 60 seconds--}}
     </script>
+
+    <script>
+        $('#upload-timetable').on('submit', function(event) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Loading...',
+                text: 'Please wait while we process your request.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: $(this).attr('action'),
+                method: $(this).attr('method'),
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    Swal.close();
+                    if(response.success && response.redirect) {
+                        window.location.href = response.redirect;
+                    }else{
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to upload photo. Please try again.',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    Swal.close();
+
+                    if(xhr.status === 422) {
+                        let errors = xhr.responseJSON.errors;
+
+                        $('.text-red-500').remove();
+                        $('input').removeClass('border-red-400');
+
+                        for (let key in errors) {
+                            let input = $('[name=' + key + ']');
+                            input.addClass('border-red-400');
+                            input.after('<p class="text-red-500 text-sm mb-2">' + errors[key][0] + '</p>');
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to upload photo. Please try again.',
+                            text: errors['timetable'][0]
+                        });
+                    }else if(xhr.status === 0){
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to upload photo.</br>Please try again.',
+                            text: `Error ${xhr.status}: No internet connection or Server is down.`
+                        });
+                    }else{
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to upload photo.</br>Please try again.',
+                            text: `Error ${xhr.status}: ${xhr.statusText}`
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+
     @endsection
 </x-layout>

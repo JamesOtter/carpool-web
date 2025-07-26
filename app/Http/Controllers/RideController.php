@@ -18,11 +18,34 @@ class RideController extends Controller
             ->where('status', 'active') // Filter only active rides
             ->latest();
 
-        // Apply filters dynamically
+        // Apply filters dynamically (from the filter section input)
         $rides->when($request->departure, fn ($query, $departure) => $query->where('departure_address', $departure))
             ->when($request->destination, fn ($query, $destination) => $query->where('destination_address', $destination))
             ->when($request->date, fn ($query, $date) => $query->whereDate('departure_date', $date))
             ->when($request->ride_type, fn ($query, $ride_type) => $query->where('ride_type', $ride_type));
+
+        // Filter rides based on uploaded timetable (If timetable rides were extracted)
+        if ($request->query('use_timetable') && session()->has('timetable_rides')) {
+            $timetableRides = session('timetable_rides');
+
+            $rides->where(function ($query) use ($timetableRides) {
+                foreach ($timetableRides as $r) {
+                    $query->orWhere(function ($q) use ($r) {
+                        $q->whereTime('departure_time', $r['departure_time']);
+
+                        // Convert departure_date to day-of-week to compare
+                        $q->whereRaw("DAYNAME(departure_date) = ?", [$r['day']]);
+
+                        if (!empty($r['destination_id'])) {
+                            $q->where('destination_id', $r['destination_id']);
+                        } elseif (!empty($r['departure_id'])) {
+                            $q->where('departure_id', $r['departure_id']);
+                        }
+                    });
+                }
+            });
+            session()->forget('timetable_rides');
+        }
 
         // Get all rides and group by recurring_id
         $rides = $rides->get()->groupBy('recurring_id');
