@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@source "../views";
+/*@import "tailwindcss";*/
+/*@source "../views";*/
 
 @tailwind base;
 @tailwind components;
