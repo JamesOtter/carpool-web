@@ -41,27 +41,6 @@ def box_center(box):
 # img_path = os.path.join(BASE_DIR, 'test_images', 'sample1.jpeg')
 # img_path = 'test_images/sample1.jpeg'
 
-# Resize it to % of original size
-# img = cv2.imread(img_path)
-# scale_percent = 70  # scale to 70% of original size
-# width = int(img.shape[1] * scale_percent / 100)
-# height = int(img.shape[0] * scale_percent / 100)
-# dim = (width, height)
-# scaled_img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
-
-# Optimize Image
-# img = cv2.imread(img_path)
-# gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-# blurred = cv2.GaussianBlur(gray, (3, 3), 0)
-# thresh = cv2.adaptiveThreshold(
-#     blurred, 255,
-#     cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-#     cv2.THRESH_BINARY,
-#     11, 2
-# )
-# kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 1))
-# processed = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
-# cv2.imwrite("optimized.jpg", processed)
 # start = time.time()
 
 # Initialize PaddleOCR  (load model once)
