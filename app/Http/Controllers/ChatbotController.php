@@ -15,8 +15,15 @@ class ChatbotController extends Controller
      */
     private function getDialogflowAccessToken()
     {
+        // Because of Larvel Cloud newly added
+        $base64 = env('GOOGLE_APPLICATION_CREDENTIALS_BASE64');
+        $decodedJson = base64_decode($base64);
+        $tempPath = storage_path('app/google-temp.json');
+        file_put_contents($tempPath, $decodedJson);
+
         $client = new Google_Client();
-        $client->setAuthConfig(storage_path(env('GOOGLE_APPLICATION_CREDENTIALS'))); // Path to your service account file
+//        $client->setAuthConfig(storage_path(env('GOOGLE_APPLICATION_CREDENTIALS'))); // Path to your service account file
+        $client->setAuthConfig($tempPath);
         $client->addScope('https://www.googleapis.com/auth/dialogflow');
 
         $token = $client->fetchAccessTokenWithAssertion();
