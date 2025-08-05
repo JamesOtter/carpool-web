@@ -5,14 +5,17 @@
     @section('title', 'Home Page')
 
     @section('heading')
-        <div class="pb-3 md:px-32">
-            <p>Home Page</p>
-        </div>
     @endsection
 
     @section('content')
-        <div class="md:px-32">
-            <h1>Welcome to carpool</h1>
+        <div>
+            <div>
+                <img src="{{ asset('images/home-part1.jpg') }}" alt="Homepage Part 1" class="w-full">
+                <img src="{{ asset('images/home-part2.jpg') }}" alt="Homepage Part 2" class="w-full">
+                <img src="{{ asset('images/home-part3.jpg') }}" alt="Homepage Part 3" class="w-full">
+                <img src="{{ asset('images/home-part4.jpg') }}" alt="Homepage Part 4" class="w-full">
+                <img src="{{ asset('images/home-part5.jpg') }}" alt="Homepage Part 5" class="w-full">
+            </div>
         </div>
     @endsection
 
