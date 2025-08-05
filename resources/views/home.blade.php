@@ -15,6 +15,8 @@
                 <img src="{{ asset('images/home-part3.jpg') }}" alt="Homepage Part 3" class="w-full">
                 <img src="{{ asset('images/home-part4.jpg') }}" alt="Homepage Part 4" class="w-full">
                 <img src="{{ asset('images/home-part5.jpg') }}" alt="Homepage Part 5" class="w-full">
+                <img src="{{ asset('images/home-part6.jpg') }}" alt="Homepage Part 5" class="w-full">
+                <img src="{{ asset('images/home-part7.jpg') }}" alt="Homepage Part 5" class="w-full">
             </div>
         </div>
     @endsection
