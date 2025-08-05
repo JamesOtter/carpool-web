@@ -166,8 +166,8 @@
                                         <x-bladewind::icon name="banknotes" class="text-green-500"/>
                                         <div class="text-slate-500 grid-rows-3">
                                             <p>Base Price: RM <span id="base-price-{{ $rideData['ride']->id }}">{{ $rideData['ride']->price }}</span></p>
-                                            <p>Surge Price: RM <span id="surge-price-{{ $rideData['ride']->id }}">0.00</span></p>
-                                            <p>Total Price: RM <span id="total-price-{{ $rideData['ride']->id }}">{{ $rideData['ride']->price }}</span></p>
+{{--                                            <p>Surge Price: RM <span id="surge-price-{{ $rideData['ride']->id }}">0.00</span></p>--}}
+{{--                                            <p>Total Price: RM <span id="total-price-{{ $rideData['ride']->id }}">{{ $rideData['ride']->price }}</span></p>--}}
                                         </div>
                                     </div>
                                     <div class="flex flex-auto gap-2">
@@ -385,63 +385,63 @@
 {{--    </script>--}}
 
     <script>
-        function updatePrice(rideId) {
-            $.ajax({
-                url: "/get-price",
-                method: 'POST',
-                data: {
-                    ride_id: rideId,
-                    _token: '{{ csrf_token() }}' // Laravel CSRF token
-                },
-                success: function(response) {
-                    // Update the price on the page
-                    $('#base-price-' + rideId).text(response.base_price.toFixed(2));
-                    $('#surge-price-' + rideId).text(response.surge_price.toFixed(2));
-                    $('#total-price-' + rideId).text(response.total_price.toFixed(2));
-                },
-                error: function(xhr) {
-                    console.error('Error fetching price:', xhr.responseText);
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: "top",
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
-                        didOpen: (toast) => {
-                            toast.onmouseenter = Swal.stopTimer;
-                            toast.onmouseleave = Swal.resumeTimer;
-                        }
-                    });
-                    Toast.fire({
-                        icon: "error",
-                        title: "Failed to fetch price"
-                    });
-                }
-            });
-        }
+        {{--function updatePrice(rideId) {--}}
+        {{--    $.ajax({--}}
+        {{--        url: "/get-price",--}}
+        {{--        method: 'POST',--}}
+        {{--        data: {--}}
+        {{--            ride_id: rideId,--}}
+        {{--            _token: '{{ csrf_token() }}' // Laravel CSRF token--}}
+        {{--        },--}}
+        {{--        success: function(response) {--}}
+        {{--            // Update the price on the page--}}
+        {{--            $('#base-price-' + rideId).text(response.base_price.toFixed(2));--}}
+        {{--            $('#surge-price-' + rideId).text(response.surge_price.toFixed(2));--}}
+        {{--            $('#total-price-' + rideId).text(response.total_price.toFixed(2));--}}
+        {{--        },--}}
+        {{--        error: function(xhr) {--}}
+        {{--            console.error('Error fetching price:', xhr.responseText);--}}
+        {{--            const Toast = Swal.mixin({--}}
+        {{--                toast: true,--}}
+        {{--                position: "top",--}}
+        {{--                showConfirmButton: false,--}}
+        {{--                timer: 3000,--}}
+        {{--                timerProgressBar: true,--}}
+        {{--                didOpen: (toast) => {--}}
+        {{--                    toast.onmouseenter = Swal.stopTimer;--}}
+        {{--                    toast.onmouseleave = Swal.resumeTimer;--}}
+        {{--                }--}}
+        {{--            });--}}
+        {{--            Toast.fire({--}}
+        {{--                icon: "error",--}}
+        {{--                title: "Failed to fetch price"--}}
+        {{--            });--}}
+        {{--        }--}}
+        {{--    });--}}
+        {{--}--}}
 
         //Update prices on page load
-        $(document).ready(function() {
-            @foreach($sortedRides as $rideData)
-                updatePrice({{ $rideData['ride']->id }});
-            @endforeach
+        {{--$(document).ready(function() {--}}
+        {{--    @foreach($sortedRides as $rideData)--}}
+        {{--        updatePrice({{ $rideData['ride']->id }});--}}
+        {{--    @endforeach--}}
 
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "top",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
-            Toast.fire({
-                icon: "success",
-                title: "Price Refreshed"
-            });
-        });
+        {{--    const Toast = Swal.mixin({--}}
+        {{--        toast: true,--}}
+        {{--        position: "top",--}}
+        {{--        showConfirmButton: false,--}}
+        {{--        timer: 3000,--}}
+        {{--        timerProgressBar: true,--}}
+        {{--        didOpen: (toast) => {--}}
+        {{--            toast.onmouseenter = Swal.stopTimer;--}}
+        {{--            toast.onmouseleave = Swal.resumeTimer;--}}
+        {{--        }--}}
+        {{--    });--}}
+        {{--    Toast.fire({--}}
+        {{--        icon: "success",--}}
+        {{--        title: "Price Refreshed"--}}
+        {{--    });--}}
+        {{--});--}}
 
         // Update prices every 60 seconds (optional)
         {{--setInterval(function() {--}}

@@ -130,30 +130,30 @@
                         <x-bladewind::card compact="true" class="mb-4">
                             <div class="ml-2">
                                 <div class="flex gap-2 mb-4">
-                                    <p class="font-bold text-lg text-gray-600">Price Breakdown</p>
+                                    <p class="font-bold text-lg text-gray-600">Price</p>
                                     <x-bladewind::icon name="banknotes" class="text-green-500"/>
                                 </div>
 
                                 <div>
-                                    <div class="grid grid-cols-2 gap-4 mx-2">
-                                        <div class="font-semibold">Base Price</div>
-                                        <div>RM <span id="base-price-{{ $ride->id }}">{{ $ride->price }}</span></div>
-                                    </div>
+{{--                                    <div class="grid grid-cols-2 gap-4 mx-2">--}}
+{{--                                        <div class="font-semibold">Base Price</div>--}}
+{{--                                        <div>RM <span id="base-price-{{ $ride->id }}">{{ $ride->price }}</span></div>--}}
+{{--                                    </div>--}}
 
-                                    <div class="grid grid-cols-2 gap-4 mx-2">
-                                        <div ></div>
-                                        <div>+</div>
-                                    </div>
+{{--                                    <div class="grid grid-cols-2 gap-4 mx-2">--}}
+{{--                                        <div ></div>--}}
+{{--                                        <div>+</div>--}}
+{{--                                    </div>--}}
 
-                                    <div class="grid grid-cols-2 gap-4 mx-2">
-                                        <div class="font-semibold">Surge Price</div>
-                                        <div>RM <span id="surge-price-{{ $ride->id }}">0.00</span></div>
-                                    </div>
+{{--                                    <div class="grid grid-cols-2 gap-4 mx-2">--}}
+{{--                                        <div class="font-semibold">Surge Price</div>--}}
+{{--                                        <div>RM <span id="surge-price-{{ $ride->id }}">0.00</span></div>--}}
+{{--                                    </div>--}}
 
                                     <hr class="my-3 mx-2">
 
                                     <div class="grid grid-cols-2 gap-4 mx-2">
-                                        <p class="font-bold">Total Price</p>
+                                        <p>Total Price</p>
                                         <div class="font-bold">RM <span id="total-price-{{ $ride->id }}">{{ $ride->price }}</span></div>
                                     </div>
                                 </div>
@@ -325,61 +325,61 @@
 
         </script>
         <script>
-            function updatePrice(rideId) {
-                $.ajax({
-                    url: "/get-price",
-                    method: 'POST',
-                    data: {
-                        ride_id: rideId,
-                        _token: '{{ csrf_token() }}' // Laravel CSRF token
-                    },
-                    success: function(response) {
-                        // Update the price on the page
-                        $('#base-price-' + rideId).text(response.base_price.toFixed(2));
-                        $('#surge-price-' + rideId).text(response.surge_price.toFixed(2));
-                        $('#total-price-' + rideId).text(response.total_price.toFixed(2));
-                    },
-                    error: function(xhr) {
-                        console.error('Error fetching price:', xhr.responseText);
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: "top",
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
-                            didOpen: (toast) => {
-                                toast.onmouseenter = Swal.stopTimer;
-                                toast.onmouseleave = Swal.resumeTimer;
-                            }
-                        });
-                        Toast.fire({
-                            icon: "Error",
-                            title: "Failed to fetch price"
-                        });
-                    }
-                });
-            }
+            {{--function updatePrice(rideId) {--}}
+            {{--    $.ajax({--}}
+            {{--        url: "/get-price",--}}
+            {{--        method: 'POST',--}}
+            {{--        data: {--}}
+            {{--            ride_id: rideId,--}}
+            {{--            _token: '{{ csrf_token() }}' // Laravel CSRF token--}}
+            {{--        },--}}
+            {{--        success: function(response) {--}}
+            {{--            // Update the price on the page--}}
+            {{--            $('#base-price-' + rideId).text(response.base_price.toFixed(2));--}}
+            {{--            $('#surge-price-' + rideId).text(response.surge_price.toFixed(2));--}}
+            {{--            $('#total-price-' + rideId).text(response.total_price.toFixed(2));--}}
+            {{--        },--}}
+            {{--        error: function(xhr) {--}}
+            {{--            console.error('Error fetching price:', xhr.responseText);--}}
+            {{--            const Toast = Swal.mixin({--}}
+            {{--                toast: true,--}}
+            {{--                position: "top",--}}
+            {{--                showConfirmButton: false,--}}
+            {{--                timer: 3000,--}}
+            {{--                timerProgressBar: true,--}}
+            {{--                didOpen: (toast) => {--}}
+            {{--                    toast.onmouseenter = Swal.stopTimer;--}}
+            {{--                    toast.onmouseleave = Swal.resumeTimer;--}}
+            {{--                }--}}
+            {{--            });--}}
+            {{--            Toast.fire({--}}
+            {{--                icon: "Error",--}}
+            {{--                title: "Failed to fetch price"--}}
+            {{--            });--}}
+            {{--        }--}}
+            {{--    });--}}
+            {{--}--}}
 
             //Update prices on page load
-            $(document).ready(function() {
-                updatePrice({{ $ride->id }});
+            {{--$(document).ready(function() {--}}
+            {{--    updatePrice({{ $ride->id }});--}}
 
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
-                Toast.fire({
-                    icon: "success",
-                    title: "Price Refreshed"
-                });
-            });
+            {{--    const Toast = Swal.mixin({--}}
+            {{--        toast: true,--}}
+            {{--        position: "top",--}}
+            {{--        showConfirmButton: false,--}}
+            {{--        timer: 3000,--}}
+            {{--        timerProgressBar: true,--}}
+            {{--        didOpen: (toast) => {--}}
+            {{--            toast.onmouseenter = Swal.stopTimer;--}}
+            {{--            toast.onmouseleave = Swal.resumeTimer;--}}
+            {{--        }--}}
+            {{--    });--}}
+            {{--    Toast.fire({--}}
+            {{--        icon: "success",--}}
+            {{--        title: "Price Refreshed"--}}
+            {{--    });--}}
+            {{--});--}}
 
             // Update prices every 60 seconds (optional)
             {{--setInterval(function() {--}}
