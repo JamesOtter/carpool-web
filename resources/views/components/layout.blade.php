@@ -111,8 +111,8 @@
                                         tabindex="-1"
                                     >
                                         <!-- Active: "bg-gray-100 outline-none", Not Active: "" -->
-                                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 outline-none" role="menuitem" tabindex="-1" id="user-menu-item-0">Your Profile</a>
-                                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 outline-none" role="menuitem" tabindex="-1" id="user-menu-item-1">Settings</a>
+{{--                                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 outline-none" role="menuitem" tabindex="-1" id="user-menu-item-0">Your Profile</a>--}}
+{{--                                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 outline-none" role="menuitem" tabindex="-1" id="user-menu-item-1">Settings</a>--}}
                                         <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-500 hover:text-white outline-none" role="menuitem" tabindex="-1" id="user-menu-item-2">Log out</a>
                                     </div>
                                 </div>
