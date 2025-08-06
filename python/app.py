@@ -1,6 +1,8 @@
 # app.py
+from aiohttp.web_middlewares import middleware
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import shutil
 import uuid
 import os
@@ -8,6 +10,15 @@ import cv2
 from ocr_utils import extract_timetable_from_image
 
 app = FastAPI()
+
+# middleware to allow own website to access
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://carpool-web-master-z0hhct.laravel.cloud/"],  # your actual Laravel domain
+    allow_credentials=True,
+    allow_methods=["POST"],  # or limit to ["POST"] if you only need POST
+    allow_headers=["*"],  # or specify allowed headers
+)
 
 UPLOAD_DIR = "./uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
