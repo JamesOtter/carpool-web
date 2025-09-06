@@ -67,5 +67,3 @@ async def ocr_timetable(file: UploadFile = File(...)):
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
 
-
-

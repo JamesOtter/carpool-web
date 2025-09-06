@@ -15,15 +15,24 @@ class ChatbotController extends Controller
      */
     private function getDialogflowAccessToken()
     {
+        //****************** For Laravel Cloud *********************
         // Because of Larvel Cloud newly added
         $base64 = env('GOOGLE_APPLICATION_CREDENTIALS_BASE64');
         $decodedJson = base64_decode($base64);
         $tempPath = storage_path('app/google-temp.json');
         file_put_contents($tempPath, $decodedJson);
+        //****************** For Laravel Cloud *********************
 
         $client = new Google_Client();
+
+        //***************** For Local Testing ***********************
 //        $client->setAuthConfig(storage_path(env('GOOGLE_APPLICATION_CREDENTIALS'))); // Path to your service account file
+        //***************** For Local Testing ***********************
+
+        //****************** For Laravel Cloud *********************
         $client->setAuthConfig($tempPath);
+        //****************** For Laravel Cloud *********************
+
         $client->addScope('https://www.googleapis.com/auth/dialogflow');
 
         $token = $client->fetchAccessTokenWithAssertion();
