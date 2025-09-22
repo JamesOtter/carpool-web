@@ -304,7 +304,7 @@ class TimetableRideController extends Controller
             'file', // Must match FastAPI param name
             file_get_contents($uploadedFile->getRealPath()),
             $uploadedFile->getClientOriginalName()
-        )->post('http://ocrtimetable006.f9fbd3cmd5evgqhb.southeastasia.azurecontainer.io/ocr-timetable');
+        )->post('http://ocrtimetable006.bagefchkhcgcg4ef.southeastasia.azurecontainer.io/ocr-timetable');
 
         if ($response->failed()) {
             throw new \Exception("OCR failed: " . $response->status() . ' ' . $response->body());
